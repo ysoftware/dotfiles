@@ -3,15 +3,20 @@ set ruler
 set rnu
 set number 
 
+set belloff=all
+
 nnoremap <Tab> :bnext<CR>
 nnoremap <S-Tab> :bprevious<CR>
 
-set guifont=Menlo-Regular:h20
 colorscheme onehalflight 
-set background=light
+noremap <C--> :colorscheme onehalflight<CR> 
+noremap <C-=> :colorscheme onehalfdark<CR>
+
+set guifont=Fira\ Code:h12
 
 syntax on
 set autowrite
+set backspace=indent,eol,start
 
 nnoremap <C-d> <C-d>zz 
 nnoremap <C-u> <C-u>zz 
@@ -28,6 +33,8 @@ inoremap <S-up> <Esc>:m .-2<CR>==gi
 vnoremap <S-down> :m '>+1<CR>gv=gv
 vnoremap <S-up> :m '<-2<CR>gv=gv
 
+
 set shiftwidth=4
 set smartindent
 set tabstop=4
+
