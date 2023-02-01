@@ -6,12 +6,12 @@ if has('win33')
 	set belloff=all
 elseif has('mac')
     set path+=~/Documents/ios-pod-mobile-sim/Pod**
+	set macligatures
 endif
 
 set ruler
 set rnu
 set number 
-
 
 nnoremap <Tab> :bnext<CR>
 nnoremap <S-Tab> :bprevious<CR>
@@ -20,7 +20,6 @@ colorscheme onehalflight
 noremap <C-S-Left> :colorscheme onehalflight<CR> 
 noremap <C-S-Right> :colorscheme onehalfdark<CR>
 
-set macligatures
 set guifont=Fira\ Code:h16
 
 syntax on
@@ -47,5 +46,7 @@ set tabstop=4
 set scroll=20
 
 set wildignorecase
+
+
 
 
