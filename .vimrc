@@ -1,8 +1,6 @@
 if has('win32')
 	set path+=.\Documents\GitHub\Lobstard\**
     set backspace=indent,eol,start
-	map <C-I> :py3f .\Documents\GitHub\swift\utils\swift-indent.py<cr>
-	imap <C-I> <c-o>:py3f .\Documents\GitHub\swift\utils\swift-indent.py<cr>
 	set belloff=all
 elseif has('mac')
     set path+=~/Documents/ios-pod-mobile-sim/Pod**
