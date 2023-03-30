@@ -1,11 +1,11 @@
 if has('win32')
-    nnoremap <C-S-up> :e C:\Program Files (x86)\Vim\_vimrc<CR>
+    nnoremap <C-S-up> :e ~\AppData\Local\nvim\.vimrc<CR>
     set path+=.\Documents\GitHub\Lobstard\**
     set backspace=indent,eol,start
     set belloff=all
 
-    nnoremap <C-]> :Files .\Documents\GitHub\<CR>
-    nnoremap <C-p> :AgIn .\Documents\GitHub\<CR>
+    nnoremap <C-]> :Files ~\Documents\GitHub\<CR>
+    nnoremap <C-p> :AgIn ~\Documents\GitHub\<CR>
     nnoremap <C-h> :History<CR>
 elseif has('mac')
     nnoremap <C-S-up> :e ~/.vimrc<CR>
@@ -95,4 +95,5 @@ set shiftwidth=4    " Indents will have a width of 4.
 set softtabstop=4   " Sets the number of columns for a TAB.
 set expandtab       " Expand TABs to spaces.
 set sw=4 
+
 
