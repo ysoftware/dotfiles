@@ -55,9 +55,9 @@ nnoremap <Tab> :bnext<CR>
 nnoremap <S-Tab> :bprevious<CR>
 
 " Adjust color theme
-colorscheme onehalflight 
-noremap <C-S-Left> :colorscheme onehalflight<CR> 
-noremap <C-S-Right> :colorscheme onehalfdark<CR>
+colorscheme onehalfdark
+noremap <C-S-Left> :colorscheme onehalflight<CR><C-l>
+noremap <C-S-Right> :colorscheme onehalfdark<CR><C-l>
 
 " Visual
 set guifont=Fira\ Code:h16
