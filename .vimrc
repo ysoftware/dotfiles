@@ -1,4 +1,4 @@
-
+if has('win32')
     nnoremap <C-S-up> :e ~\Documents\GitHub\vimrc\.vimrc<CR>
     set path+=.\Documents\GitHub\Lobstard\**
     set backspace=indent,eol,start
