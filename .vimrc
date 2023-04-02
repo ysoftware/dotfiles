@@ -8,8 +8,7 @@ if has('win32')
     nnoremap <C-p> :AgIn ~\Documents\GitHub\<CR>
     nnoremap <C-h> :History<CR>
 elseif has('mac')
-    nnoremap <C-S-up> :e ~/.vimrc<CR>
-    set macligatures
+    nnoremap <C-S-up> :e ~/Documents/GitHub/vimrc/.vimrc<CR>
 
     set path+=~/Documents/ios-pod-mobile-sim/Pod/Classes**
     nnoremap <C-]> :Files ~/Documents/ios-pod-mobile-sim/Pod/Classes<CR>
