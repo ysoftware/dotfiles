@@ -1,5 +1,5 @@
-if has('win32')
-    nnoremap <C-S-up> :e ~\AppData\Local\nvim\.vimrc<CR>
+
+    nnoremap <C-S-up> :e ~\Documents\GitHub\vimrc\.vimrc<CR>
     set path+=.\Documents\GitHub\Lobstard\**
     set backspace=indent,eol,start
     set belloff=all
