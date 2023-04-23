@@ -11,8 +11,8 @@ elseif has('mac')
     nnoremap <C-S-up> :e ~/Documents/GitHub/vimrc/.vimrc<CR>
 
     set path+=~/Documents/ios-pod-mobile-sim/Pod/Classes**
-    nnoremap <C-]> :Files ~/Documents/ios-pod-mobile-sim/Pod/Classes<CR>
-    nnoremap <C-p> :AgIn ~/Documents/ios-pod-mobile-sim/Pod/Classes<CR>
+    nnoremap <C-]> :Files ~/Documents/ios-pod-mobile-sim/Pod<CR>
+    nnoremap <C-p> :AgIn ~/Documents/ios-pod-mobile-sim/Pod<CR>
     nnoremap <C-h> :History<CR>
 endif
 
@@ -20,7 +20,7 @@ endif
 command! -bang -nargs=+ -complete=dir Files
 	\ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'options': [
 	\	'--reverse', '-i', '--info=inline', '--keep-right'
-	\ ]}, 'right:70%'), <bang>0)
+	\ ]}, 'right:40%'), <bang>0)
 
 
 " Search in files (Ag)
@@ -58,6 +58,12 @@ colorscheme onehalfdark
 noremap <C-S-Left> :colorscheme onehalflight<CR><C-l>
 noremap <C-S-Right> :colorscheme onehalfdark<CR><C-l>
 
+" Copy paste stuff
+noremap p "+p
+noremap P "+P
+noremap y "+y
+noremap Y "+Y
+
 " Visual
 set guifont=Fira\ Code:h16
 syntax on
@@ -69,6 +75,7 @@ set scroll=20
 set wildignorecase
 
 " Search and center
+vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
 nnoremap <C-d> <C-d>zz 
 nnoremap <C-u> <C-u>zz 
 nnoremap n nzzzv
