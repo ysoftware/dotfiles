@@ -1,29 +1,20 @@
+" Setup File Search
 if has('win32')
     nnoremap <C-S-up> :e ~\Documents\GitHub\vimrc\.vimrc<CR>
-    set path+=.\Documents\GitHub\Lobstard\**
-    set backspace=indent,eol,start
-    set belloff=all
-
     nnoremap <C-]> :Files ~\Documents\GitHub\<CR>
     nnoremap <C-p> :AgIn ~\Documents\GitHub\<CR>
     nnoremap <C-h> :History<CR>
 elseif has('mac')
     nnoremap <C-S-up> :e ~/Documents/GitHub/vimrc/.vimrc<CR>
-
-    set path+=~/Documents/ios-pod-mobile-sim/Pod/Classes**
-    nnoremap <C-]> :Files ~/Documents/ios-pod-mobile-sim/Pod<CR>
-    nnoremap <C-p> :AgIn ~/Documents/ios-pod-mobile-sim/Pod<CR>
+    nnoremap <C-]> :Files ~/Documents/ios-pod-mobile-sim<CR>
+    nnoremap <C-p> :AgIn ~/Documents/ios-pod-mobile-sim<CR>
     nnoremap <C-h> :History<CR>
 endif
 
-" Search (Files)
 command! -bang -nargs=+ -complete=dir Files
 	\ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'options': [
 	\	'--reverse', '-i', '--info=inline', '--keep-right'
 	\ ]}, 'right:40%'), <bang>0)
-
-
-" Search in files (Ag)
 function! s:ag_in(bang, ...)
     call fzf#vim#ag(join(a:000[1:], ' '), fzf#vim#with_preview({'dir': expand(a:1), 'options': [
 		\ '--reverse', '-i', '--info=inline', '--keep-right'
@@ -31,18 +22,21 @@ function! s:ag_in(bang, ...)
 endfunction
 command! -bang -nargs=+ -complete=dir AgIn call s:ag_in(<bang>0, <f-args>)
 
-" Plugins for mac
+" Setup Plugin Manager
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
 if empty(glob(data_dir . '/autoload/plug.vim'))
   silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
+" List of installed plugins
 call plug#begin('~/.local/share/nvim/plugged')
+
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'dense-analysis/ale'
 Plug 'github/copilot.vim'
+
 call plug#end()
 
 " Plugins set up
@@ -73,6 +67,11 @@ set number
 set autowrite
 set scroll=20
 set wildignorecase
+
+if has('win32')
+set backspace=indent,eol,start
+set belloff=all
+endif
 
 " Search and center
 vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
