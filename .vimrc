@@ -42,18 +42,28 @@ call plug#begin('~/.local/share/nvim/plugged')
 
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
-Plug 'dense-analysis/ale'
 Plug 'github/copilot.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'itchyny/lightline.vim'
 Plug 'mhinz/vim-startify'
 Plug 'mg979/vim-visual-multi', {'branch': 'master'}
+Plug 'airblade/vim-gitgutter'
+
+Plug 'dense-analysis/ale'
+Plug 'vim-syntastic/syntastic'
+Plug 'keith/swift.vim'
 
 call plug#end()
 
-" Plugins set up
+" Setup ale
 let g:ale_completion_enabled = 1
 let g:ale_linters = {'swift': []}
+
+" Setup syntactic
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
 
 " Switch tabs
 nnoremap <Tab> :bnext<CR>
@@ -70,6 +80,7 @@ let g:lightline = { 'colorscheme': 'one',
       \   },
       \ }
 set noshowmode
+
 
 " Adjust color theme
 colorscheme onehalfdark
