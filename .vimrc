@@ -37,6 +37,7 @@ Plug 'junegunn/fzf.vim'
 Plug 'dense-analysis/ale'
 Plug 'github/copilot.vim'
 Plug 'tpope/vim-fugitive'
+Plug 'itchyny/lightline.vim'
 
 call plug#end()
 
@@ -47,6 +48,10 @@ let g:ale_linters = {'swift': []}
 " Switch tabs
 nnoremap <Tab> :bnext<CR>
 nnoremap <S-Tab> :bprevious<CR>
+
+" Setup status line
+let g:lightline = { 'colorscheme': 'one' }
+set noshowmode
 
 " Adjust color theme
 colorscheme onehalfdark
