@@ -36,6 +36,7 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'dense-analysis/ale'
 Plug 'github/copilot.vim'
+Plug 'tpope/vim-fugitive'
 
 call plug#end()
 
@@ -80,7 +81,7 @@ nnoremap <C-u> <C-u>zz
 nnoremap n nzzzv
 nnoremap N Nzzzv
 
-imap jk <Esc>
+imap jk <Esc>:cd %:p:h<CR>
 
 " Move lines
 nnoremap <S-down> :m .+1<CR>==
@@ -100,5 +101,4 @@ set shiftwidth=4    " Indents will have a width of 4.
 set softtabstop=4   " Sets the number of columns for a TAB.
 set expandtab       " Expand TABs to spaces.
 set sw=4 
-
 
