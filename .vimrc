@@ -1,3 +1,11 @@
+" TODO
+" fix file search previews on Windows
+" fix auto-identation in C#, Swift files
+" Swift LSP support
+" Swift autocomplete
+" Comment lines of code (vim-commentary)
+"
+
 " Setup File Search
 if has('win32')
     nnoremap <C-S-up> :e ~\Documents\GitHub\vimrc\.vimrc<CR>
@@ -38,6 +46,8 @@ Plug 'dense-analysis/ale'
 Plug 'github/copilot.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'itchyny/lightline.vim'
+Plug 'mhinz/vim-startify'
+Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 
 call plug#end()
 
