@@ -4,7 +4,6 @@
 " Swift LSP support
 " Swift autocomplete
 " Comment lines of code (vim-commentary)
-"
 
 " Setup File Search
 if has('win32')
@@ -42,34 +41,63 @@ call plug#begin('~/.local/share/nvim/plugged')
 
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
-Plug 'github/copilot.vim'
-Plug 'tpope/vim-fugitive'
-Plug 'itchyny/lightline.vim'
-Plug 'mhinz/vim-startify'
-Plug 'mg979/vim-visual-multi', {'branch': 'master'}
-Plug 'airblade/vim-gitgutter'
 
-Plug 'dense-analysis/ale'
-Plug 'vim-syntastic/syntastic'
-Plug 'keith/swift.vim'
+" LSP
+Plug 'prabirshrestha/async.vim'
+Plug 'prabirshrestha/vim-lsp'
+
+Plug 'keith/swift.vim' " Swift support
+Plug 'github/copilot.vim'
+Plug 'tpope/vim-fugitive' " Git
+Plug 'itchyny/lightline.vim' " Status line
+Plug 'mhinz/vim-startify' " Startup screen
+Plug 'airblade/vim-gitgutter' " Git diffs
 
 call plug#end()
 
-" Setup ale
-let g:ale_completion_enabled = 1
-let g:ale_linters = {'swift': []}
+" SourceKit-LSP configuration
+if executable('sourcekit-lsp')
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'sourcekit-lsp',
+        \ 'cmd': {server_info->['sourcekit-lsp']},
+        \ 'whitelist': ['swift'],
+        \ })
+endif
 
-" Setup syntactic
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
+" vim-lsp setup
+function! s:on_lsp_buffer_enabled() abort
+    setlocal omnifunc=lsp#complete
+    setlocal signcolumn=yes
+    if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
+    nmap <buffer> gd <plug>(lsp-definition)
+    nmap <buffer> gs <plug>(lsp-document-symbol-search)
+    nmap <buffer> gS <plug>(lsp-workspace-symbol-search)
+    nmap <buffer> gr <plug>(lsp-references)
+    nmap <buffer> gi <plug>(lsp-implementation)
+    nmap <buffer> gt <plug>(lsp-type-definition)
+    nmap <buffer> <leader>rn <plug>(lsp-rename)
+    nmap <buffer> [g <plug>(lsp-previous-diagnostic)
+    nmap <buffer> ]g <plug>(lsp-next-diagnostic)
+    nmap <buffer> K <plug>(lsp-hover)
+    nnoremap <buffer> <expr><c-f> lsp#scroll(+4)
+    nnoremap <buffer> <expr><c-d> lsp#scroll(-4)
+
+    let g:lsp_format_sync_timeout = 1000
+    autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
+    
+    " refer to doc to add more commands
+endfunction
+
+" Setup gitgutter
+nmap ]h <Plug>(GitGutterNextHunk)
+nmap [h <Plug>(GitGutterPrevHunk)
 
 " Switch tabs
 nnoremap <Tab> :bnext<CR>
 nnoremap <S-Tab> :bprevious<CR>
 
-" Setup status line
+" Setup lightline
+set noshowmode
 let g:lightline = { 'colorscheme': 'one', 
       \   'active': {
       \     'left': [ [ 'mode', 'paste' ],
@@ -79,8 +107,6 @@ let g:lightline = { 'colorscheme': 'one',
       \     'gitbranch': 'FugitiveHead'
       \   },
       \ }
-set noshowmode
-
 
 " Adjust color theme
 colorscheme onehalfdark
@@ -93,7 +119,7 @@ noremap P "+P
 noremap y "+y
 noremap Y "+Y
 
-" Visual
+" Visuals
 set guifont=Fira\ Code:h16
 syntax on
 set ruler
@@ -104,8 +130,8 @@ set scroll=20
 set wildignorecase
 
 if has('win32')
-set backspace=indent,eol,start
-set belloff=all
+    set backspace=indent,eol,start
+    set belloff=all
 endif
 
 " Search and center
@@ -135,4 +161,3 @@ set shiftwidth=4    " Indents will have a width of 4.
 set softtabstop=4   " Sets the number of columns for a TAB.
 set expandtab       " Expand TABs to spaces.
 set sw=4 
-
