@@ -1,4 +1,6 @@
 " TODO
+" Peek here: https://github.com/rluba/neovim-config/blob/master/init.vim
+" https://github.com/preservim/nerdtree
 " fix file search previews on Windows
 " fix auto-identation in C#, Swift files
 " Swift LSP support
