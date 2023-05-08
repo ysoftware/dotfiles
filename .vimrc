@@ -122,7 +122,7 @@ noremap y "+y
 noremap Y "+Y
 
 " Visuals
-set guifont=Fira\ Code:h16
+set guifont=Fira_Code_Retina:h16
 syntax on
 set ruler
 set rnu
