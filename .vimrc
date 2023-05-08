@@ -136,8 +136,12 @@ if has('win32')
     set belloff=all
 endif
 
-" Search and center
+" Search
 vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
+
+" Navigation
+noremap } <Cmd>call search('^\s*$\\|\%$', 'W')<CR>
+noremap { <Cmd>call search('^\s*$\\|\%^', 'Wb')<CR>
 nnoremap <C-d> <C-d>zz 
 nnoremap <C-u> <C-u>zz 
 nnoremap n nzzzv
