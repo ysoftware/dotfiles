@@ -1,10 +1,7 @@
 " TODO
 " Peek here: https://github.com/rluba/neovim-config/blob/master/init.vim
-" https://github.com/preservim/nerdtree
 " fix file search previews on Windows
 " fix auto-identation in C#, Swift files
-" Swift LSP support
-" Swift autocomplete
 
 " Setup File Search
 if has('win32')
@@ -54,6 +51,7 @@ Plug 'itchyny/lightline.vim' " Status line
 Plug 'mhinz/vim-startify' " Startup screen
 Plug 'airblade/vim-gitgutter' " Git diffs
 Plug 'tpope/vim-commentary' " Comment lines of code
+Plug 'preservim/nerdtree' " Project tree
 
 call plug#end()
 
@@ -67,6 +65,13 @@ if executable('sourcekit-lsp')
 endif
 
 " vim-lsp setup
+if executable('sourcekit-lsp')
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'sourcekit-lsp',
+        \ 'cmd': {server_info->['sourcekit-lsp']},
+        \ 'whitelist': ['swift'],
+        \ })
+endif
 function! s:on_lsp_buffer_enabled() abort
     setlocal omnifunc=lsp#complete
     setlocal signcolumn=yes
@@ -81,14 +86,16 @@ function! s:on_lsp_buffer_enabled() abort
     nmap <buffer> [g <plug>(lsp-previous-diagnostic)
     nmap <buffer> ]g <plug>(lsp-next-diagnostic)
     nmap <buffer> K <plug>(lsp-hover)
-    nnoremap <buffer> <expr><c-f> lsp#scroll(+4)
-    nnoremap <buffer> <expr><c-d> lsp#scroll(-4)
-
     let g:lsp_format_sync_timeout = 1000
     autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
-    
-    " refer to doc to add more commands
 endfunction
+augroup lsp_install
+    au!
+    autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+augroup END
+augroup filetype
+  au! BufRead,BufNewFile *.swift set ft=swift
+augroup END
 
 " Setup gitgutter
 nmap ]h <Plug>(GitGutterNextHunk)
@@ -97,6 +104,12 @@ nmap [h <Plug>(GitGutterPrevHunk)
 " Switch tabs
 nnoremap <Tab> :bnext<CR>
 nnoremap <S-Tab> :bprevious<CR>
+
+" Nerd tree
+nnoremap <leader>n :NERDTreeFocus<CR>
+nnoremap <C-n> :NERDTree<CR>
+nnoremap <C-t> :NERDTreeToggle<CR>
+nnoremap <C-f> :NERDTreeFind<CR>
 
 " Setup lightline
 set noshowmode
