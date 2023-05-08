@@ -5,7 +5,6 @@
 " fix auto-identation in C#, Swift files
 " Swift LSP support
 " Swift autocomplete
-" Comment lines of code (vim-commentary)
 
 " Setup File Search
 if has('win32')
@@ -54,6 +53,7 @@ Plug 'tpope/vim-fugitive' " Git
 Plug 'itchyny/lightline.vim' " Status line
 Plug 'mhinz/vim-startify' " Startup screen
 Plug 'airblade/vim-gitgutter' " Git diffs
+Plug 'tpope/vim-commentary' " Comment lines of code
 
 call plug#end()
 
