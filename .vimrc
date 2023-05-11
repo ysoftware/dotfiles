@@ -43,7 +43,7 @@ Plug 'junegunn/fzf.vim'
 " LSP
 Plug 'prabirshrestha/async.vim'
 Plug 'prabirshrestha/vim-lsp'
-
+Plug 'Mofiqul/vscode.nvim'
 Plug 'keith/swift.vim' " Swift support
 Plug 'github/copilot.vim'
 Plug 'tpope/vim-fugitive' " Git
@@ -124,9 +124,11 @@ let g:lightline = { 'colorscheme': 'one',
       \ }
 
 " Adjust color theme
-colorscheme onehalfdark
-noremap <C-S-Left> :colorscheme onehalflight<CR><C-l>
-noremap <C-S-Right> :colorscheme onehalfdark<CR><C-l>
+colorscheme vscode
+" noremap <C-S-Left> :colorscheme onehalflight<CR><C-l>
+" noremap <C-S-Right> :colorscheme onehalfdark<CR><C-l>
+noremap <C-S-Right> :set background=light<CR><C-l>
+noremap <C-S-Left> :set background=dark<CR><C-l>
 
 " Copy paste stuff
 noremap p "+p
@@ -169,6 +171,10 @@ inoremap <S-down> <Esc>:m .+1<CR>==gi
 inoremap <S-up> <Esc>:m .-2<CR>==gi
 vnoremap <S-down> :m '>+1<CR>gv=gv
 vnoremap <S-up> :m '<-2<CR>gv=gv
+
+" Tab lines
+vnoremap < <gv
+vnoremap > >gv
 
 " Tabs and shit
 filetype plugin indent on
