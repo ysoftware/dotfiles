@@ -1,7 +1,6 @@
 " TODO
 " Peek here: https://github.com/rluba/neovim-config/blob/master/init.vim
 " fix file search previews on Windows
-" fix auto-identation in C#, Swift files
 
 " Setup File Search
 if has('win32')
