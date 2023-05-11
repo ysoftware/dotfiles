@@ -123,10 +123,8 @@ let g:lightline = { 'colorscheme': 'one',
       \   },
       \ }
 
-" Adjust color theme
 colorscheme vscode
-" noremap <C-S-Left> :colorscheme onehalflight<CR><C-l>
-" noremap <C-S-Right> :colorscheme onehalfdark<CR><C-l>
+set background=dark
 noremap <C-S-Right> :set background=light<CR><C-l>
 noremap <C-S-Left> :set background=dark<CR><C-l>
 
