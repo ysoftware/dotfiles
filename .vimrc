@@ -4,17 +4,16 @@
 
 " Setup File Search
 if has('win32')
-    nnoremap <C-S-up> :e ~\Documents\GitHub\vimrc\.vimrc<CR>
+    nnoremap <C-S-up> :tabnew ~\Documents\GitHub\vimrc\.vimrc<CR>
     nnoremap <C-]> :Files ~\Documents\GitHub\<CR>
     nnoremap <C-p> :AgIn ~\Documents\GitHub\<CR>
     nnoremap <C-h> :History<CR>
 elseif has('mac')
-    nnoremap <C-S-up> :e ~/Documents/GitHub/vimrc/.vimrc<CR>
+    nnoremap <C-S-up> :tabnew ~/Documents/GitHub/vimrc/.vimrc<CR>
     nnoremap <C-]> :Files ~/Documents/ios-pod-mobile-sim<CR>
     nnoremap <C-p> :AgIn ~/Documents/ios-pod-mobile-sim<CR>
     nnoremap <C-h> :History<CR>
 endif
-
 command! -bang -nargs=+ -complete=dir Files
 	\ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'options': [
 	\	'--reverse', '-i', '--info=inline', '--keep-right'
@@ -63,6 +62,9 @@ if executable('sourcekit-lsp')
         \ })
 endif
 
+" Disable Copilot by default
+let g:copilot_enabled = v:false
+
 " vim-lsp setup
 if executable('sourcekit-lsp')
     au User lsp_setup call lsp#register_server({
@@ -95,20 +97,6 @@ augroup END
 augroup filetype
   au! BufRead,BufNewFile *.swift set ft=swift
 augroup END
-
-" Setup gitgutter
-nmap ]h <Plug>(GitGutterNextHunk)
-nmap [h <Plug>(GitGutterPrevHunk)
-
-" Switch tabs
-nnoremap <Tab> :bnext<CR>
-nnoremap <S-Tab> :bprevious<CR>
-
-" Nerd tree
-nnoremap <leader>n :NERDTreeFocus<CR>
-nnoremap <C-n> :NERDTree<CR>
-nnoremap <C-t> :NERDTreeToggle<CR>
-nnoremap <C-f> :NERDTreeFind<CR>
 
 " Setup lightline
 set noshowmode
@@ -152,14 +140,41 @@ endif
 vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
 
 " Navigation
-noremap } <Cmd>call search('^\s*$\\|\%$', 'W')<CR>
-noremap { <Cmd>call search('^\s*$\\|\%^', 'Wb')<CR>
 nnoremap <C-d> <C-d>zz 
 nnoremap <C-u> <C-u>zz 
 nnoremap n nzzzv
 nnoremap N Nzzzv
 
+" Jump to next empty line
+noremap } <Cmd>call search('^\s*$\\|\%$', 'W')<CR>
+noremap { <Cmd>call search('^\s*$\\|\%^', 'Wb')<CR>
+
+" Jump to next git change
+nmap ]h <Plug>(GitGutterNextHunk)zz
+nmap [h <Plug>(GitGutterPrevHunk)zz
+
+" Create new tab
+nnoremap <leader>' :tabnew<CR>
+nnoremap <leader>q :bd<CR>
+
+" Switch tabs and buffers
+nnoremap <Tab> :tabnext<CR>
+nnoremap <S-Tab> :tabprevious<CR>
+nnoremap § :bnext<CR>
+nnoremap ± :bprevious<CR>
+
+" Funny command to quit insert mode without escape
 imap jk <Esc>:cd %:p:h<CR>
+
+" Tab lines
+vnoremap < <gv
+vnoremap > >gv
+
+" Nerd tree
+nnoremap <leader>n :NERDTreeFocus<CR>
+nnoremap <C-n> :NERDTree<CR>
+nnoremap <C-t> :NERDTreeToggle<CR>
+nnoremap <C-f> :NERDTreeFind<CR>
 
 " Move lines
 nnoremap <S-down> :m .+1<CR>==
@@ -168,10 +183,6 @@ inoremap <S-down> <Esc>:m .+1<CR>==gi
 inoremap <S-up> <Esc>:m .-2<CR>==gi
 vnoremap <S-down> :m '>+1<CR>gv=gv
 vnoremap <S-up> :m '<-2<CR>gv=gv
-
-" Tab lines
-vnoremap < <gv
-vnoremap > >gv
 
 " Tabs and shit
 filetype plugin indent on
