@@ -178,6 +178,9 @@ nnoremap <C-n> :NERDTree<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
 nnoremap <C-f> :NERDTreeFind<CR>
 
+" Prettify json (depends on installed jq)
+command! Prettify :%!jq .
+
 " Move lines
 nnoremap <S-down> :m .+1<CR>==
 nnoremap <S-up> :m .-2<CR>==
