@@ -14,6 +14,8 @@ elseif has('mac')
     nnoremap <C-p> :AgIn ~/Documents/ios-pod-mobile-sim<CR>
     nnoremap <C-h> :History<CR>
 endif
+
+let g:fzf_history_dir = '~/.local/share/fzf-history'
 command! -bang -nargs=+ -complete=dir Files
 	\ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'options': [
 	\	'--reverse', '-i', '--info=inline', '--keep-right'
