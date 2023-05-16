@@ -41,17 +41,17 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 
 " LSP
-Plug 'prabirshrestha/async.vim'
-Plug 'prabirshrestha/vim-lsp'
-Plug 'Mofiqul/vscode.nvim'
 Plug 'keith/swift.vim' " Swift support
-Plug 'github/copilot.vim'
 Plug 'tpope/vim-fugitive' " Git
 Plug 'itchyny/lightline.vim' " Status line
 Plug 'mhinz/vim-startify' " Startup screen
 Plug 'airblade/vim-gitgutter' " Git diffs
 Plug 'tpope/vim-commentary' " Comment lines of code
 Plug 'preservim/nerdtree' " Project tree
+Plug 'prabirshrestha/async.vim'
+Plug 'prabirshrestha/vim-lsp'
+Plug 'Mofiqul/vscode.nvim'
+Plug 'github/copilot.vim'
 
 call plug#end()
 
@@ -140,6 +140,8 @@ endif
 
 " Search
 vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
+nnoremap <leader>p *ve"+y:exe 'AgIn ~/Documents/ios-pod-mobile-sim ' . @+<CR>
+vnoremap <leader>p "+y:exe 'AgIn ~/Documents/ios-pod-mobile-sim ' . @+<CR>
 
 " Navigation
 nnoremap <C-d> <C-d>zz 
