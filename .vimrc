@@ -124,7 +124,12 @@ noremap y "+y
 noremap Y "+Y
 
 " Visuals
-set guifont=Fira_Code_Retina:h16
+if has('win32')
+    set guifont=Fira\ Code:h16
+else
+    set guifont=Fira_Code_Retina:h16
+endif
+
 syntax on
 set ruler
 set rnu
