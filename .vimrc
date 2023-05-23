@@ -16,6 +16,7 @@ elseif has('mac')
 endif
 
 let g:fzf_history_dir = '~/.local/share/fzf-history'
+let g:fzf_action = { 'enter': 'tab split' }
 command! -bang -nargs=+ -complete=dir Files
 	\ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'options': [
 	\	'--reverse', '-i', '--info=inline', '--keep-right'
@@ -54,6 +55,10 @@ Plug 'Mofiqul/vscode.nvim'
 Plug 'github/copilot.vim'
 
 call plug#end()
+
+" Setup nerd tree
+let NERDTreeShowHidden=1
+let NERDTreeCustomOpenArgs={'file':{'where': 't'}}
 
 " SourceKit-LSP configuration
 if executable('sourcekit-lsp')
@@ -205,4 +210,13 @@ set tabstop=4       " The width of a TAB is set to 4.
 set shiftwidth=4    " Indents will have a width of 4.
 set softtabstop=4   " Sets the number of columns for a TAB.
 set expandtab       " Expand TABs to spaces.
-set sw=4 
+set sw=4
+
+" Build xcode project
+function! ReRunLastFileCommand()
+  if exists("g:vim_terminal") && exists("g:last_run_in_terminal")
+    call RunInTerminal(g:last_run_in_terminal)
+  endif
+endfunction
+command! Xb :!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript
+nnoremap <C-b> :Xb<CR><CR>
