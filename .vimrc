@@ -132,7 +132,12 @@ noremap y "+y
 noremap Y "+Y
 
 " Visuals
-set guifont=Fira_Code_Retina:h16
+if has('win32')
+    set guifont=Fira\ Code:h15
+else
+    set guifont=Fira_Code_Retina:h16
+endif
+
 syntax on
 set ruler
 set rnu
@@ -211,10 +216,12 @@ set expandtab       " Expand TABs to spaces.
 set sw=4
 
 " Build xcode project
-function! ReRunLastFileCommand()
-  if exists("g:vim_terminal") && exists("g:last_run_in_terminal")
-    call RunInTerminal(g:last_run_in_terminal)
-  endif
-endfunction
-command! Xb :!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript
-nnoremap <C-b> :Xb<CR><CR>
+if has('mac')
+    function! ReRunLastFileCommand()
+      if exists("g:vim_terminal") && exists("g:last_run_in_terminal")
+        call RunInTerminal(g:last_run_in_terminal)
+      endif
+    endfunction
+    command! Xb :!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript
+    nnoremap <C-b> :Xb<CR><CR>
+endif
