@@ -1,6 +1,8 @@
 " TODO
 " Peek here: https://github.com/rluba/neovim-config/blob/master/init.vim
 " fix file search previews on Windows
+" Don't open new tab for vimrc if it's open, activate it
+" We jump with <C-u> 1 line less the first time than <C-d>
 
 " Setup File Search
 if has('win32')
@@ -43,6 +45,7 @@ Plug 'junegunn/fzf.vim'
 
 " LSP
 Plug 'keith/swift.vim' " Swift support
+Plug 'jansedivy/jai.vim' " Jai support
 Plug 'tpope/vim-fugitive' " Git
 Plug 'itchyny/lightline.vim' " Status line
 Plug 'mhinz/vim-startify' " Startup screen
@@ -135,7 +138,7 @@ set ruler
 set rnu
 set number 
 set autowrite
-set scroll=20
+set scroll=15
 set wildignorecase
 
 if has('win32')

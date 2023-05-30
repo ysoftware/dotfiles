@@ -1,6 +1,7 @@
 tell application "Xcode"
-    set targetProject to active workspace document
-    if (build targetProject) is equal to "Build succeeded" then
-        launch targetProject
-    end if
+	set targetProject to active workspace document
+
+	tell targetProject
+		debug
+	end tell
 end tell
