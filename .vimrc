@@ -7,12 +7,12 @@
 " Setup File Search
 if has('win32')
     nnoremap <C-S-up> :tabnew ~\Documents\GitHub\vimrc\.vimrc<CR>
-    nnoremap <C-]> :Files ~\Documents\GitHub\<CR>
+    nnoremap <C-]> :Files ~\Documents\<CR>
     nnoremap <C-p> :AgIn ~\Documents\GitHub\<CR>
     nnoremap <C-h> :History<CR>
 elseif has('mac')
     nnoremap <C-S-up> :tabnew ~/Documents/GitHub/vimrc/.vimrc<CR>
-    nnoremap <C-]> :Files ~/Documents/ios-pod-mobile-sim<CR>
+    nnoremap <C-]> :Files ~/Documents/<CR>
     nnoremap <C-p> :AgIn ~/Documents/ios-pod-mobile-sim<CR>
     nnoremap <C-h> :History<CR>
 endif
@@ -153,8 +153,14 @@ endif
 
 " Search
 vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
-nnoremap <leader>p *ve"+y:exe 'AgIn ~/Documents/ios-pod-mobile-sim ' . @+<CR>
-vnoremap <leader>p "+y:exe 'AgIn ~/Documents/ios-pod-mobile-sim ' . @+<CR>
+
+if has('win32') " TODO: fix windows commands
+    " nnoremap <leader>p *ve"+y:exe 'AgIn ~\Documents\ ' . @+<CR>
+    " vnoremap <leader>p "+y:exe 'AgIn ~\Documents\ ' . @+<CR>
+else
+    nnoremap <leader>p *ve"+y:exe 'AgIn ~/Documents/ios-pod-mobile-sim ' . @+<CR>
+    vnoremap <leader>p "+y:exe 'AgIn ~/Documents/ios-pod-mobile-sim ' . @+<CR>
+endif
 
 " Navigation
 nnoremap <C-d> <C-d>zz 
