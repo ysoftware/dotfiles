@@ -183,7 +183,6 @@ nnoremap <leader>q :bd<CR>
 nnoremap <Tab> :tabnext<CR>
 nnoremap <S-Tab> :tabprevious<CR>
 nnoremap § :bnext<CR>
-nnoremap ` :bnext<CR>
 nnoremap ± :bprevious<CR>
 
 " Funny command to quit insert mode without escape
