@@ -13,7 +13,7 @@ if has('win32')
 elseif has('mac')
     nnoremap <C-S-up> :tabnew ~/Documents/GitHub/vimrc/.vimrc<CR>
     nnoremap <C-]> :Files ~/Documents/<CR>
-    nnoremap <C-p> :AgIn ~/Documents/ios-pod-mobile-sim<CR>
+    nnoremap <C-p> :AgIn ~/Documents/<CR>
     nnoremap <C-h> :History<CR>
 endif
 
@@ -55,7 +55,6 @@ Plug 'preservim/nerdtree' " Project tree
 Plug 'prabirshrestha/async.vim'
 Plug 'prabirshrestha/vim-lsp'
 Plug 'Mofiqul/vscode.nvim'
-Plug 'github/copilot.vim'
 
 call plug#end()
 
@@ -184,6 +183,7 @@ nnoremap <leader>q :bd<CR>
 nnoremap <Tab> :tabnext<CR>
 nnoremap <S-Tab> :tabprevious<CR>
 nnoremap § :bnext<CR>
+nnoremap ` :bnext<CR>
 nnoremap ± :bprevious<CR>
 
 " Funny command to quit insert mode without escape
