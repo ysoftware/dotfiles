@@ -152,6 +152,7 @@ if has('win32')
 endif
 
 " Search
+let g:searchindex_line_limit=2000000
 vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
 nnoremap <leader>p *ve"+y:exe 'AgIn ~/Documents/ios-pod-mobile-sim ' . @+<CR>
 vnoremap <leader>p "+y:exe 'AgIn ~/Documents/ios-pod-mobile-sim ' . @+<CR>
