@@ -4,6 +4,13 @@
 " Don't open new tab for vimrc if it's open, activate it
 " We jump with <C-u> 1 line less the first time than <C-d>
 
+" Snippets
+if has('mac')
+    :ab ws [weak self] in<Left><Left><Left>
+    :ab gl guard let self else { return }
+    :ab si .store(in: &subscribers)
+endif
+ 
 " Setup File Search
 if has('win32')
     nnoremap <C-S-up> :tabnew ~\Documents\GitHub\vimrc\.vimrc<CR>
@@ -63,13 +70,13 @@ let NERDTreeShowHidden=1
 let NERDTreeCustomOpenArgs={'file':{'where': 't'}}
 
 " SourceKit-LSP configuration
-if executable('sourcekit-lsp')
-    au User lsp_setup call lsp#register_server({
-        \ 'name': 'sourcekit-lsp',
-        \ 'cmd': {server_info->['sourcekit-lsp']},
-        \ 'whitelist': ['swift'],
-        \ })
-endif
+" if executable('sourcekit-lsp')
+"     au User lsp_setup call lsp#register_server({
+"         \ 'name': 'sourcekit-lsp',
+"         \ 'cmd': {server_info->['sourcekit-lsp']},
+"         \ 'whitelist': ['swift'],
+"         \ })
+" endif
 
 " Disable Copilot by default
 let g:copilot_enabled = v:false
@@ -157,8 +164,8 @@ if has('win32') " TODO: fix windows commands
     " nnoremap <leader>p *ve"+y:exe 'AgIn ~\Documents\ ' . @+<CR>
     " vnoremap <leader>p "+y:exe 'AgIn ~\Documents\ ' . @+<CR>
 else
-    nnoremap <leader>p *ve"+y:exe 'AgIn ~/Documents/ios-pod-mobile-sim ' . @+<CR>
-    vnoremap <leader>p "+y:exe 'AgIn ~/Documents/ios-pod-mobile-sim ' . @+<CR>
+    nnoremap <leader>p *ve"+y:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @+<CR>
+    vnoremap <leader>p "+y:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @+<CR>
 endif
 
 " Navigation
@@ -183,6 +190,7 @@ nnoremap <leader>q :bd<CR>
 nnoremap <Tab> :tabnext<CR>
 nnoremap <S-Tab> :tabprevious<CR>
 nnoremap § :bnext<CR>
+nnoremap ` :bnext<CR>
 nnoremap ± :bprevious<CR>
 
 " Funny command to quit insert mode without escape
