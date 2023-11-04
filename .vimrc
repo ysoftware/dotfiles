@@ -158,6 +158,7 @@ if has('win32')
 endif
 
 " Search
+let g:searchindex_line_limit=2000000
 vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
 
 if has('win32') " TODO: fix windows commands
