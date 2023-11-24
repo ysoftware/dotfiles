@@ -15,7 +15,7 @@ endif
 if has('win32')
     nnoremap <C-S-up> :tabnew ~\Documents\GitHub\vimrc\.vimrc<CR>
     nnoremap <C-]> :Files ~\Documents\<CR>
-    nnoremap <C-p> :AgIn ~\Documents\GitHub\<CR>
+    nnoremap <C-p> :AgIn ~\Documents\<CR>
     nnoremap <C-h> :History<CR>
 elseif has('mac')
     nnoremap <C-S-up> :tabnew ~/Documents/GitHub/vimrc/.vimrc<CR>
@@ -170,8 +170,8 @@ else
 endif
 
 " Navigation
-nnoremap <C-d> <C-d>zz 
-nnoremap <C-u> <C-u>zz 
+" nnoremap <C-d> <C-d>zz 
+" nnoremap <C-u> <C-u>zz 
 nnoremap n nzzzv
 nnoremap N Nzzzv
 
