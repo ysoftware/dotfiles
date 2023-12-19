@@ -26,10 +26,14 @@ endif
 
 let g:fzf_history_dir = '~/.local/share/fzf-history'
 let g:fzf_action = { 'enter': 'tab split' }
+
+" Files setup
 command! -bang -nargs=+ -complete=dir Files
 	\ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'options': [
 	\	'--reverse', '-i', '--info=inline', '--keep-right'
 	\ ]}, 'right:40%'), <bang>0)
+
+" AgIn setup
 function! s:ag_in(bang, ...)
     call fzf#vim#ag(join(a:000[1:], ' '), fzf#vim#with_preview({'dir': expand(a:1), 'options': [
 		\ '--reverse', '-i', '--info=inline', '--keep-right'
