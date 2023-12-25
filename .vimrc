@@ -13,9 +13,9 @@ endif
  
 " Setup File Search
 if has('win32')
-    nnoremap <C-S-up> :tabnew ~\Documents\GitHub\vimrc\.vimrc<CR>
-    nnoremap <C-]> :Files ~\Documents\<CR>
-    nnoremap <C-p> :AgIn ~\Documents\<CR>
+    nnoremap <C-S-up> :tabnew D:\Documents\GitHub\vimrc\.vimrc<CR>
+    nnoremap <C-]> :Files D:\Documents\<CR>
+    nnoremap <C-p> :AgIn D:\Documents\<CR>
     nnoremap <C-h> :History<CR>
 elseif has('mac')
     nnoremap <C-S-up> :tabnew ~/Documents/GitHub/vimrc/.vimrc<CR>
@@ -148,18 +148,18 @@ else
     set guifont=Fira_Code_Retina:h16
 endif
 
+if has('win32')
+    set backspace=indent,eol,start
+    set belloff=all
+endif
+
 syntax on
 set ruler
 set rnu
 set number 
 set autowrite
-set scroll=15
 set wildignorecase
-
-if has('win32')
-    set backspace=indent,eol,start
-    set belloff=all
-endif
+set scroll=15
 
 " Search
 let g:searchindex_line_limit=2000000
