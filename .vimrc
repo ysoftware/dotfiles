@@ -14,8 +14,8 @@ endif
 " Setup File Search
 if has('win32')
     nnoremap <C-S-up> :tabnew D:\Documents\GitHub\vimrc\.vimrc<CR>
-    nnoremap <C-]> :Files D:\Documents\<CR>
-    nnoremap <C-p> :AgIn D:\Documents\<CR>
+    nnoremap <C-]> :Files D:\Documents\GitHub\miseq<CR>
+    nnoremap <C-p> :AgIn D:\Documents\GitHub\miseq<CR>
     nnoremap <C-h> :History<CR>
 elseif has('mac')
     nnoremap <C-S-up> :tabnew ~/Documents/GitHub/vimrc/.vimrc<CR>
@@ -57,6 +57,8 @@ Plug 'junegunn/fzf.vim'
 " LSP
 Plug 'keith/swift.vim' " Swift support
 Plug 'jansedivy/jai.vim' " Jai support
+
+Plug 'mbbill/undotree'
 Plug 'tpope/vim-fugitive' " Git
 Plug 'itchyny/lightline.vim' " Status line
 Plug 'mhinz/vim-startify' " Startup screen
