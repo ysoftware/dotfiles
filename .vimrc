@@ -18,6 +18,7 @@ if has('win32')
     nnoremap <C-p> :AgIn D:\Documents\GitHub\miseq<CR>
     nnoremap <C-h> :History<CR>
 elseif has('mac')
+    nnoremap <C-S-down> :tabnew ~/Documents/Check24/check24-worklog/worklog.txt<CR>
     nnoremap <C-S-up> :tabnew ~/Documents/GitHub/vimrc/.vimrc<CR>
     nnoremap <C-]> :Files ~/Documents/<CR>
     nnoremap <C-p> :AgIn ~/Documents/<CR>
@@ -234,14 +235,3 @@ set shiftwidth=4    " Indents will have a width of 4.
 set softtabstop=4   " Sets the number of columns for a TAB.
 set expandtab       " Expand TABs to spaces.
 set sw=4
-
-" Build xcode project
-if has('mac')
-    function! ReRunLastFileCommand()
-      if exists("g:vim_terminal") && exists("g:last_run_in_terminal")
-        call RunInTerminal(g:last_run_in_terminal)
-      endif
-    endfunction
-    command! Xb :!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript
-    nnoremap <C-b> :Xb<CR><CR>
-endif
