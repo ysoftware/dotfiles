@@ -195,12 +195,12 @@ nnoremap <leader>' :tabnew<CR>
 nnoremap <leader>q :bd<CR>
 
 " Switch tabs and buffers
-nnoremap <Tab> :tabnext<CR>
-nnoremap <S-Tab> :tabprevious<CR>
-nnoremap § :bnext<CR>
-nnoremap ` :bnext<CR>
-nnoremap ± :bprevious<CR>
-
+" Since <Tab> in VIM is the same as <C-i>, we can't use it here
+nnoremap § :tabnext<CR>
+nnoremap ` :tabnext<CR>
+nnoremap ± :tabprevious<CR>
+nnoremap ~ :tabprevious<CR>
+ 
 " Funny command to quit insert mode without escape
 imap jk <Esc>:cd %:p:h<CR>
 
