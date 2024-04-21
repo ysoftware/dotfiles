@@ -182,6 +182,11 @@ endif
 nnoremap n nzzzv
 nnoremap N Nzzzv
 
+" Brackets around selection
+xnoremap <leader>[ <ESC>a]<ESC>gv`<<ESC>i[<ESC>
+xnoremap <leader>( <ESC>a)<ESC>gv`<<ESC>i(<ESC>
+xnoremap <leader>{ <ESC>a}<ESC>gv`<<ESC>i{<ESC>
+
 " Jump to next empty line
 noremap } <Cmd>call search('^\s*$\\|\%$', 'W')<CR>
 noremap { <Cmd>call search('^\s*$\\|\%^', 'Wb')<CR>
