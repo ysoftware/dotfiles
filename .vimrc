@@ -18,6 +18,7 @@ if has('win32')
     nnoremap <C-p> :AgIn D:\Documents\GitHub\miseq<CR>
     nnoremap <C-h> :History<CR>
 elseif has('mac')
+    nnoremap <C-S-down> :tabnew ~/Documents/Check24/check24-worklog/worklog.txt<CR>
     nnoremap <C-S-up> :tabnew ~/Documents/GitHub/vimrc/.vimrc<CR>
     nnoremap <C-]> :Files ~/Documents/<CR>
     nnoremap <C-p> :AgIn ~/Documents/<CR>
@@ -181,6 +182,11 @@ endif
 nnoremap n nzzzv
 nnoremap N Nzzzv
 
+" Brackets around selection
+xnoremap <leader>[ <ESC>a]<ESC>gv`<<ESC>i[<ESC>
+xnoremap <leader>( <ESC>a)<ESC>gv`<<ESC>i(<ESC>
+xnoremap <leader>{ <ESC>a}<ESC>gv`<<ESC>i{<ESC>
+
 " Jump to next empty line
 noremap } <Cmd>call search('^\s*$\\|\%$', 'W')<CR>
 noremap { <Cmd>call search('^\s*$\\|\%^', 'Wb')<CR>
@@ -194,12 +200,12 @@ nnoremap <leader>' :tabnew<CR>
 nnoremap <leader>q :bd<CR>
 
 " Switch tabs and buffers
-nnoremap <Tab> :tabnext<CR>
-nnoremap <S-Tab> :tabprevious<CR>
-nnoremap § :bnext<CR>
-nnoremap ` :bnext<CR>
-nnoremap ± :bprevious<CR>
-
+" Since <Tab> in VIM is the same as <C-i>, we can't use it here
+nnoremap § :tabnext<CR>
+nnoremap ` :tabnext<CR>
+nnoremap ± :tabprevious<CR>
+nnoremap ~ :tabprevious<CR>
+ 
 " Funny command to quit insert mode without escape
 imap jk <Esc>:cd %:p:h<CR>
 
@@ -237,13 +243,6 @@ set sw=4
 
 " Build xcode project
 if has('mac')
-    function! ReRunLastFileCommand()
-      if exists("g:vim_terminal") && exists("g:last_run_in_terminal")
-        call RunInTerminal(g:last_run_in_terminal)
-      endif
-    endfunction
-    command! Xb :!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript
-    nnoremap <C-b> :Xb<CR><CR>
 else
     nnoremap <C-b> :make<CR>
 endif
