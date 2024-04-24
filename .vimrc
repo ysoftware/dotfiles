@@ -244,4 +244,6 @@ if has('mac')
     endfunction
     command! Xb :!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript
     nnoremap <C-b> :Xb<CR><CR>
+else
+    nnoremap <C-b> :make<CR>
 endif
