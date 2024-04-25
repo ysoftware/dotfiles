@@ -199,13 +199,6 @@ nmap [h <Plug>(GitGutterPrevHunk)zz
 nnoremap <leader>' :tabnew<CR>
 nnoremap <leader>q :bd<CR>
 
-" Switch tabs and buffers
-" Since <Tab> in VIM is the same as <C-i>, we can't use it here
-nnoremap § :tabnext<CR>
-nnoremap ` :tabnext<CR>
-nnoremap ± :tabprevious<CR>
-nnoremap ~ :tabprevious<CR>
- 
 " Funny command to quit insert mode without escape
 imap jk <Esc>:cd %:p:h<CR>
 
