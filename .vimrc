@@ -133,6 +133,7 @@ let g:lightline = { 'colorscheme': 'one',
       \   },
       \ }
 
+" Might want to first comment this out before :PlugInstall
 colorscheme vscode
 set background=dark
 noremap <C-S-Right> :set background=light<CR><C-l>
