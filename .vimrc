@@ -1,8 +1,11 @@
+" Notes
+" - To see search count above 100 - :%s///gn
+
 " TODO
-" Peek here: https://github.com/rluba/neovim-config/blob/master/init.vim
-" fix file search previews on Windows
-" Don't open new tab for vimrc if it's open, activate it
-" We jump with <C-u> 1 line less the first time than <C-d>
+" - Peek here: https://github.com/rluba/neovim-config/blob/master/init.vim
+" - fix file search previews on Windows
+" - Don't open new tab for vimrc if it's open, activate it
+" - We jump with <C-u> 1 line less the first time than <C-d>
 
 " Snippets
 if has('mac')
@@ -22,6 +25,12 @@ elseif has('mac')
     nnoremap <C-S-up> :tabnew ~/Documents/GitHub/vimrc/.vimrc<CR>
     nnoremap <C-]> :Files ~/Documents/Check24/ios-pod-mobile-sim<CR>
     nnoremap <C-p> :AgIn ~/Documents/Check24/ios-pod-mobile-sim<CR>
+    nnoremap <C-h> :History<CR>
+elseif has('linux')
+    nnoremap <C-S-down> :tabnew ~/Documents/GitHub/os-todos.txt<CR>
+    nnoremap <C-S-up> :tabnew ~/Documents/GitHub/vimrc/.vimrc<CR>
+    nnoremap <C-]> :Files ~/Documents/<CR>
+    nnoremap <C-p> :AgIn ~/Documents/<CR>
     nnoremap <C-h> :History<CR>
 endif
 
@@ -94,6 +103,7 @@ let g:lightline = { 'colorscheme': 'one',
       \   },
       \ }
 
+" Might want to first comment this out before :PlugInstall
 colorscheme vscode
 set background=dark
 noremap <C-S-Right> :set background=light<CR><C-l>
@@ -108,7 +118,9 @@ noremap Y "+Y
 " Visuals
 if has('win32')
     set guifont=Fira\ Code:h15
-else
+elseif has('linux')
+    set guifont=Fira\ Code:h15
+elseif has('mac')
     set guifont=Fira_Code_Retina:h16
 endif
 
