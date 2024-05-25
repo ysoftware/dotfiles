@@ -5,7 +5,6 @@
 " - Peek here: https://github.com/rluba/neovim-config/blob/master/init.vim
 " - fix file search previews on Windows
 " - Don't open new tab for vimrc if it's open, activate it
-" - We jump with <C-u> 1 line less the first time than <C-d>
 
 " Snippets
 if has('mac')
