@@ -18,19 +18,19 @@ endif
  
 " Setup File Search
 if has('win32')
-    nnoremap <C-S-up> :tabnew D:\Documents\GitHub\vimrc\.vimrc<CR>
+    nnoremap <C-S-up> :call OpenOrSwitchToTab('D:\Documents\GitHub\vimrc\.vimrc')<CR>
     nnoremap <C-]> :Files D:\Documents\GitHub\miseq<CR>
     nnoremap <C-p> :AgIn D:\Documents\GitHub\miseq<CR>
     nnoremap <C-h> :History<CR>
 elseif has('mac')
-    nnoremap <C-S-down> :tabnew ~/Documents/Check24/check24-worklog/worklog.txt<CR>
-    nnoremap <C-S-up> :tabnew ~/Documents/GitHub/vimrc/.vimrc<CR>
+    nnoremap <C-S-down> :call OpenOrSwitchToTab('~/Documents/Check24/check24-worklog/worklog.txt')<CR>
+    nnoremap <C-S-up> :call OpenOrSwitchToTab('~/Documents/GitHub/vimrc/.vimrc')<CR>
     nnoremap <C-]> :Files ~/Documents/Check24/ios-pod-mobile-sim<CR>
     nnoremap <C-p> :AgIn ~/Documents/Check24/ios-pod-mobile-sim<CR>
     nnoremap <C-h> :History<CR>
 elseif has('linux')
-    nnoremap <C-S-down> :tabnew ~/Documents/GitHub/os-todos.txt<CR>
-    nnoremap <C-S-up> :tabnew ~/Documents/GitHub/vimrc/.vimrc<CR>
+    nnoremap <C-S-down> :call OpenOrSwitchToTab('~/Documents/GitHub/os-todos.txt')<CR>
+    nnoremap <C-S-up> :call OpenOrSwitchToTab('~/Documents/GitHub/vimrc/.vimrc')<CR>
     nnoremap <C-]> :Files ~/Documents/<CR>
     nnoremap <C-p> :AgIn ~/Documents/<CR>
     nnoremap <C-h> :History<CR>
@@ -215,3 +215,17 @@ if has('mac')
 else
     nnoremap <C-b> :make<CR>
 endif
+
+function! OpenOrSwitchToTab(file)
+  let tab_open = 0
+  for tab in range(tabpagenr('$'))
+      if fnamemodify(bufname(tabpagebuflist(tab + 1)[0]), ':p') == fnamemodify(a:file, ':p')
+      execute 'tabnext ' . (tab + 1)
+      let tab_open = 1
+      break
+    endif
+  endfor
+  if !tab_open
+    execute 'tabnew ' . a:file
+  endif
+endfunction
