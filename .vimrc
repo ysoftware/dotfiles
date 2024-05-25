@@ -9,9 +9,12 @@
 
 " Snippets
 if has('mac')
-    :ab ws [weak self] in<Left><Left><Left>
-    :ab gl guard let self else { return }
-    :ab si .store(in: &subscribers)
+  augroup SwiftSnippets
+    autocmd!
+    autocmd FileType swift abbrev ws [weak self] in<Left><Left><Left>
+    autocmd FileType swift abbrev gl guard let self else { return }
+    autocmd FileType swift abbrev si .store(in: &subscribers)
+  augroup END
 endif
  
 " Setup File Search
