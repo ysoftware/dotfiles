@@ -27,7 +27,7 @@ elseif has('mac')
     nnoremap <C-p> :AgIn ~/Documents/<CR>
     nnoremap <C-h> :History<CR>
 elseif has('linux')
-    nnoremap <C-S-down> :tabnew ~/Documents/GitHub/os-todos.txt<CR>
+    nnoremap <C-S-down> :tabnew ~/Documents/os-todos.txt<CR>
     nnoremap <C-S-up> :tabnew ~/Documents/GitHub/vimrc/.vimrc<CR>
     nnoremap <C-]> :Files ~/Documents/<CR>
     nnoremap <C-p> :AgIn ~/Documents/<CR>
@@ -208,6 +208,7 @@ nmap ]h <Plug>(GitGutterNextHunk)zz
 nmap [h <Plug>(GitGutterPrevHunk)zz
 
 " Create new tab
+nnoremap tg gT
 nnoremap <leader>' :tabnew<CR>
 nnoremap <leader>q :bd<CR>
 
