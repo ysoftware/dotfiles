@@ -5,48 +5,72 @@
 " - Peek here: https://github.com/rluba/neovim-config/blob/master/init.vim
 " - fix file search previews on Windows
 " - Don't open new tab for vimrc if it's open, activate it
-" - We jump with <C-u> 1 line less the first time than <C-d>
 
 " Snippets
 if has('mac')
-    :ab ws [weak self] in<Left><Left><Left>
-    :ab gl guard let self else { return }
-    :ab si .store(in: &subscribers)
+  augroup SwiftSnippets
+    autocmd!
+    autocmd FileType swift abbrev ws [weak self] in<Left><Left><Left>
+    autocmd FileType swift abbrev gl guard let self else { return }
+    autocmd FileType swift abbrev si .store(in: &subscribers)
+  augroup END
 endif
  
 " Setup File Search
 if has('win32')
-    nnoremap <C-S-up> :tabnew D:\Documents\GitHub\vimrc\.vimrc<CR>
+    nnoremap <C-S-up> :call OpenOrSwitchToTab('D:\Documents\GitHub\vimrc\.vimrc')<CR>
     nnoremap <C-]> :Files D:\Documents\GitHub\miseq<CR>
     nnoremap <C-p> :AgIn D:\Documents\GitHub\miseq<CR>
     nnoremap <C-h> :History<CR>
 elseif has('mac')
-    nnoremap <C-S-down> :tabnew ~/Documents/Check24/check24-worklog/worklog.txt<CR>
-    nnoremap <C-S-up> :tabnew ~/Documents/GitHub/vimrc/.vimrc<CR>
-    nnoremap <C-]> :Files ~/Documents/<CR>
-    nnoremap <C-p> :AgIn ~/Documents/<CR>
+    nnoremap <C-S-down> :call OpenOrSwitchToTab('~/Documents/Check24/check24-worklog/worklog.txt')<CR>
+    nnoremap <C-S-up> :call OpenOrSwitchToTab('~/Documents/GitHub/vimrc/.vimrc')<CR>
+    nnoremap <C-]> :Files ~/Documents/Check24/ios-pod-mobile-sim<CR>
+    nnoremap <C-p> :AgIn ~/Documents/Check24/ios-pod-mobile-sim<CR>
     nnoremap <C-h> :History<CR>
 elseif has('linux')
-    nnoremap <C-S-down> :tabnew ~/Documents/os-todos.txt<CR>
-    nnoremap <C-S-up> :tabnew ~/Documents/GitHub/vimrc/.vimrc<CR>
+    nnoremap <C-S-down> :call OpenOrSwitchToTab('~/Documents/os-todos.txt')<CR>
+    nnoremap <C-S-up> :call OpenOrSwitchToTab('~/Documents/GitHub/vimrc/.vimrc')<CR>
     nnoremap <C-]> :Files ~/Documents/<CR>
     nnoremap <C-p> :AgIn ~/Documents/<CR>
     nnoremap <C-h> :History<CR>
 endif
+
+" List of installed plugins
+call plug#begin('~/.local/share/nvim/plugged')
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+
+" Syntax highlighting
+Plug 'keith/swift.vim' " Swift support
+Plug 'jansedivy/jai.vim' " Jai support
+
+Plug 'mbbill/undotree'
+Plug 'tpope/vim-fugitive' " Git
+Plug 'itchyny/lightline.vim' " Status line
+Plug 'mhinz/vim-startify' " Startup screen
+Plug 'airblade/vim-gitgutter' " Git diffs
+Plug 'tpope/vim-commentary' " Comment lines of code
+Plug 'preservim/nerdtree' " Project tree
+Plug 'Mofiqul/vscode.nvim'
+call plug#end()
 
 let g:fzf_history_dir = '~/.local/share/fzf-history'
 let g:fzf_action = { 'enter': 'tab split' }
 
 " Files setup
 command! -bang -nargs=+ -complete=dir Files
-	\ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'options': [
-	\	'--reverse', '-i', '--info=inline', '--keep-right'
+	\ call fzf#vim#files(<q-args>, 
+    \ fzf#vim#with_preview({'options': [
+	\     '--reverse', '-i', '--info=inline', '--keep-right'
 	\ ]}, 'right:40%'), <bang>0)
 
 " AgIn setup
 function! s:ag_in(bang, ...)
-    call fzf#vim#ag(join(a:000[1:], ' '), fzf#vim#with_preview({'dir': expand(a:1), 'options': [
-		\ '--reverse', '-i', '--info=inline', '--keep-right'
+    call fzf#vim#ag(join(a:000[1:], ' '),
+        \ '--ignore=*.pbxproj',
+        \ fzf#vim#with_preview({'dir': expand(a:1), 'options': [
+        \     '--reverse', '-i', '--info=inline', '--keep-right'
         \ ]}, 'down:60%'), a:bang)
 endfunction
 command! -bang -nargs=+ -complete=dir AgIn call s:ag_in(<bang>0, <f-args>)
@@ -58,77 +82,16 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
-" List of installed plugins
-call plug#begin('~/.local/share/nvim/plugged')
-
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
-
-" LSP
-Plug 'keith/swift.vim' " Swift support
-Plug 'jansedivy/jai.vim' " Jai support
-
-Plug 'mbbill/undotree'
-Plug 'tpope/vim-fugitive' " Git
-Plug 'itchyny/lightline.vim' " Status line
-Plug 'mhinz/vim-startify' " Startup screen
-Plug 'airblade/vim-gitgutter' " Git diffs
-Plug 'tpope/vim-commentary' " Comment lines of code
-Plug 'preservim/nerdtree' " Project tree
-Plug 'prabirshrestha/async.vim'
-Plug 'prabirshrestha/vim-lsp'
-Plug 'Mofiqul/vscode.nvim'
-
-call plug#end()
-
 " Setup nerd tree
 let NERDTreeShowHidden=1
 let NERDTreeCustomOpenArgs={'file':{'where': 't'}}
 
-" SourceKit-LSP configuration
-" if executable('sourcekit-lsp')
-"     au User lsp_setup call lsp#register_server({
-"         \ 'name': 'sourcekit-lsp',
-"         \ 'cmd': {server_info->['sourcekit-lsp']},
-"         \ 'whitelist': ['swift'],
-"         \ })
-" endif
-
-" Disable Copilot by default
-let g:copilot_enabled = v:false
-
-" vim-lsp setup
-if executable('sourcekit-lsp')
-    au User lsp_setup call lsp#register_server({
-        \ 'name': 'sourcekit-lsp',
-        \ 'cmd': {server_info->['sourcekit-lsp']},
-        \ 'whitelist': ['swift'],
-        \ })
+" Disable Copilot by default on macbook
+if has('mac')
+    let g:copilot_enabled = v:true
+    let g:copilot_auto_enable = v:true
+    let g:copilot_filetypes = { '*': v:false, 'swift': v:true, 'jai': v:true, 'c': v:true, 'h': v:true, 'vim': v:true, 'javascript': v:true }
 endif
-function! s:on_lsp_buffer_enabled() abort
-    setlocal omnifunc=lsp#complete
-    setlocal signcolumn=yes
-    if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
-    nmap <buffer> gd <plug>(lsp-definition)
-    nmap <buffer> gs <plug>(lsp-document-symbol-search)
-    nmap <buffer> gS <plug>(lsp-workspace-symbol-search)
-    nmap <buffer> gr <plug>(lsp-references)
-    nmap <buffer> gi <plug>(lsp-implementation)
-    nmap <buffer> gt <plug>(lsp-type-definition)
-    nmap <buffer> <leader>rn <plug>(lsp-rename)
-    nmap <buffer> [g <plug>(lsp-previous-diagnostic)
-    nmap <buffer> ]g <plug>(lsp-next-diagnostic)
-    nmap <buffer> K <plug>(lsp-hover)
-    let g:lsp_format_sync_timeout = 1000
-    autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
-endfunction
-augroup lsp_install
-    au!
-    autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
-augroup END
-augroup filetype
-  au! BufRead,BufNewFile *.swift set ft=swift
-augroup END
 
 " Setup lightline
 set noshowmode
@@ -252,3 +215,17 @@ if has('mac')
 else
     nnoremap <C-b> :make<CR>
 endif
+
+function! OpenOrSwitchToTab(file)
+  let tab_open = 0
+  for tab in range(tabpagenr('$'))
+      if fnamemodify(bufname(tabpagebuflist(tab + 1)[0]), ':p') == fnamemodify(a:file, ':p')
+      execute 'tabnext ' . (tab + 1)
+      let tab_open = 1
+      break
+    endif
+  endfor
+  if !tab_open
+    execute 'tabnew ' . a:file
+  endif
+endfunction
