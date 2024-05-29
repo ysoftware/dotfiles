@@ -19,22 +19,23 @@ endif
 " Setup File Search
 if has('win32')
     nnoremap <C-S-up> :call OpenOrSwitchToTab('D:\Documents\GitHub\vimrc\.vimrc')<CR>
-    nnoremap <C-]> :Files D:\Documents\GitHub\miseq<CR>
-    nnoremap <C-p> :AgIn D:\Documents\GitHub\miseq<CR>
-    nnoremap <C-h> :History<CR>
+    nnoremap <C-]> :Files D:\Documents<CR>
+    nnoremap <C-p> :AgIn D:\Documents<CR>
 elseif has('mac')
     nnoremap <C-S-down> :call OpenOrSwitchToTab('~/Documents/Check24/check24-worklog/worklog.txt')<CR>
     nnoremap <C-S-up> :call OpenOrSwitchToTab('~/Documents/GitHub/vimrc/.vimrc')<CR>
+
     nnoremap <C-]> :Files ~/Documents/Check24/ios-pod-mobile-sim<CR>
     nnoremap <C-p> :AgIn ~/Documents/Check24/ios-pod-mobile-sim<CR>
-    nnoremap <C-h> :History<CR>
+    nnoremap <C-[> :AgIn ~/Documents<CR>
 elseif has('linux')
     nnoremap <C-S-down> :call OpenOrSwitchToTab('~/Documents/GitHub/os-todos.txt')<CR>
     nnoremap <C-S-up> :call OpenOrSwitchToTab('~/Documents/GitHub/vimrc/.vimrc')<CR>
     nnoremap <C-]> :Files ~/Documents/<CR>
     nnoremap <C-p> :AgIn ~/Documents/<CR>
-    nnoremap <C-h> :History<CR>
 endif
+
+nnoremap <C-h> :History<CR>
 
 " List of installed plugins
 call plug#begin('~/.local/share/nvim/plugged')
