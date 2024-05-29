@@ -27,7 +27,8 @@ elseif has('mac')
 
     nnoremap <C-]> :Files ~/Documents/Check24/ios-pod-mobile-sim<CR>
     nnoremap <C-p> :AgIn ~/Documents/Check24/ios-pod-mobile-sim<CR>
-    nnoremap <C-[> :AgIn ~/Documents<CR>
+    nnoremap <leader><C-]> :Files ~/Documents<CR>
+    nnoremap <leader><C-p> :AgIn ~/Documents<CR>
 elseif has('linux')
     nnoremap <C-S-down> :call OpenOrSwitchToTab('~/Documents/os-todos.txt')<CR>
     nnoremap <C-S-up> :call OpenOrSwitchToTab('~/Documents/GitHub/vimrc/.vimrc')<CR>
