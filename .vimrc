@@ -212,8 +212,8 @@ set softtabstop=4   " Sets the number of columns for a TAB.
 set expandtab       " Expand TABs to spaces.
 set sw=4
 
-" Build xcode project
 if has('mac')
+    command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
 else
     nnoremap <C-b> :make<CR>
 endif
