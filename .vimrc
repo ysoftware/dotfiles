@@ -53,7 +53,8 @@ Plug 'itchyny/lightline.vim' " Status line
 Plug 'mhinz/vim-startify' " Startup screen
 Plug 'airblade/vim-gitgutter' " Git diffs
 Plug 'tpope/vim-commentary' " Comment lines of code
-Plug 'preservim/nerdtree' " Project tree
+Plug 'preservim/nerdtree' |
+    \ Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'Mofiqul/vscode.nvim'
 call plug#end()
 
@@ -90,8 +91,8 @@ let NERDTreeCustomOpenArgs={'file':{'where': 't'}}
 
 " Disable Copilot by default on macbook
 if has('mac')
-    let g:copilot_enabled = v:true
-    let g:copilot_auto_enable = v:true
+    let g:copilot_enabled = v:false
+    let g:copilot_auto_enable = v:false
     let g:copilot_filetypes = { '*': v:false, 'swift': v:true, 'jai': v:true, 'c': v:true, 'h': v:true, 'vim': v:true, 'javascript': v:true }
 endif
 
@@ -185,6 +186,18 @@ vnoremap < <gv
 vnoremap > >gv
 
 " Nerd tree
+let g:NERDTreeGitStatusIndicatorMapCustom = {
+    \ 'Modified'  :'m',
+    \ 'Staged'    :'s',
+    \ 'Untracked' :'t',
+    \ 'Renamed'   :'r',
+    \ 'Unmerged'  :'n',
+    \ 'Deleted'   :'d',
+    \ 'Dirty'     :'✗',
+    \ 'Ignored'   :'i',
+    \ 'Clean'     :'c',
+    \ 'Unknown'   :'u',
+    \ }
 nnoremap <leader>n :NERDTreeFocus<CR>
 nnoremap <C-n> :NERDTree<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
