@@ -51,11 +51,10 @@ Plug 'mbbill/undotree'
 Plug 'tpope/vim-fugitive' " Git
 Plug 'itchyny/lightline.vim' " Status line
 Plug 'mhinz/vim-startify' " Startup screen
-Plug 'airblade/vim-gitgutter' " Git diffs
 Plug 'tpope/vim-commentary' " Comment lines of code
-Plug 'preservim/nerdtree' |
-    \ Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'Mofiqul/vscode.nvim'
+Plug 'preservim/nerdtree' | " File browser
+    \ Plug 'Xuyuanp/nerdtree-git-plugin' " Plugin with git status
+Plug 'Mofiqul/vscode.nvim' " color theme
 call plug#end()
 
 let g:fzf_history_dir = '~/.local/share/fzf-history'
@@ -227,6 +226,7 @@ set sw=4
 
 if has('mac')
     command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
+    nnoremap <C-b> :!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript<CR><CR>
 else
     nnoremap <C-b> :make<CR>
 endif
