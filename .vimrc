@@ -121,7 +121,7 @@ noremap Y "+Y
 if has('win32')
     set guifont=Fira\ Code:h15
 elseif has('linux')
-    set guifont=Fira\ Code:h15
+    set guifont=Fira\ Code:h20
 elseif has('mac')
     set guifont=Fira_Code_Retina:h16
 endif
@@ -213,7 +213,7 @@ set sw=4
 " Build xcode project
 if has('mac')
 else
-    nnoremap <C-b> :make<CR>
+    nnoremap <C-b> :make -B<CR>
 endif
 
 function! OpenOrSwitchToTab(file)
