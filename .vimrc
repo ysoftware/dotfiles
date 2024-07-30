@@ -86,6 +86,7 @@ endif
 
 " Setup nerd tree
 let NERDTreeShowHidden=1
+let g:NERDTreeWinSize=50
 let NERDTreeCustomOpenArgs={'file':{'where': 't'}}
 
 " Disable Copilot by default on macbook
@@ -142,13 +143,11 @@ set wildignorecase
 set scroll=15
 
 " Search
+set ic " case insensitive search
 let g:searchindex_line_limit=2000000
-vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
+vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR
 
-if has('win32') " TODO: fix windows commands
-    " nnoremap <leader>p *ve"+y:exe 'AgIn ~\Documents\ ' . @+<CR>
-    " vnoremap <leader>p "+y:exe 'AgIn ~\Documents\ ' . @+<CR>
-else
+if has('mac')
     nnoremap <leader>p *ve"+y:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @+<CR>
     vnoremap <leader>p "+y:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @+<CR>
 endif
