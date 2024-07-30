@@ -19,22 +19,24 @@ endif
 " Setup File Search
 if has('win32')
     nnoremap <C-S-up> :call OpenOrSwitchToTab('D:\Documents\GitHub\vimrc\.vimrc')<CR>
-    nnoremap <C-]> :Files D:\Documents\GitHub\miseq<CR>
-    nnoremap <C-p> :AgIn D:\Documents\GitHub\miseq<CR>
-    nnoremap <C-h> :History<CR>
+    nnoremap <C-]> :Files D:\Documents<CR>
+    nnoremap <C-p> :AgIn D:\Documents<CR>
 elseif has('mac')
     nnoremap <C-S-down> :call OpenOrSwitchToTab('~/Documents/Check24/check24-worklog/worklog.txt')<CR>
     nnoremap <C-S-up> :call OpenOrSwitchToTab('~/Documents/GitHub/vimrc/.vimrc')<CR>
+
     nnoremap <C-]> :Files ~/Documents/Check24/ios-pod-mobile-sim<CR>
     nnoremap <C-p> :AgIn ~/Documents/Check24/ios-pod-mobile-sim<CR>
-    nnoremap <C-h> :History<CR>
+    nnoremap <leader><C-]> :Files ~/Documents<CR>
+    nnoremap <leader><C-p> :AgIn ~/Documents<CR>
 elseif has('linux')
     nnoremap <C-S-down> :call OpenOrSwitchToTab('~/Documents/os-todos.txt')<CR>
     nnoremap <C-S-up> :call OpenOrSwitchToTab('~/Documents/GitHub/vimrc/.vimrc')<CR>
     nnoremap <C-]> :Files ~/Documents/<CR>
     nnoremap <C-p> :AgIn ~/Documents/<CR>
-    nnoremap <C-h> :History<CR>
 endif
+
+nnoremap <C-h> :History<CR>
 
 " List of installed plugins
 call plug#begin('~/.local/share/nvim/plugged')
@@ -49,10 +51,10 @@ Plug 'mbbill/undotree'
 Plug 'tpope/vim-fugitive' " Git
 Plug 'itchyny/lightline.vim' " Status line
 Plug 'mhinz/vim-startify' " Startup screen
-Plug 'airblade/vim-gitgutter' " Git diffs
 Plug 'tpope/vim-commentary' " Comment lines of code
-Plug 'preservim/nerdtree' " Project tree
-Plug 'Mofiqul/vscode.nvim'
+Plug 'preservim/nerdtree' | " File browser
+    \ Plug 'Xuyuanp/nerdtree-git-plugin' " Plugin with git status
+Plug 'Mofiqul/vscode.nvim' " color theme
 call plug#end()
 
 let g:fzf_history_dir = '~/.local/share/fzf-history'
@@ -84,12 +86,13 @@ endif
 
 " Setup nerd tree
 let NERDTreeShowHidden=1
+let g:NERDTreeWinSize=50
 let NERDTreeCustomOpenArgs={'file':{'where': 't'}}
 
 " Disable Copilot by default on macbook
 if has('mac')
-    let g:copilot_enabled = v:true
-    let g:copilot_auto_enable = v:true
+    let g:copilot_enabled = v:false
+    let g:copilot_auto_enable = v:false
     let g:copilot_filetypes = { '*': v:false, 'swift': v:true, 'jai': v:true, 'c': v:true, 'h': v:true, 'vim': v:true, 'javascript': v:true }
 endif
 
@@ -140,13 +143,11 @@ set wildignorecase
 set scroll=15
 
 " Search
+set ic " case insensitive search
 let g:searchindex_line_limit=2000000
-vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
+vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR
 
-if has('win32') " TODO: fix windows commands
-    " nnoremap <leader>p *ve"+y:exe 'AgIn ~\Documents\ ' . @+<CR>
-    " vnoremap <leader>p "+y:exe 'AgIn ~\Documents\ ' . @+<CR>
-else
+if has('mac')
     nnoremap <leader>p *ve"+y:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @+<CR>
     vnoremap <leader>p "+y:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @+<CR>
 endif
@@ -183,6 +184,18 @@ vnoremap < <gv
 vnoremap > >gv
 
 " Nerd tree
+let g:NERDTreeGitStatusIndicatorMapCustom = {
+    \ 'Modified'  :'m',
+    \ 'Staged'    :'s',
+    \ 'Untracked' :'t',
+    \ 'Renamed'   :'r',
+    \ 'Unmerged'  :'n',
+    \ 'Deleted'   :'d',
+    \ 'Dirty'     :'✗',
+    \ 'Ignored'   :'i',
+    \ 'Clean'     :'c',
+    \ 'Unknown'   :'u',
+    \ }
 nnoremap <leader>n :NERDTreeFocus<CR>
 nnoremap <C-n> :NERDTree<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
@@ -210,8 +223,9 @@ set softtabstop=4   " Sets the number of columns for a TAB.
 set expandtab       " Expand TABs to spaces.
 set sw=4
 
-" Build xcode project
 if has('mac')
+    command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
+    nnoremap <C-b> :!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript<CR><CR>
 else
     nnoremap <C-b> :make -B<CR>
 endif
