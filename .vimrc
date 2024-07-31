@@ -47,8 +47,10 @@ Plug 'junegunn/fzf.vim'
 Plug 'keith/swift.vim' " Swift support
 Plug 'jansedivy/jai.vim' " Jai support
 
-Plug 'mbbill/undotree'
+" Plug 'mbbill/undotree'
+" Plug 'neovim/nvim-lspconfig'
 Plug 'tpope/vim-fugitive' " Git
+Plug 'airblade/vim-gitgutter'
 Plug 'itchyny/lightline.vim' " Status line
 Plug 'mhinz/vim-startify' " Startup screen
 Plug 'tpope/vim-commentary' " Comment lines of code
@@ -84,19 +86,14 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
+" LSP setup
+" lua require'lspconfig'.sourcekit.setup{}
+
 " Setup nerd tree
 let NERDTreeShowHidden=1
 let g:NERDTreeWinSize=50
 let NERDTreeCustomOpenArgs={'file':{'where': 't'}}
 
-" Disable Copilot by default on macbook
-if has('mac')
-    let g:copilot_enabled = v:false
-    let g:copilot_auto_enable = v:false
-    let g:copilot_filetypes = { '*': v:false, 'swift': v:true, 'jai': v:true, 'c': v:true, 'h': v:true, 'vim': v:true, 'javascript': v:true }
-endif
-
-" Setup lightline
 set noshowmode
 let g:lightline = { 'colorscheme': 'one', 
       \   'active': {
@@ -170,6 +167,8 @@ noremap { <Cmd>call search('^\s*$\\|\%^', 'Wb')<CR>
 " Jump to next git change
 nmap ]h <Plug>(GitGutterNextHunk)zz
 nmap [h <Plug>(GitGutterPrevHunk)zz
+
+nnoremap <leader>g :vertical:G<CR>
 
 " Create new tab
 nnoremap tg gT
