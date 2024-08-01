@@ -228,7 +228,7 @@ set sw=4
 
 if has('mac')
     command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
-    nnoremap <C-b> :!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript<CR><CR>
+    nnoremap <C-b> :w<CR>:!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript<CR><CR>
 else
     nnoremap <C-b> :make<CR>
 endif
