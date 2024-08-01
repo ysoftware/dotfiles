@@ -125,7 +125,7 @@ noremap Y "+Y
 if has('win32')
     set guifont=Fira\ Code:h15
 elseif has('linux')
-    set guifont=Fira\ Code:h15
+    set guifont=Fira\ Code:h20
 elseif has('mac')
     set guifont=Fira_Code_Retina:h16
 endif
@@ -230,7 +230,7 @@ if has('mac')
     command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
     nnoremap <C-b> :w<CR>:!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript<CR><CR>
 else
-    nnoremap <C-b> :make<CR>
+    nnoremap <C-b> :make -B<CR>
 endif
 
 function! OpenOrSwitchToTab(file)
