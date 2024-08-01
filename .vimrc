@@ -105,7 +105,11 @@ let g:lightline = { 'colorscheme': 'one',
       \   },
       \ }
 
-" Might want to first comment this out before :PlugInstall
+" weird auto-text wrapping to new line, this is horrible
+set textwidth=0
+set wrapmargin=1
+
+" Before this theme is installed via :PlugInstall, vimrc will give an error here
 colorscheme vscode
 set background=dark
 noremap <C-S-Right> :set background=light<CR><C-l>
