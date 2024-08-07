@@ -65,17 +65,32 @@ let g:fzf_action = { 'enter': 'tab split' }
 " Files setup
 command! -bang -nargs=+ -complete=dir Files
 	\ call fzf#vim#files(<q-args>, 
-    \ fzf#vim#with_preview({'options': [
-	\     '--reverse', '-i', '--info=inline', '--keep-right'
-	\ ]}, 'right:40%'), <bang>0)
+    \     fzf#vim#with_preview(
+    \         {
+    \             'options': [
+    \                 '--reverse', '-i', '--info=inline', 
+    \                 '--keep-right', '--preview="bat -p --color always {}"'
+    \             ]
+    \         },
+    \         'right:40%'
+    \     ), 
+    \ <bang>0)
 
 " AgIn setup
 function! s:ag_in(bang, ...)
     call fzf#vim#ag(join(a:000[1:], ' '),
         \ '--ignore=*.pbxproj',
-        \ fzf#vim#with_preview({'dir': expand(a:1), 'options': [
-        \     '--reverse', '-i', '--info=inline', '--keep-right'
-        \ ]}, 'down:60%'), a:bang)
+        \     fzf#vim#with_preview(
+        \         {
+        \             'dir': expand(a:1), 
+        \             'options': [
+        \                 '--reverse', '-i', '--info=inline', 
+        \                 '--keep-right', '--preview="bat -p --color always {}"' 
+        \             ]
+        \         }, 
+        \         'right:40%'
+        \     ), 
+        \ a:bang)
 endfunction
 command! -bang -nargs=+ -complete=dir AgIn call s:ag_in(<bang>0, <f-args>)
 
@@ -111,9 +126,18 @@ set wrapmargin=1
 
 " Before this theme is installed via :PlugInstall, vimrc will give an error here
 colorscheme vscode
-set background=dark
 noremap <C-S-Right> :set background=light<CR><C-l>
 noremap <C-S-Left> :set background=dark<CR><C-l>
+
+if has('mac')
+    if system('defaults read -g AppleInterfaceStyle') == "Dark\n"
+        set background=dark
+    else
+        set background=light
+    endif
+else
+    set background=dark
+endif
 
 " Copy paste stuff
 noremap p "+p
@@ -199,10 +223,9 @@ let g:NERDTreeGitStatusIndicatorMapCustom = {
     \ 'Clean'     :'c',
     \ 'Unknown'   :'u',
     \ }
-nnoremap <leader>n :NERDTreeFocus<CR>
-nnoremap <C-n> :NERDTree<CR>
-nnoremap <C-t> :NERDTreeToggle<CR>
+
 nnoremap <C-f> :NERDTreeFind<CR>
+nnoremap <C-t> :NERDTreeToggleVCS<CR>
 
 " Prettify json (depends on installed jq)
 command! Prettify :%!jq .
