@@ -68,7 +68,7 @@ command! -bang -nargs=+ -complete=dir Files
     \     fzf#vim#with_preview(
     \         {
     \             'options': [
-    \                 '--reverse', '-i', '--info=inline', 
+    \                 '--reverse', '-i', '--info=inline',
     \                 '--keep-right', '--preview="bat -p --color always {}"'
     \             ]
     \         },
@@ -88,7 +88,7 @@ function! s:ag_in(bang, ...)
         \                 '--keep-right', '--preview="bat -p --color always {}"' 
         \             ]
         \         }, 
-        \         'right:40%'
+        \         'down:70%'
         \     ), 
         \ a:bang)
 endfunction
