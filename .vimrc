@@ -2,6 +2,7 @@
 " - To see search count above 100 - :%s///gn
 
 " TODO
+" - Disable FUCKING STUPID word wrapping (repro: when typing a long comment, it will auto break at 100th)
 " - Peek here: https://github.com/rluba/neovim-config/blob/master/init.vim
 " - fix file search previews on Windows
 " - Don't open new tab for vimrc if it's open, activate it
@@ -126,8 +127,7 @@ let g:lightline = { 'colorscheme': 'one',
       \ }
 
 " weird auto-text wrapping to new line, this is horrible
-set textwidth=0
-set wrapmargin=1
+set formatoptions-=cro
 
 " Before this theme is installed via :PlugInstall, vimrc will give an error here
 colorscheme vscode
