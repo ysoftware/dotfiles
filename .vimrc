@@ -6,6 +6,11 @@
 " - fix file search previews on Windows
 " - Don't open new tab for vimrc if it's open, activate it
 
+" Replace Xcode
+" - File explorer (with single state, where certain directories stay open)
+" - Jump between edited/specific set of files
+" - Search and replace in multiple files
+
 " Snippets
 if has('mac')
   augroup SwiftSnippets
@@ -255,6 +260,9 @@ if has('mac')
 else
     nnoremap <C-b> :make -B<CR>
 endif
+
+" close all other buffers
+command! BufOnly silent! execute "%bd|e#|bd#"
 
 function! OpenOrSwitchToTab(file)
   let tab_open = 0
