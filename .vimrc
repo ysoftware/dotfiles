@@ -174,6 +174,7 @@ set scroll=15
 
 " Search
 set ic " case insensitive search
+set gdefault
 let g:searchindex_line_limit=2000000
 vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR
 
@@ -262,7 +263,7 @@ else
 endif
 
 " close all other buffers
-command! BufOnly silent! execute "%bd|e#|bd#"
+command! Bufo silent! execute "%bd|e#|bd#"
 
 function! OpenOrSwitchToTab(file)
   let tab_open = 0
