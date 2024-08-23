@@ -171,6 +171,7 @@ set scroll=15
 
 " Search
 set ic " case insensitive search
+set gdefault
 let g:searchindex_line_limit=2000000
 vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR
 
