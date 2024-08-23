@@ -3,9 +3,6 @@
 
 " TODO
 " - Disable FUCKING STUPID word wrapping (repro: when typing a long comment, it will auto break at 100th)
-" - Peek here: https://github.com/rluba/neovim-config/blob/master/init.vim
-" - fix file search previews on Windows
-" - Don't open new tab for vimrc if it's open, activate it
 
 " Replace Xcode
 " - File explorer (with single state, where certain directories stay open)
@@ -262,7 +259,7 @@ else
 endif
 
 " close all other buffers
-command! BufOnly silent! execute "%bd|e#|bd#"
+command! Bufo silent! execute "%bd|e#|bd#"
 
 function! OpenOrSwitchToTab(file)
   let tab_open = 0
