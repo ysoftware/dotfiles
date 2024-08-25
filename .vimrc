@@ -39,6 +39,15 @@ elseif has('linux')
     nnoremap <C-p> :AgIn ~/Documents/<CR>
 endif
 
+" Search symbol under cursor
+if has('mac')
+    nnoremap <leader>p *ve"+y:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @+<CR>
+    vnoremap <leader>p "+y:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @+<CR>
+elseif has('linux')
+    nnoremap <leader>p *ve"+y:exe 'AgIn ~/Documents ' . @+<CR>
+    vnoremap <leader>p "+y:exe 'AgIn ~/Documents ' . @+<CR>
+endif
+
 nnoremap <C-h> :History<CR>
 
 " List of installed plugins
@@ -64,6 +73,12 @@ call plug#end()
 
 let g:fzf_history_dir = '~/.local/share/fzf-history'
 let g:fzf_action = { 'enter': 'tab split' }
+
+
+let g:bufferline_echo = 0
+autocmd VimEnter *
+    \ let &statusline='%{bufferline#refresh_status()}'
+    \ .bufferline#get_status_string()
 
 " Files setup
 command! -bang -nargs=+ -complete=dir Files
@@ -175,16 +190,12 @@ set gdefault
 let g:searchindex_line_limit=2000000
 vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR
 
-if has('mac')
-    nnoremap <leader>p *ve"+y:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @+<CR>
-    vnoremap <leader>p "+y:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @+<CR>
-endif
-
 " Navigation
 " nnoremap <C-d> <C-d>zz 
 " nnoremap <C-u> <C-u>zz 
 nnoremap n nzzzv
 nnoremap N Nzzzv
+let mapleader = " "
 
 " Brackets around selection
 xnoremap <leader>[ <ESC>a]<ESC>gv`<<ESC>i[<ESC>
