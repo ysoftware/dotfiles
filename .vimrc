@@ -41,11 +41,11 @@ endif
 
 " Search symbol under cursor
 if has('mac')
-    nnoremap <leader>p *ve"+y:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @+<CR>
-    vnoremap <leader>p "+y:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @+<CR>
+    nnoremap <leader>p *ve"hy:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @h<CR>
+    vnoremap <leader>p "hy:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @h<CR>
 elseif has('linux')
-    nnoremap <leader>p *ve"+y:exe 'AgIn ~/Documents ' . @+<CR>
-    vnoremap <leader>p "+y:exe 'AgIn ~/Documents ' . @+<CR>
+    nnoremap <leader>p *ve"hy:exe 'AgIn ~/Documents ' . @h<CR>
+    vnoremap <leader>p "hy:exe 'AgIn ~/Documents ' . @h<CR>
 endif
 
 nnoremap <C-h> :History<CR>
@@ -73,12 +73,6 @@ call plug#end()
 
 let g:fzf_history_dir = '~/.local/share/fzf-history'
 let g:fzf_action = { 'enter': 'tab split' }
-
-
-let g:bufferline_echo = 0
-autocmd VimEnter *
-    \ let &statusline='%{bufferline#refresh_status()}'
-    \ .bufferline#get_status_string()
 
 " Files setup
 command! -bang -nargs=+ -complete=dir Files
@@ -188,7 +182,9 @@ set scroll=15
 set ic " case insensitive search
 set gdefault
 let g:searchindex_line_limit=2000000
-vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR
+
+vnoremap // "hy/\C\V<C-R>=escape(@h, '\/')<CR><CR>
+vnoremap ts "hy:%s/\V<C-R>=escape(@h, '\/')<CR>//gcI<Left><Left><Left><Left>
 
 " Navigation
 " nnoremap <C-d> <C-d>zz 
