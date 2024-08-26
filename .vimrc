@@ -82,9 +82,6 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
-" LSP setup
-" lua require'lspconfig'.sourcekit.setup{}
-
 " Setup nerd tree
 let NERDTreeShowHidden=1
 let g:NERDTreeWinSize=50
@@ -126,19 +123,11 @@ noremap y "+y
 noremap Y "+Y
 
 " Visuals
-if has('win32')
-    set guifont=Fira\ Code:h15
-elseif has('linux')
+if has('linux')
     set guifont=Fira\ Code:h20
 elseif has('mac')
     set guifont=Fira_Code_Retina:h16
 endif
-
-if has('win32')
-    set backspace=indent,eol,start
-    set belloff=all
-endif
-
 syntax on
 set ruler
 set rnu
