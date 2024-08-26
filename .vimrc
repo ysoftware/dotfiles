@@ -43,6 +43,8 @@ endif
 if has('mac')
     nnoremap <leader>p *ve"hy:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @h<CR>
     vnoremap <leader>p "hy:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @h<CR>
+    
+    nnoremap <leader>c *ve"hy:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim (public\|final\|private\|)(\s+)(var\|let\|class\|struct\|protocol\|case)(\s+)'.@h<CR>
 elseif has('linux')
     nnoremap <leader>p *ve"hy:exe 'AgIn ~/Documents ' . @h<CR>
     vnoremap <leader>p "hy:exe 'AgIn ~/Documents ' . @h<CR>
