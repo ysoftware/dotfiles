@@ -41,13 +41,11 @@ endif
 
 " Search symbol under cursor
 if has('mac')
-    nnoremap <leader>p *ve"hy:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @h<CR>
-    vnoremap <leader>p "hy:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @h<CR>
-    
-    nnoremap <leader>d *ve"hy:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ^(\s+)(public\|final\|private\|)(\s+)(var\|let\|class\|struct\|protocol\|case)(\s+)'.@h<CR>
+    nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @h<CR>
+    nnoremap <leader>d "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ^.*(func\|var\|let\|class\|struct\|protocol\|case)(\s+)'.@h<CR>
 elseif has('linux')
-    nnoremap <leader>p *ve"hy:exe 'AgIn ~/Documents ' . @h<CR>
-    vnoremap <leader>p "hy:exe 'AgIn ~/Documents ' . @h<CR>
+    nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents ' . @h<CR>
+    nnoremap <leader>d "hyiw:exe 'AgIn ~/Documents ^.*(fun \|fn \|void \|int \|struct \|enum )(\s+)'.@h<CR>
 endif
 
 nnoremap <C-h> :History<CR>
@@ -185,7 +183,6 @@ set ic " case insensitive search
 set gdefault
 let g:searchindex_line_limit=2000000
 
-nnoremap <leader>p :cp<CR>
 nnoremap <leader>n :cn<CR>
 
 vnoremap // "hy/\C\V<C-R>=escape(@h, '\/')<CR><CR>
