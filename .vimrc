@@ -185,6 +185,9 @@ set ic " case insensitive search
 set gdefault
 let g:searchindex_line_limit=2000000
 
+nnoremap <leader>p :cp<CR>
+nnoremap <leader>n :cn<CR>
+
 vnoremap // "hy/\C\V<C-R>=escape(@h, '\/')<CR><CR>
 vnoremap ts "hy:%s/\V<C-R>=escape(@h, '\/')<CR>//gcI<Left><Left><Left><Left>
 
