@@ -44,7 +44,7 @@ if has('mac')
     nnoremap <leader>p *ve"hy:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @h<CR>
     vnoremap <leader>p "hy:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @h<CR>
     
-    nnoremap <leader>c *ve"hy:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim (public\|final\|private\|)(\s+)(var\|let\|class\|struct\|protocol\|case)(\s+)'.@h<CR>
+    nnoremap <leader>d *ve"hy:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ^(\s+)(public\|final\|private\|)(\s+)(var\|let\|class\|struct\|protocol\|case)(\s+)'.@h<CR>
 elseif has('linux')
     nnoremap <leader>p *ve"hy:exe 'AgIn ~/Documents ' . @h<CR>
     vnoremap <leader>p "hy:exe 'AgIn ~/Documents ' . @h<CR>
@@ -194,6 +194,7 @@ vnoremap ts "hy:%s/\V<C-R>=escape(@h, '\/')<CR>//gcI<Left><Left><Left><Left>
 nnoremap n nzzzv
 nnoremap N Nzzzv
 let mapleader = " "
+set switchbuf+=useopen
 
 " Brackets around selection
 xnoremap <leader>[ <ESC>a]<ESC>gv`<<ESC>i[<ESC>
@@ -263,7 +264,9 @@ set sw=4
 
 if has('mac')
     command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
-    nnoremap <C-b> :w<CR>:!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript<CR><CR>
+    nnoremap <C-b> :w<CR>:!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript<CR><CR> 
+    nnoremap <leader>e :cgete system('~/Documents/GitHub/XcodeVim/app.exe C24MobileSimOnly')<CR>:copen<CR>
+    nnoremap <leader>l :ccl<CR>
 else
     nnoremap <C-b> :make -B<CR>
 endif
