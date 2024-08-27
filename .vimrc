@@ -7,7 +7,7 @@
 " Replace Xcode
 " - File explorer (with single state, where certain directories stay open)
 " - Jump between edited/specific set of files
-" - Search and replace in multiple files
+" - Replace in multiple files
 
 " Snippets
 if has('mac')
@@ -19,37 +19,6 @@ if has('mac')
   augroup END
 endif
  
-" Setup File Search
-if has('win32')
-    nnoremap <C-S-up> :call OpenOrSwitchToTab('D:\Documents\GitHub\vimrc\.vimrc')<CR>
-    nnoremap <C-]> :Files D:\Documents<CR>
-    nnoremap <C-p> :AgIn D:\Documents<CR>
-elseif has('mac')
-    nnoremap <C-S-down> :call OpenOrSwitchToTab('~/Documents/Check24/check24-worklog/worklog.txt')<CR>
-    nnoremap <C-S-up> :call OpenOrSwitchToTab('~/Documents/GitHub/vimrc/.vimrc')<CR>
-
-    nnoremap <C-]> :Files ~/Documents/Check24/ios-pod-mobile-sim<CR>
-    nnoremap <C-p> :AgIn ~/Documents/Check24/ios-pod-mobile-sim<CR>
-    nnoremap <leader><C-]> :Files ~/Documents<CR>
-    nnoremap <leader><C-p> :AgIn ~/Documents<CR>
-elseif has('linux')
-    nnoremap <C-S-down> :call OpenOrSwitchToTab('~/Documents/os-todos.txt')<CR>
-    nnoremap <C-S-up> :call OpenOrSwitchToTab('~/Documents/GitHub/vimrc/.vimrc')<CR>
-    nnoremap <C-]> :Files ~/Documents/<CR>
-    nnoremap <C-p> :AgIn ~/Documents/<CR>
-endif
-
-" Search symbol under cursor
-if has('mac')
-    nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @h<CR>
-    nnoremap <leader>d "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ^.*(func\|var\|let\|class\|struct\|protocol\|case)(\s+)'.@h<CR>
-elseif has('linux')
-    nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents ' . @h<CR>
-    nnoremap <leader>d "hyiw:exe 'AgIn ~/Documents ^.*(fun \|fn \|void \|int \|struct \|enum )(\s+)'.@h<CR>
-endif
-
-nnoremap <C-h> :History<CR>
-
 " List of installed plugins
 call plug#begin('~/.local/share/nvim/plugged')
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
@@ -178,13 +147,6 @@ set autowrite
 set wildignorecase
 set scroll=15
 
-" Search
-set ic " case insensitive search
-set gdefault
-let g:searchindex_line_limit=2000000
-
-nnoremap <leader>n :cn<CR>
-
 vnoremap // "hy/\C\V<C-R>=escape(@h, '\/')<CR><CR>
 vnoremap ts "hy:%s/\V<C-R>=escape(@h, '\/')<CR>//gcI<Left><Left><Left><Left>
 
@@ -287,3 +249,40 @@ function! OpenOrSwitchToTab(file)
     execute 'tabnew ' . a:file
   endif
 endfunction
+
+" - SEARCH
+
+" File Search
+if has('win32')
+    nnoremap <C-S-up> :call OpenOrSwitchToTab('D:\Documents\GitHub\vimrc\.vimrc')<CR>
+    nnoremap <C-]> :Files D:\Documents<CR>
+    nnoremap <C-p> :AgIn D:\Documents<CR>
+elseif has('mac')
+    nnoremap <C-S-down> :call OpenOrSwitchToTab('~/Documents/Check24/check24-worklog/worklog.txt')<CR>
+    nnoremap <C-S-up> :call OpenOrSwitchToTab('~/Documents/GitHub/vimrc/.vimrc')<CR>
+
+    nnoremap <C-]> :Files ~/Documents/Check24/ios-pod-mobile-sim<CR>
+    nnoremap <C-p> :AgIn ~/Documents/Check24/ios-pod-mobile-sim<CR>
+    nnoremap <leader><C-]> :Files ~/Documents<CR>
+    nnoremap <leader><C-p> :AgIn ~/Documents<CR>
+elseif has('linux')
+    nnoremap <C-S-down> :call OpenOrSwitchToTab('~/Documents/os-todos.txt')<CR>
+    nnoremap <C-S-up> :call OpenOrSwitchToTab('~/Documents/GitHub/vimrc/.vimrc')<CR>
+    nnoremap <C-]> :Files ~/Documents/<CR>
+    nnoremap <C-p> :AgIn ~/Documents/<CR>
+endif
+
+" Symbol under cursor
+if has('mac')
+    nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @h<CR>
+    nnoremap <leader>d "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ^.*(actor\|enum\|func\|var\|let\|class\|struct\|protocol\|case)(\s+)'.@h<CR>
+elseif has('linux')
+    nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents ' . @h<CR>
+    nnoremap <leader>d "hyiw:exe 'AgIn ~/Documents ^.*(fun \|fn \|void \|int \|struct \|enum )(\s+)'.@h<CR>
+endif
+
+set ic " case insensitive search
+set gdefault
+let g:searchindex_line_limit=2000000
+nnoremap <leader>n :cn<CR>
+nnoremap <C-h> :History<CR>
