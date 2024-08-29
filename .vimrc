@@ -83,9 +83,6 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
-" LSP setup
-" lua require'lspconfig'.sourcekit.setup{}
-
 " Setup nerd tree
 let NERDTreeShowHidden=1
 let g:NERDTreeWinSize=50
@@ -127,19 +124,11 @@ noremap y "+y
 noremap Y "+Y
 
 " Visuals
-if has('win32')
-    set guifont=Fira\ Code:h15
-elseif has('linux')
+if has('linux')
     set guifont=Fira\ Code:h20
 elseif has('mac')
     set guifont=Fira_Code_Retina:h16
 endif
-
-if has('win32')
-    set backspace=indent,eol,start
-    set belloff=all
-endif
-
 syntax on
 set ruler
 set rnu
@@ -152,8 +141,6 @@ vnoremap // "hy/\C\V<C-R>=escape(@h, '\/')<CR><CR>
 vnoremap ts "hy:%s/\V<C-R>=escape(@h, '\/')<CR>//gcI<Left><Left><Left><Left>
 
 " Navigation
-" nnoremap <C-d> <C-d>zz 
-" nnoremap <C-u> <C-u>zz 
 nnoremap n nzzzv
 nnoremap N Nzzzv
 let mapleader = " "
@@ -245,11 +232,7 @@ endfunction
 " - SEARCH
 
 " File Search
-if has('win32')
-    nnoremap <C-S-up> :call OpenOrSwitchToTab('D:\Documents\GitHub\vimrc\.vimrc')<CR>
-    nnoremap <C-]> :Files D:\Documents<CR>
-    nnoremap <C-p> :AgIn D:\Documents<CR>
-elseif has('mac')
+if has('mac')
     nnoremap <C-S-down> :call OpenOrSwitchToTab('~/Documents/Check24/check24-worklog/worklog.txt')<CR>
     nnoremap <C-S-up> :call OpenOrSwitchToTab('~/Documents/GitHub/vimrc/.vimrc')<CR>
 
@@ -278,12 +261,12 @@ set gdefault
 let g:searchindex_line_limit=2000000
 nnoremap <leader>n :cn<CR>
 nnoremap <C-h> :History<CR>
+nnoremap <leader>l :ccl<CR>
 
 if has('mac')
     command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
     nnoremap <C-b> :w<CR>:!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript<CR><CR> 
     nnoremap <leader>e :cgete system('~/Documents/GitHub/XcodeVim/app.exe C24MobileSimOnly')<CR>:copen<CR>
-    nnoremap <leader>l :ccl<CR>
 else
     nnoremap <C-b> :make -B<CR>
 endif
