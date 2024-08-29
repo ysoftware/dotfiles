@@ -13,6 +13,7 @@
 if has('mac')
   augroup SwiftSnippets
     autocmd!
+    autocmd FileType swift abbrev wink .sink { [weak self] in<CR><CR>}<CR>.store(in: &subscribers)<Up><Up><Up><Left><Left><Left>
     autocmd FileType swift abbrev ws [weak self] in<Left><Left><Left>
     autocmd FileType swift abbrev gl guard let self else { return }
     autocmd FileType swift abbrev si .store(in: &subscribers)
@@ -224,15 +225,6 @@ set softtabstop=4   " Sets the number of columns for a TAB.
 set expandtab       " Expand TABs to spaces.
 set sw=4
 
-if has('mac')
-    command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
-    nnoremap <C-b> :w<CR>:!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript<CR><CR> 
-    nnoremap <leader>e :cgete system('~/Documents/GitHub/XcodeVim/app.exe C24MobileSimOnly')<CR>:copen<CR>
-    nnoremap <leader>l :ccl<CR>
-else
-    nnoremap <C-b> :make -B<CR>
-endif
-
 " close all other buffers
 command! Bufo silent! execute "%bd|e#|bd#"
 
@@ -286,3 +278,12 @@ set gdefault
 let g:searchindex_line_limit=2000000
 nnoremap <leader>n :cn<CR>
 nnoremap <C-h> :History<CR>
+
+if has('mac')
+    command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
+    nnoremap <C-b> :w<CR>:!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript<CR><CR> 
+    nnoremap <leader>e :cgete system('~/Documents/GitHub/XcodeVim/app.exe C24MobileSimOnly')<CR>:copen<CR>
+    nnoremap <leader>l :ccl<CR>
+else
+    nnoremap <C-b> :make -B<CR>
+endif
