@@ -267,33 +267,32 @@ if has('mac')
     command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
     nnoremap <C-b> :w<CR>:!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript<CR><CR> 
     nnoremap <leader>e :cgete system('~/Documents/GitHub/XcodeVim/app.exe C24MobileSimOnly')<CR>:copen<CR>
-
-    lua << EOF
-    function ShowDiagnosticMessage()
-        vim.diagnostic.hide()
-        local ns_id = vim.api.nvim_create_namespace("XcodeVim")
-
-        -- vim.fn.system("~/Documents/GitHub/XcodeVim/app.exe C24MobileSimOnly")
-        -- first find the buffer in question
-        -- vim.api.nvim_list_bufs()
-
-        local bufnr = vim.api.nvim_get_current_buf()
-        local diagnostic = {{
-            bufnr = bufnr,
-            lnum = 283,
-            col = 8,
-            end_lnum = 283,
-            end_col = 16,
-            severity = vim.diagnostic.severity.ERROR,
-            message = "Hey take a look at that!",
-        }}
-        vim.diagnostic.set(ns_id, bufnr, diagnostic)
-    end
-    EOF
-
     nnoremap <silent> <leader>b :lua ShowDiagnosticMessage()<CR>
 else
     nnoremap <C-b> :make<CR>
     nnoremap <leader>e :copen<CR>
 endif
 
+
+lua << EOF
+function ShowDiagnosticMessage()
+    vim.diagnostic.hide()
+    local ns_id = vim.api.nvim_create_namespace("XcodeVim")
+
+    -- vim.fn.system("~/Documents/GitHub/XcodeVim/app.exe C24MobileSimOnly")
+    -- first find the buffer in question
+    -- vim.api.nvim_list_bufs()
+
+    local bufnr = vim.api.nvim_get_current_buf()
+    local diagnostic = {{
+        bufnr = bufnr,
+        lnum = 283,
+        col = 8,
+        end_lnum = 283,
+        end_col = 16,
+        severity = vim.diagnostic.severity.ERROR,
+        message = "Hey take a look at that!",
+    }}
+    vim.diagnostic.set(ns_id, bufnr, diagnostic)
+end
+EOF
