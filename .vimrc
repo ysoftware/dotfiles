@@ -271,7 +271,8 @@ if has('mac')
     command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
     nnoremap <C-b> :w<CR>:!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript<CR><CR> 
 else
-    nnoremap <C-b> :make -B<CR>
+    nnoremap <C-b> :make<CR>
+    nnoremap <leader>e :copen<CR>
 endif
 
 " LSP
