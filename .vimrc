@@ -29,8 +29,7 @@ Plug 'junegunn/fzf.vim'
 Plug 'keith/swift.vim' " Swift support
 Plug 'jansedivy/jai.vim' " Jai support
 
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-
+Plug 'neoclide/coc.nvim', {'branch': 'release'} " Code completions
 " Plug 'nvim-lua/plenary.nvim' " Needed for telescope
 " Plug 'MunifTanjim/nui.nvim' " needed for xcodebuild
 " Plug 'nvim-telescope/telescope.nvim' " needed for xcodebuild
@@ -52,7 +51,9 @@ let g:fzf_history_dir = '~/.local/share/fzf-history'
 let g:fzf_action = { 'enter': 'tab split' }
 
 " LSP
-lua require("lspconfig").sourcekit.setup {}
+if has('mac')
+    lua require("lspconfig").sourcekit.setup {}
+endif
 lua require("lspconfig").rust_analyzer.setup {}
 
 " Files setup
