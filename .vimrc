@@ -29,8 +29,13 @@ Plug 'junegunn/fzf.vim'
 Plug 'keith/swift.vim' " Swift support
 Plug 'jansedivy/jai.vim' " Jai support
 
+" Plug 'nvim-lua/plenary.nvim' " Needed for telescope
+" Plug 'MunifTanjim/nui.nvim' " needed for xcodebuild
+" Plug 'nvim-telescope/telescope.nvim' " needed for xcodebuild
+" Plug 'wojciech-kulik/xcodebuild.nvim' " Xcode tools
+
 " Plug 'mbbill/undotree'
-" Plug 'neovim/nvim-lspconfig'
+Plug 'neovim/nvim-lspconfig'
 Plug 'tpope/vim-fugitive' " Git
 Plug 'airblade/vim-gitgutter'
 Plug 'itchyny/lightline.vim' " Status line
@@ -127,7 +132,7 @@ noremap Y "+Y
 if has('linux')
     set guifont=Fira\ Code:h20
 elseif has('mac')
-    set guifont=Fira_Code_Retina:h16
+    set guifont=Fira_Code_Retina:h15
 endif
 syntax on
 set ruler
@@ -250,23 +255,39 @@ endif
 " Symbol under cursor
 if has('mac')
     nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @h<CR>
-    nnoremap <leader>d "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ^.*(actor\|enum\|func\|var\|let\|class\|struct\|protocol\|case)(\s+)'.@h<CR>
+    " nnoremap <leader>d "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ^.*(actor\|enum\|func\|var\|let\|class\|struct\|protocol\|case)(\s+)'.@h<CR>
 elseif has('linux')
     nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents ' . @h<CR>
-    nnoremap <leader>d "hyiw:exe 'AgIn ~/Documents ^.*(fun \|fn \|void \|int \|struct \|enum )(\s+)'.@h<CR>
 endif
 
 set ic " case insensitive search
 set gdefault
 let g:searchindex_line_limit=2000000
-nnoremap <leader>n :cn<CR>
 nnoremap <C-h> :History<CR>
+nnoremap <leader>n :cn<CR>
 nnoremap <leader>l :ccl<CR>
 
 if has('mac')
     command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
     nnoremap <C-b> :w<CR>:!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript<CR><CR> 
-    nnoremap <leader>e :cgete system('~/Documents/GitHub/XcodeVim/app.exe C24MobileSimOnly')<CR>:copen<CR>
 else
     nnoremap <C-b> :make -B<CR>
 endif
+
+" LSP
+nnoremap <leader>h :lua vim.lsp.buf.hover()<CR>
+nnoremap <leader>k :lua vim.diagnostic.open_float()<CR>
+nnoremap <leader>d :lua vim.lsp.buf.definition()<CR>
+
+lua << EOF
+    require("lspconfig").sourcekit.setup({ })
+
+--    require("xcodebuild").setup({
+--    show_build_progress_bar = true,
+--        integrations = {
+--            xcode_build_server = {
+--                enabled = true
+--            }
+--        }
+--    })
+EOF
