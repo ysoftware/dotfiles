@@ -30,10 +30,10 @@ Plug 'keith/swift.vim' " Swift support
 Plug 'jansedivy/jai.vim' " Jai support
 
 Plug 'neoclide/coc.nvim', {'branch': 'release'} " Code completions
-" Plug 'nvim-lua/plenary.nvim' " Needed for telescope
-" Plug 'MunifTanjim/nui.nvim' " needed for xcodebuild
-" Plug 'nvim-telescope/telescope.nvim' " needed for xcodebuild
-" Plug 'wojciech-kulik/xcodebuild.nvim' " Xcode tools
+Plug 'wojciech-kulik/xcodebuild.nvim' " Xcode tools
+Plug 'MunifTanjim/nui.nvim' " needed for xcodebuild
+Plug 'nvim-telescope/telescope.nvim' " needed for xcodebuild
+Plug 'nvim-lua/plenary.nvim' " Needed for telescope
 
 " Plug 'mbbill/undotree'
 Plug 'neovim/nvim-lspconfig'
@@ -172,6 +172,7 @@ nmap ]h <Plug>(GitGutterNextHunk)zz
 nmap [h <Plug>(GitGutterPrevHunk)zz
 
 nnoremap <leader>g :vertical:G<CR>
+nnoremap <leader>gd :GitGutterDiff<CR>
 
 " Create new tab
 nnoremap tg gT
@@ -262,7 +263,6 @@ endif
 " Symbol under cursor
 if has('mac')
     nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @h<CR>
-    " nnoremap <leader>d "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ^.*(actor\|enum\|func\|var\|let\|class\|struct\|protocol\|case)(\s+)'.@h<CR>
 elseif has('linux')
     nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents ' . @h<CR>
 endif
@@ -282,6 +282,25 @@ else
     nnoremap <leader>e :copen<CR>
 endif
 
+" Vim LSP
 nnoremap <leader>h :lua vim.lsp.buf.hover()<CR>
 nnoremap <leader>k :lua vim.diagnostic.open_float()<CR>
 nnoremap <leader>d :lua vim.lsp.buf.definition()<CR>
+
+" Completions
+set updatetime=150
+set signcolumn=yes
+autocmd Filetype * let b:coc_suggest_disable=1
+" inoremap <silent><expr><C-n> coc#refresh()
+" inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
+"     \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+" Xcodebuild
+if has('mac')
+    lua require("xcodebuild").setup {}
+    nnoremap <leader>e :XcodebuildPicker<CR>
+    nnoremap <leader>r :Simo<CR> :XcodebuildBuildRun<CR>
+
+    command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/Example/' 
+endif
+
