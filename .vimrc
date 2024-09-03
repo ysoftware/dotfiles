@@ -139,7 +139,7 @@ noremap Y "+Y
 if has('linux')
     set guifont=Fira\ Code:h20
 elseif has('mac')
-    set guifont=Fira_Code_Retina:h15
+    set guifont=Fira_Code_Retina:h16
 endif
 syntax on
 set ruler
@@ -172,7 +172,7 @@ nmap ]h <Plug>(GitGutterNextHunk)zz
 nmap [h <Plug>(GitGutterPrevHunk)zz
 
 nnoremap <leader>g :vertical:G<CR>
-nnoremap <leader>gd :GitGutterDiff<CR>
+command! Diff execute 'GitGutterDiff'
 
 " Create new tab
 nnoremap tg gT
@@ -303,4 +303,3 @@ if has('mac')
 
     command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/Example/' 
 endif
-
