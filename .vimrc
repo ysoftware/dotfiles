@@ -112,7 +112,7 @@ let g:lightline = { 'colorscheme': 'one',
       \ }
 
 " weird auto-text wrapping to new line, this is horrible
-set formatoptions-=cro
+autocmd Filetype * set formatoptions-=cro
 
 " Before this theme is installed via :PlugInstall, vimrc will give an error here
 colorscheme vscode
@@ -288,6 +288,7 @@ nnoremap <leader>k :lua vim.diagnostic.open_float()<CR>
 nnoremap <leader>d :lua vim.lsp.buf.definition()<CR>
 
 " Completions
+set complete-=t " don't include tags in searching for completions
 set updatetime=150
 set signcolumn=yes
 autocmd Filetype * let b:coc_suggest_disable=1
@@ -302,7 +303,8 @@ if has('mac')
     nnoremap <leader>r :Simo<CR> :XcodebuildBuildRun<CR>
     command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/Example/' 
     command! Setup :XcodebuildPicker
+    command! Lg :XcodebuildOpenLog
     
     " [Ticket] Take branch name as ticket number and put at the start of commit
-    command! Tick execute 'normal /branch <CR>f/<Right>veeeyggpI[<Esc>A] '
+    command! Tick execute 'keeppatterns normal /branch <CR>f/<Right>veeeyggpI[<Esc>A] '
 endif
