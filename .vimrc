@@ -295,11 +295,14 @@ autocmd Filetype * let b:coc_suggest_disable=1
 " inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
 "     \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
-" Xcodebuild
 if has('mac')
+    " Xcodebuild
     lua require("xcodebuild").setup {}
-    nnoremap <leader>e :XcodebuildPicker<CR>
+    nnoremap <leader>e :Telescope quickfix<CR>
     nnoremap <leader>r :Simo<CR> :XcodebuildBuildRun<CR>
-
     command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/Example/' 
+    command! Setup :XcodebuildPicker
+    
+    " [Ticket] Take branch name as ticket number and put at the start of commit
+    command! Tick execute 'normal /branch <CR>f/<Right>veeeyggpI[<Esc>A] '
 endif
