@@ -36,6 +36,7 @@ Plug 'nvim-telescope/telescope.nvim' " needed for xcodebuild
 Plug 'nvim-lua/plenary.nvim' " Needed for telescope
 
 " Plug 'mbbill/undotree'
+Plug 'kshenoy/vim-signature'
 Plug 'neovim/nvim-lspconfig'
 Plug 'tpope/vim-fugitive' " Git
 Plug 'airblade/vim-gitgutter'
@@ -263,8 +264,10 @@ endif
 " Symbol under cursor
 if has('mac')
     nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @h<CR>
+    nnoremap <leader>P "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ^.*(actor\|enum\|func\|var\|let\|class\|struct\|protocol\|case)(\s+)'.@h<CR>
 elseif has('linux')
     nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents ' . @h<CR>
+    nnoremap <leader>P "hyiw:exe 'AgIn ~/Documents ^.*(fun\|fn\|void\|int\|struct\|enum)(\s+)'.@h<CR>
 endif
 
 set ic " case insensitive search
