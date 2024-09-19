@@ -49,7 +49,6 @@ Plug 'Mofiqul/vscode.nvim' " color theme
 call plug#end()
 
 let g:fzf_history_dir = '~/.local/share/fzf-history'
-let g:fzf_action = { 'enter': 'tab split' }
 
 " LSP
 if has('mac')
@@ -229,34 +228,20 @@ set sw=4
 " close all other buffers
 command! Bufo silent! execute "%bd|e#|bd#"
 
-function! OpenOrSwitchToTab(file)
-  let tab_open = 0
-  for tab in range(tabpagenr('$'))
-      if fnamemodify(bufname(tabpagebuflist(tab + 1)[0]), ':p') == fnamemodify(a:file, ':p')
-      execute 'tabnext ' . (tab + 1)
-      let tab_open = 1
-      break
-    endif
-  endfor
-  if !tab_open
-    execute 'tabnew ' . a:file
-  endif
-endfunction
-
 " - SEARCH
 
 " File Search
 if has('mac')
-    nnoremap <C-S-down> :call OpenOrSwitchToTab('~/Documents/Check24/check24-worklog/worklog.txt')<CR>
-    nnoremap <C-S-up> :call OpenOrSwitchToTab('~/Documents/GitHub/vimrc/.vimrc')<CR>
+    nnoremap <C-S-down> :e ~/Documents/Check24/check24-worklog/worklog.txt<CR>
+    nnoremap <C-S-up> :e ~/Documents/GitHub/vimrc/.vimrc<CR>
 
     nnoremap <C-]> :Files ~/Documents/Check24/ios-pod-mobile-sim<CR>
     nnoremap <C-p> :AgIn ~/Documents/Check24/ios-pod-mobile-sim<CR>
     nnoremap <leader><C-]> :Files ~/Documents<CR>
     nnoremap <leader><C-p> :AgIn ~/Documents<CR>
 elseif has('linux')
-    nnoremap <C-S-down> :call OpenOrSwitchToTab('~/Documents/os-todos.txt')<CR>
-    nnoremap <C-S-up> :call OpenOrSwitchToTab('~/Documents/GitHub/vimrc/.vimrc')<CR>
+    nnoremap <C-S-down> :e ~/Documents/os-todos.txt<CR>
+    nnoremap <C-S-up> :e ~/Documents/GitHub/vimrc/.vimrc<CR>
     nnoremap <C-]> :Files ~/Documents/<CR>
     nnoremap <C-p> :AgIn ~/Documents/<CR>
 endif
@@ -279,9 +264,7 @@ nnoremap <leader>l :XcodebuildCloseLogs<CR> :ccl<CR>
 
 if has('mac')
     command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
-    nnoremap <C-b> :w<CR>:!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript<CR><CR> 
 else
-    nnoremap <C-b> :make<CR>
     nnoremap <leader>e :copen<CR>
 endif
 
