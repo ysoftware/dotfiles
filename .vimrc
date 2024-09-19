@@ -275,7 +275,7 @@ set gdefault
 let g:searchindex_line_limit=2000000
 nnoremap <C-h> :History<CR>
 nnoremap <leader>n :cn<CR>
-nnoremap <leader>l :ccl<CR>
+nnoremap <leader>l :XcodebuildCloseLogs<CR> :ccl<CR>
 
 if has('mac')
     command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
