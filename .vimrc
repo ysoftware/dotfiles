@@ -225,8 +225,12 @@ set softtabstop=4   " Sets the number of columns for a TAB.
 set expandtab       " Expand TABs to spaces.
 set sw=4
 
-" close all other buffers
+" buffers
 command! Bufo silent! execute "%bd|e#|bd#"
+nnoremap <C-W>. :vertical res +10<CR>
+nnoremap <C-W>, :vertical res -10<CR>
+nnoremap <C-W>> :res +10<CR>
+nnoremap <C-W>< :res -10<CR>
 
 " - SEARCH
 
