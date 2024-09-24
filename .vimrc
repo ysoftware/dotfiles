@@ -26,6 +26,10 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'bling/vim-bufferline' " show all open buffers
 
+Plug 'mfussenegger/nvim-dap' " Debug adapter protocol
+Plug 'nvim-neotest/nvim-nio' " dependency of DAP
+Plug 'rcarriga/nvim-dap-ui' " Dap UI
+
 " Syntax highlighting
 Plug 'keith/swift.vim' " Swift support
 Plug 'jansedivy/jai.vim' " Jai support
@@ -60,6 +64,18 @@ if has('mac')
     lua require("lspconfig").sourcekit.setup {}
 endif
 lua require("lspconfig").rust_analyzer.setup {}
+
+" DAP (debug adapter protocol)
+lua require("xcodebuild.integrations.dap").setup("/Users/iaroslav.erokhin/Documents/Other/codelldb-x86_64-darwin/extension/adapter")
+lua require("dapui").setup()
+
+    " vim.keymap.set("n", "<leader>dd", xcodebuild.build_and_debug, { desc = "Build & Debug" })
+    " vim.keymap.set("n", "<leader>dr", xcodebuild.debug_without_build, { desc = "Debug Without Building" })
+    " vim.keymap.set("n", "<leader>dt", xcodebuild.debug_tests, { desc = "Debug Tests" })
+    " vim.keymap.set("n", "<leader>dT", xcodebuild.debug_class_tests, { desc = "Debug Class Tests" })
+    " vim.keymap.set("n", "<leader>b", xcodebuild.toggle_breakpoint, { desc = "Toggle Breakpoint" })
+    " vim.keymap.set("n", "<leader>B", xcodebuild.toggle_message_breakpoint, { desc = "Toggle Message Breakpoint" })
+    " vim.keymap.set("n", "<leader>dx", xcodebuild.terminate_session, { desc = "Terminate Debugger" })
 
 " Files setup
 command! -bang -nargs=+ -complete=dir Files
@@ -158,6 +174,14 @@ nnoremap N Nzzzv
 let mapleader = " "
 set switchbuf+=useopen
 
+nnoremap <leader>bn :bn<CR>
+nnoremap <leader>bv :bp<CR>
+
+" Tabs
+nnoremap tg gT
+nnoremap <leader>' :tabnew<CR>
+nnoremap <leader>q :bd<CR>
+
 " Brackets around selection
 xnoremap <leader>[ <ESC>a]<ESC>gv`<<ESC>i[<ESC>
 xnoremap <leader>( <ESC>a)<ESC>gv`<<ESC>i(<ESC>
@@ -173,11 +197,6 @@ nmap [h <Plug>(GitGutterPrevHunk)zz
 
 nnoremap <leader>g :vertical:G<CR>
 command! Diff execute 'GitGutterDiff'
-
-" Create new tab
-nnoremap tg gT
-nnoremap <leader>' :tabnew<CR>
-nnoremap <leader>q :bd<CR>
 
 " Funny command to quit insert mode without escape
 imap jk <Esc>:cd %:p:h<CR>
@@ -298,8 +317,9 @@ if has('mac')
     nnoremap <leader>e :Telescope quickfix<CR>
     nnoremap <leader>r :Simo<CR> :XcodebuildBuildRun<CR>
     command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/Example/' 
-    command! Setup :XcodebuildPicker
+    command! Set :XcodebuildPicker
     command! Lg :XcodebuildOpenLog
+    command! QAct :XcodebuildCodeActions
     
     " [Ticket] Take branch name as ticket number and put at the start of commit
     command! Tick execute 'keeppatterns normal /branch <CR>f/<Right>veeeyggpI[<Esc>A] '
