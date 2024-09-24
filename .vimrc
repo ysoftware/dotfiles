@@ -55,6 +55,7 @@ if has('mac')
     lua require("lspconfig").sourcekit.setup {}
 endif
 lua require("lspconfig").rust_analyzer.setup {}
+lua require("lspconfig").ols.setup {}
 
 " Files setup
 command! -bang -nargs=+ -complete=dir Files
@@ -279,6 +280,7 @@ if has('mac')
     nnoremap <C-b> :w<CR>:!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript<CR><CR> 
 else
     nnoremap <C-b> :make<CR>
+    nnoremap <silent><leader>b :make<CR>
     nnoremap <leader>e :copen<CR>
 endif
 
