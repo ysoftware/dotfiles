@@ -20,37 +20,38 @@ if has('mac')
   augroup END
 endif
  
-" List of installed plugins
 call plug#begin('~/.local/share/nvim/plugged')
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
-Plug 'bling/vim-bufferline' " show all open buffers
 
+" Fuzzy finder
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } } 
+Plug 'junegunn/fzf.vim'
+
+if has('mac') " Xcode stuff
 Plug 'mfussenegger/nvim-dap' " Debug adapter protocol
 Plug 'nvim-neotest/nvim-nio' " dependency of DAP
 Plug 'rcarriga/nvim-dap-ui' " Dap UI
+Plug 'wojciech-kulik/xcodebuild.nvim' " Xcode tools
+Plug 'MunifTanjim/nui.nvim' " needed for xcodebuild
+Plug 'nvim-telescope/telescope.nvim' " needed for xcodebuild
+Plug 'nvim-lua/plenary.nvim' " Needed for telescope
+endif
 
 " Syntax highlighting
 Plug 'keith/swift.vim' " Swift support
 Plug 'jansedivy/jai.vim' " Jai support
 
-Plug 'neoclide/coc.nvim', {'branch': 'release'} " Code completions
-Plug 'wojciech-kulik/xcodebuild.nvim' " Xcode tools
-Plug 'MunifTanjim/nui.nvim' " needed for xcodebuild
-Plug 'nvim-telescope/telescope.nvim' " needed for xcodebuild
-Plug 'nvim-lua/plenary.nvim' " Needed for telescope
+Plug 'preservim/nerdtree' | " File browser
+    \ Plug 'Xuyuanp/nerdtree-git-plugin' " Plugin with git status
 
-" Plug 'mbbill/undotree'
-Plug 'kshenoy/vim-signature'
-Plug 'neovim/nvim-lspconfig'
+Plug 'neovim/nvim-lspconfig' " Lsp
 Plug 'tpope/vim-fugitive' " Git
-Plug 'airblade/vim-gitgutter'
+Plug 'airblade/vim-gitgutter' " More Git
+Plug 'bling/vim-bufferline' " Show all open buffers
+Plug 'kshenoy/vim-signature' " Show marks
 Plug 'itchyny/lightline.vim' " Status line
 Plug 'mhinz/vim-startify' " Startup screen
 Plug 'tpope/vim-commentary' " Comment lines of code
-Plug 'preservim/nerdtree' | " File browser
-    \ Plug 'Xuyuanp/nerdtree-git-plugin' " Plugin with git status
-Plug 'Mofiqul/vscode.nvim' " color theme
+Plug 'Mofiqul/vscode.nvim' " Color theme
 call plug#end()
 
 let g:fzf_history_dir = '~/.local/share/fzf-history'
@@ -60,23 +61,26 @@ let g:bufferline_inactive_highlight = 'StatusLineNC'
 let g:bufferline_solo_highlight = 0
 
 " LSP
-if has('mac')
-    lua require("lspconfig").sourcekit.setup {}
-endif
 lua require("lspconfig").rust_analyzer.setup {}
 lua require("lspconfig").ols.setup {}
 
+if has('mac')
+    lua require("lspconfig").sourcekit.setup {}
+endif
+
 " DAP (debug adapter protocol)
+if has('mac')
 lua require("xcodebuild.integrations.dap").setup("/Users/iaroslav.erokhin/Documents/Other/codelldb-x86_64-darwin/extension/adapter")
 lua require("dapui").setup()
 
-    " vim.keymap.set("n", "<leader>dd", xcodebuild.build_and_debug, { desc = "Build & Debug" })
-    " vim.keymap.set("n", "<leader>dr", xcodebuild.debug_without_build, { desc = "Debug Without Building" })
-    " vim.keymap.set("n", "<leader>dt", xcodebuild.debug_tests, { desc = "Debug Tests" })
-    " vim.keymap.set("n", "<leader>dT", xcodebuild.debug_class_tests, { desc = "Debug Class Tests" })
-    " vim.keymap.set("n", "<leader>b", xcodebuild.toggle_breakpoint, { desc = "Toggle Breakpoint" })
-    " vim.keymap.set("n", "<leader>B", xcodebuild.toggle_message_breakpoint, { desc = "Toggle Message Breakpoint" })
-    " vim.keymap.set("n", "<leader>dx", xcodebuild.terminate_session, { desc = "Terminate Debugger" })
+" vim.keymap.set("n", "<leader>dd", xcodebuild.build_and_debug, { desc = "Build & Debug" })
+" vim.keymap.set("n", "<leader>dr", xcodebuild.debug_without_build, { desc = "Debug Without Building" })
+" vim.keymap.set("n", "<leader>dt", xcodebuild.debug_tests, { desc = "Debug Tests" })
+" vim.keymap.set("n", "<leader>dT", xcodebuild.debug_class_tests, { desc = "Debug Class Tests" })
+" vim.keymap.set("n", "<leader>b", xcodebuild.toggle_breakpoint, { desc = "Toggle Breakpoint" })
+" vim.keymap.set("n", "<leader>B", xcodebuild.toggle_message_breakpoint, { desc = "Toggle Message Breakpoint" })
+" vim.keymap.set("n", "<leader>dx", xcodebuild.terminate_session, { desc = "Terminate Debugger" })
+endif
 
 " Files setup
 command! -bang -nargs=+ -complete=dir Files
@@ -146,7 +150,7 @@ else
     set background=dark
 endif
 
-" Copy paste stuff
+" Copy paste with system buffer
 noremap p "+p
 noremap P "+P
 noremap y "+y
@@ -158,6 +162,7 @@ if has('linux')
 elseif has('mac')
     set guifont=Fira_Code_Retina:h16
 endif
+
 syntax on
 set ruler
 set rnu
@@ -170,9 +175,9 @@ vnoremap // "hy/\C\V<C-R>=escape(@h, '\/')<CR><CR>
 vnoremap ts "hy:%s/\V<C-R>=escape(@h, '\/')<CR>//gcI<Left><Left><Left><Left>
 
 " Navigation
+let mapleader = " "
 nnoremap n nzzzv
 nnoremap N Nzzzv
-let mapleader = " "
 set switchbuf+=useopen
 
 nnoremap <leader>bn :bn<CR>
@@ -295,7 +300,6 @@ if has('mac')
     command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
 else
     nnoremap <C-b> :make<CR>
-    nnoremap <silent><leader>b :make<CR>
     nnoremap <leader>e :copen<CR>
 endif
 
