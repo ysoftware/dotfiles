@@ -281,6 +281,7 @@ endif
 nnoremap <leader>h :lua vim.lsp.buf.hover()<CR>
 nnoremap <leader>k :lua vim.diagnostic.open_float()<CR>
 nnoremap <leader>d :lua vim.lsp.buf.definition()<CR>
+nnoremap <leader>D :lua vim.lsp.buf.references()<CR>
 
 " Completions
 set complete-=t " don't include tags in searching for completions
