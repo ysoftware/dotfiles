@@ -24,6 +24,7 @@ endif
 call plug#begin('~/.local/share/nvim/plugged')
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
+Plug 'bling/vim-bufferline' " show all open buffers
 
 " Syntax highlighting
 Plug 'keith/swift.vim' " Swift support
@@ -36,6 +37,7 @@ Plug 'nvim-telescope/telescope.nvim' " needed for xcodebuild
 Plug 'nvim-lua/plenary.nvim' " Needed for telescope
 
 " Plug 'mbbill/undotree'
+Plug 'kshenoy/vim-signature'
 Plug 'neovim/nvim-lspconfig'
 Plug 'tpope/vim-fugitive' " Git
 Plug 'airblade/vim-gitgutter'
@@ -48,7 +50,10 @@ Plug 'Mofiqul/vscode.nvim' " color theme
 call plug#end()
 
 let g:fzf_history_dir = '~/.local/share/fzf-history'
-let g:fzf_action = { 'enter': 'tab split' }
+
+let g:bufferline_echo = 1
+let g:bufferline_inactive_highlight = 'StatusLineNC'
+let g:bufferline_solo_highlight = 0
 
 " LSP
 if has('mac')
@@ -96,11 +101,6 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
-" Setup nerd tree
-let NERDTreeShowHidden=1
-let g:NERDTreeWinSize=50
-let NERDTreeCustomOpenArgs={'file':{'where': 't'}}
-
 set noshowmode
 let g:lightline = { 'colorscheme': 'one', 
       \   'active': {
@@ -113,7 +113,7 @@ let g:lightline = { 'colorscheme': 'one',
       \ }
 
 " weird auto-text wrapping to new line, this is horrible
-set formatoptions-=cro
+autocmd Filetype * set formatoptions-=cro
 
 " Before this theme is installed via :PlugInstall, vimrc will give an error here
 colorscheme vscode
@@ -188,6 +188,10 @@ vnoremap < <gv
 vnoremap > >gv
 
 " Nerd tree
+let NERDTreeShowHidden=1
+let NERDTreeCustomOpenArgs={'file':{'keepopen': '0'}}
+let g:NERDTreeWinSize=50
+
 let g:NERDTreeGitStatusIndicatorMapCustom = {
     \ 'Modified'  :'m',
     \ 'Staged'    :'s',
@@ -195,14 +199,15 @@ let g:NERDTreeGitStatusIndicatorMapCustom = {
     \ 'Renamed'   :'r',
     \ 'Unmerged'  :'n',
     \ 'Deleted'   :'d',
-    \ 'Dirty'     :'✗',
+    \ 'Dirty'     :'x',
     \ 'Ignored'   :'i',
     \ 'Clean'     :'c',
     \ 'Unknown'   :'u',
     \ }
 
 nnoremap <C-f> :NERDTreeFind<CR>
-nnoremap <C-t> :NERDTreeToggleVCS<CR>
+nnoremap <leader><C-f> :NERDTreeVCS<CR>
+nnoremap <C-t> :NERDTreeToggle<CR>
 
 " Prettify json (depends on installed jq)
 command! Prettify :%!jq .
@@ -226,37 +231,27 @@ set softtabstop=4   " Sets the number of columns for a TAB.
 set expandtab       " Expand TABs to spaces.
 set sw=4
 
-" close all other buffers
+" buffers
 command! Bufo silent! execute "%bd|e#|bd#"
-
-function! OpenOrSwitchToTab(file)
-  let tab_open = 0
-  for tab in range(tabpagenr('$'))
-      if fnamemodify(bufname(tabpagebuflist(tab + 1)[0]), ':p') == fnamemodify(a:file, ':p')
-      execute 'tabnext ' . (tab + 1)
-      let tab_open = 1
-      break
-    endif
-  endfor
-  if !tab_open
-    execute 'tabnew ' . a:file
-  endif
-endfunction
+nnoremap <C-W>. :vertical res +10<CR>
+nnoremap <C-W>, :vertical res -10<CR>
+nnoremap <C-W>> :res +10<CR>
+nnoremap <C-W>< :res -10<CR>
 
 " - SEARCH
 
 " File Search
 if has('mac')
-    nnoremap <C-S-down> :call OpenOrSwitchToTab('~/Documents/Check24/check24-worklog/worklog.txt')<CR>
-    nnoremap <C-S-up> :call OpenOrSwitchToTab('~/Documents/GitHub/vimrc/.vimrc')<CR>
+    nnoremap <C-S-down> :e ~/Documents/Check24/check24-worklog/worklog.txt<CR>
+    nnoremap <C-S-up> :e ~/Documents/GitHub/vimrc/.vimrc<CR>
 
     nnoremap <C-]> :Files ~/Documents/Check24/ios-pod-mobile-sim<CR>
     nnoremap <C-p> :AgIn ~/Documents/Check24/ios-pod-mobile-sim<CR>
     nnoremap <leader><C-]> :Files ~/Documents<CR>
     nnoremap <leader><C-p> :AgIn ~/Documents<CR>
 elseif has('linux')
-    nnoremap <C-S-down> :call OpenOrSwitchToTab('~/Documents/os-todos.txt')<CR>
-    nnoremap <C-S-up> :call OpenOrSwitchToTab('~/Documents/GitHub/vimrc/.vimrc')<CR>
+    nnoremap <C-S-down> :e ~/Documents/os-todos.txt<CR>
+    nnoremap <C-S-up> :e ~/Documents/GitHub/vimrc/.vimrc<CR>
     nnoremap <C-]> :Files ~/Documents/<CR>
     nnoremap <C-p> :AgIn ~/Documents/<CR>
 endif
@@ -264,8 +259,10 @@ endif
 " Symbol under cursor
 if has('mac')
     nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @h<CR>
+    nnoremap <leader>P "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ^.*(actor\|enum\|func\|var\|let\|class\|struct\|protocol\|case)(\s+)'.@h<CR>
 elseif has('linux')
     nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents ' . @h<CR>
+    nnoremap <leader>P "hyiw:exe 'AgIn ~/Documents ^.*(fun\|fn\|void\|int\|struct\|enum)(\s+)'.@h<CR>
 endif
 
 set ic " case insensitive search
@@ -273,11 +270,10 @@ set gdefault
 let g:searchindex_line_limit=2000000
 nnoremap <C-h> :History<CR>
 nnoremap <leader>n :cn<CR>
-nnoremap <leader>l :ccl<CR>
+nnoremap <leader>l :XcodebuildCloseLogs<CR> :ccl<CR>
 
 if has('mac')
     command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
-    nnoremap <C-b> :w<CR>:!osascript ~/Documents/GitHub/vimrc/build_xcode.applescript<CR><CR> 
 else
     nnoremap <C-b> :make<CR>
     nnoremap <silent><leader>b :make<CR>
@@ -288,8 +284,10 @@ endif
 nnoremap <leader>h :lua vim.lsp.buf.hover()<CR>
 nnoremap <leader>k :lua vim.diagnostic.open_float()<CR>
 nnoremap <leader>d :lua vim.lsp.buf.definition()<CR>
+nnoremap <leader>D :lua vim.lsp.buf.references()<CR>
 
 " Completions
+set complete-=t " don't include tags in searching for completions
 set updatetime=150
 set signcolumn=yes
 autocmd Filetype * let b:coc_suggest_disable=1
@@ -297,11 +295,15 @@ autocmd Filetype * let b:coc_suggest_disable=1
 " inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
 "     \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
-" Xcodebuild
 if has('mac')
+    " Xcodebuild
     lua require("xcodebuild").setup {}
-    nnoremap <leader>e :XcodebuildPicker<CR>
+    nnoremap <leader>e :Telescope quickfix<CR>
     nnoremap <leader>r :Simo<CR> :XcodebuildBuildRun<CR>
-
     command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/Example/' 
+    command! Setup :XcodebuildPicker
+    command! Lg :XcodebuildOpenLog
+    
+    " [Ticket] Take branch name as ticket number and put at the start of commit
+    command! Tick execute 'keeppatterns normal /branch <CR>f/<Right>veeeyggpI[<Esc>A] '
 endif
