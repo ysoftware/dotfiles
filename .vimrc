@@ -24,6 +24,7 @@ endif
 call plug#begin('~/.local/share/nvim/plugged')
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
+Plug 'bling/vim-bufferline' " show all open buffers
 
 " Syntax highlighting
 Plug 'keith/swift.vim' " Swift support
@@ -49,6 +50,10 @@ Plug 'Mofiqul/vscode.nvim' " color theme
 call plug#end()
 
 let g:fzf_history_dir = '~/.local/share/fzf-history'
+
+let g:bufferline_echo = 1
+let g:bufferline_inactive_highlight = 'StatusLineNC'
+let g:bufferline_solo_highlight = 0
 
 " LSP
 if has('mac')
@@ -94,11 +99,6 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
   silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
-
-" Setup nerd tree
-let NERDTreeShowHidden=1
-let g:NERDTreeWinSize=50
-let NERDTreeCustomOpenArgs={'file':{'where': 't'}}
 
 set noshowmode
 let g:lightline = { 'colorscheme': 'one', 
@@ -187,6 +187,10 @@ vnoremap < <gv
 vnoremap > >gv
 
 " Nerd tree
+let NERDTreeShowHidden=1
+let NERDTreeCustomOpenArgs={'file':{'keepopen': '0'}}
+let g:NERDTreeWinSize=50
+
 let g:NERDTreeGitStatusIndicatorMapCustom = {
     \ 'Modified'  :'m',
     \ 'Staged'    :'s',
@@ -201,7 +205,8 @@ let g:NERDTreeGitStatusIndicatorMapCustom = {
     \ }
 
 nnoremap <C-f> :NERDTreeFind<CR>
-nnoremap <C-t> :NERDTreeToggleVCS<CR>
+nnoremap <leader><C-f> :NERDTreeVCS<CR>
+nnoremap <C-t> :NERDTreeToggle<CR>
 
 " Prettify json (depends on installed jq)
 command! Prettify :%!jq .
