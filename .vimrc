@@ -64,6 +64,7 @@ if has('mac')
     lua require("lspconfig").sourcekit.setup {}
 endif
 lua require("lspconfig").rust_analyzer.setup {}
+lua require("lspconfig").ols.setup {}
 
 " DAP (debug adapter protocol)
 lua require("xcodebuild.integrations.dap").setup("/Users/iaroslav.erokhin/Documents/Other/codelldb-x86_64-darwin/extension/adapter")
@@ -293,6 +294,8 @@ nnoremap <leader>l :XcodebuildCloseLogs<CR> :ccl<CR>
 if has('mac')
     command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
 else
+    nnoremap <C-b> :make<CR>
+    nnoremap <silent><leader>b :make<CR>
     nnoremap <leader>e :copen<CR>
 endif
 
