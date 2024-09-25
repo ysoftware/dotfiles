@@ -63,6 +63,7 @@ let g:bufferline_solo_highlight = 0
 " LSP
 lua require("lspconfig").rust_analyzer.setup {}
 lua require("lspconfig").ols.setup {}
+lua require("lspconfig").clangd.setup {}
 
 if has('mac')
     lua require("lspconfig").sourcekit.setup {}
@@ -294,11 +295,12 @@ set gdefault
 let g:searchindex_line_limit=2000000
 nnoremap <C-h> :History<CR>
 nnoremap <leader>n :cn<CR>
-nnoremap <leader>l :XcodebuildCloseLogs<CR> :ccl<CR>
 
 if has('mac')
+    nnoremap <leader>l :XcodebuildCloseLogs<CR> :ccl<CR>
     command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
 else
+    nnoremap <leader>l :ccl<CR>
     nnoremap <C-b> :make<CR>
     nnoremap <leader>e :copen<CR>
 endif
@@ -313,10 +315,6 @@ nnoremap <leader>D :lua vim.lsp.buf.references()<CR>
 set complete-=t " don't include tags in searching for completions
 set updatetime=150
 set signcolumn=yes
-autocmd Filetype * let b:coc_suggest_disable=1
-" inoremap <silent><expr><C-n> coc#refresh()
-" inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
-"     \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
 if has('mac')
     " Xcodebuild
