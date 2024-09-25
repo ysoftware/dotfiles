@@ -317,7 +317,7 @@ autocmd Filetype * let b:coc_suggest_disable=1
 if has('mac')
     " Xcodebuild
     lua require("xcodebuild").setup {}
-    nnoremap <leader>e :Telescope quickfix<CR>
+    nnoremap <leader>e :Telescope quickfix<CR><Esc>
     nnoremap <leader>r :Simo<CR> :XcodebuildBuildRun<CR>
     command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/Example/' 
     command! Set :XcodebuildPicker
