@@ -71,16 +71,8 @@ endif
 
 " DAP (debug adapter protocol)
 if has('mac')
-lua require("xcodebuild.integrations.dap").setup("/Users/iaroslav.erokhin/Documents/Other/codelldb-x86_64-darwin/extension/adapter")
-lua require("dapui").setup()
-
-" vim.keymap.set("n", "<leader>dd", xcodebuild.build_and_debug, { desc = "Build & Debug" })
-" vim.keymap.set("n", "<leader>dr", xcodebuild.debug_without_build, { desc = "Debug Without Building" })
-" vim.keymap.set("n", "<leader>dt", xcodebuild.debug_tests, { desc = "Debug Tests" })
-" vim.keymap.set("n", "<leader>dT", xcodebuild.debug_class_tests, { desc = "Debug Class Tests" })
-" vim.keymap.set("n", "<leader>b", xcodebuild.toggle_breakpoint, { desc = "Toggle Breakpoint" })
-" vim.keymap.set("n", "<leader>B", xcodebuild.toggle_message_breakpoint, { desc = "Toggle Message Breakpoint" })
-" vim.keymap.set("n", "<leader>dx", xcodebuild.terminate_session, { desc = "Terminate Debugger" })
+    lua require("xcodebuild.integrations.dap").setup("/Users/iaroslav.erokhin/Documents/Other/codelldb-x86_64-darwin/extension/adapter")
+    lua require("dapui").setup()
 endif
 
 " Files setup
@@ -306,7 +298,7 @@ else
 endif
 
 " Vim LSP
-nnoremap <leader>h :lua vim.lsp.buf.hover()<CR>
+nnoremap <leader>hh :lua vim.lsp.buf.hover()<CR>
 nnoremap <leader>k :lua vim.diagnostic.open_float()<CR>
 nnoremap <leader>d :lua vim.lsp.buf.definition()<CR>
 nnoremap <leader>D :lua vim.lsp.buf.references()<CR>
@@ -324,8 +316,10 @@ if has('mac')
     command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/Example/' 
     command! Set :XcodebuildPicker
     command! Lg :XcodebuildOpenLog
-    command! QAct :XcodebuildCodeActions
+    nnoremap Q :XcodebuildCodeActions
     
     " [Ticket] Take branch name as ticket number and put at the start of commit
     command! Tick execute 'keeppatterns normal /branch <CR>f/<Right>veeeyggpI[<Esc>A] '
+else
+    nnoremap Q :lua vim.lsp.buf.code_action()<CR>
 endif
