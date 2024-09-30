@@ -287,13 +287,13 @@ set gdefault
 let g:searchindex_line_limit=2000000
 nnoremap <C-h> :History<CR>
 nnoremap <leader>n :cn<CR>
+nnoremap <C-b> :make<CR>
 
 if has('mac')
     nnoremap <leader>l :XcodebuildCloseLogs<CR> :ccl<CR>
     command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
 else
     nnoremap <leader>l :ccl<CR>
-    nnoremap <C-b> :make<CR>
     nnoremap <leader>e :copen<CR>
 endif
 
@@ -311,7 +311,7 @@ set signcolumn=yes
 if has('mac')
     " Xcodebuild
     lua require("xcodebuild").setup {}
-    nnoremap <leader>e :Telescope quickfix<CR>
+    nnoremap <leader>e :Telescope quickfix<CR><Esc>
     nnoremap <leader>r :Simo<CR> :XcodebuildBuildRun<CR>
     command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/Example/' 
     command! Set :XcodebuildPicker
