@@ -291,6 +291,7 @@ nnoremap <C-b> :make<CR>
 
 if has('mac')
     nnoremap <leader>l :XcodebuildCloseLogs<CR> :ccl<CR>
+    command! Setup :XcodebuildSetup
     command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
 else
     nnoremap <leader>l :ccl<CR>
