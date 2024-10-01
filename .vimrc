@@ -126,10 +126,6 @@ let g:lightline = { 'colorscheme': 'one',
 
 " weird auto-text wrapping to new line, this is horrible
 
-" Before this theme is installed via :PlugInstall, vimrc will give an error here
-noremap <C-S-Right> :set background=light<CR><C-l>
-noremap <C-S-Left> :set background=dark<CR><C-l>
-
 if has('mac')
     if system('defaults read -g AppleInterfaceStyle') == "Dark\n"
         set background=dark
@@ -140,6 +136,12 @@ else
     set background=dark
 endif
 
+noremap <C-S-Right> :set background=light<CR><C-l>
+noremap <C-S-Left> :set background=dark<CR><C-l>
+autocmd OptionSet background call yaroscheme#apply()
+colorscheme yaroscheme
+call yaroscheme#apply()
+
 " Copy paste with system buffer
 noremap p "+p
 noremap P "+P
@@ -147,9 +149,9 @@ noremap y "+y
 noremap Y "+Y
 
 " Visuals
-if has('linux')
-    set guifont=Fira\ Code:h20
-elseif has('mac')
+" On linux I use terminal, so font is set by that
+" Ligatures are also not supported, so whatever
+if has('mac')
     set guifont=Fira_Code_Retina:h16
 endif
 
@@ -301,11 +303,6 @@ nnoremap <leader>k :lua vim.diagnostic.open_float()<CR>
 nnoremap <leader>d :lua vim.lsp.buf.definition()<CR>
 nnoremap <leader>D :lua vim.lsp.buf.references()<CR>
 
-" Completions
-set complete-=t " don't include tags in searching for completions
-set updatetime=150
-set signcolumn=yes
-
 if has('mac')
     " Xcodebuild
     lua require("xcodebuild").setup {}
@@ -321,99 +318,3 @@ if has('mac')
 else
     nnoremap Q :lua vim.lsp.buf.code_action()<CR>
 endif
-
-
-" COLOR SCHEME
-hi clear
-if exists("syntax_on")
-    syntax reset
-endif
-
-let g:colors_name="yaro"
-
-function! s:setfg(group, color) 
-    exe "highlight " . a:group . " guibg=NONE guifg=" . a:color
-endfunction
-
-function! s:setbgfg(group, color_bg, color_fg) 
-    exe "highlight " . a:group . " guibg= " . a:color_bg . " guifg=" . a:color_fg
-endfunction
-
-let s:bg_default = "#181818"
-let s:bg_highlight = "#302f2b"
-let s:bg_select = "#4a6072"
-let s:bg_green = "#263f23"
-let s:bg_red = "#3f0909"
-
-let s:text_white = "#e5e5e5"
-let s:text_green = "#73bf69"
-let s:text_blue = "#95c1e5"
-let s:text_brown = "#bfa87c"
-let s:text_red = "#a51818"
-let s:text_yellow = "#e4e5ac"
-let s:text_darkgray = "#595959"
-
-call s:setbgfg("Normal", s:bg_default, s:text_white)
-call s:setbgfg("NormalNC", s:bg_default, s:text_white)
-call s:setfg("Comment", s:text_green)
-call s:setfg("Constant", s:text_white)
-call s:setfg("Identifier", s:text_white)
-call s:setfg("Special", s:text_white)
-call s:setfg("Ignore", s:text_white)
-call s:setfg("Underlined", s:text_white)
-call s:setfg("Todo", s:text_yellow)
-call s:setfg("Statement", s:text_blue)
-call s:setfg("Type", s:text_blue)
-call s:setfg("PreProc", s:text_brown)
-call s:setfg("Error", s:text_red)
-
-call s:setfg("String", s:text_green)
-call s:setfg("Character", s:text_green)
-call s:setfg("Include", s:text_green)
-call s:setfg("Operator", s:text_white)
-call s:setfg("SpecialChar", s:text_white)
-call s:setfg("Delimiter", s:text_white)
-call s:setfg("Structure", s:text_yellow)
-call s:setfg("Function", s:text_yellow)
-call s:setfg("Typedef", s:text_yellow)
-call s:setfg("StorageClass", s:text_yellow)
-call s:setfg("Number", s:text_blue)
-call s:setfg("Boolean", s:text_blue)
-call s:setfg("Float", s:text_blue)
-call s:setfg("Conditional", s:text_blue)
-call s:setfg("Repeat", s:text_blue)
-call s:setfg("Keyword", s:text_blue)
-call s:setfg("PreCondit", s:text_blue)
-call s:setfg("Define", s:text_brown)
-call s:setfg("Label", s:text_brown)
-call s:setfg("Macro", s:text_brown)
-
-call s:setfg("LineNr", s:text_yellow)
-call s:setfg("Directory", s:text_blue)
-call s:setfg("LineNrAbove", s:text_darkgray)
-call s:setfg("LineNrBelow", s:text_darkgray)
-
-call s:setbgfg("Search", s:bg_select, s:text_white)
-call s:setbgfg("IncSearch", s:bg_select, s:text_yellow)
-call s:setbgfg("EndOfBuffer", s:bg_default, s:text_white)
-
-call s:setfg("ErrorMsg", s:text_red)
-
-call s:setbgfg("QuickFixLine", s:bg_highlight, s:text_white)
-
-call s:setbgfg("Visual", s:bg_select, s:text_white)
-call s:setbgfg("VisualNOS", s:bg_select, s:text_white)
-
-call s:setbgfg("Pmenu", s:bg_default, s:text_white)
-call s:setbgfg("PmenuExtra", s:bg_default, s:text_white)
-call s:setbgfg("PmenuSbar", s:bg_default, s:text_white)
-call s:setbgfg("PmenuKind", s:bg_default, s:text_white)
-
-call s:setbgfg("DiffAdd", s:bg_green, s:text_white)
-call s:setbgfg("DiffChange", s:bg_green, s:text_white)
-call s:setbgfg("DiffDelete", s:bg_red, s:text_white)
-call s:setbgfg("DiffText", s:bg_default, s:text_white)
-
-" Git fugitive colors
-call s:setbgfg("diffAdded", s:bg_green, s:text_white)
-call s:setbgfg("diffRemoved", s:bg_red, s:text_white)
