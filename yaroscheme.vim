@@ -17,17 +17,17 @@ function! yaroscheme#apply()
 if &background == "dark"
     let s:bg_default = "#181818"
     let s:bg_highlight = "#302f2b"
-    let s:bg_select = "#4a6072"
+    let s:bg_select = "#424f59"
     let s:bg_green = "#263f23"
     let s:bg_red = "#3f0909"
 
     let s:text_normal = "#e5e5e5"
     let s:text_on_bg = "#e5e5e5"
-    let s:text_green = "#73bf69"
-    let s:text_blue = "#95c1e5"
-    let s:text_brown = "#bfa87c"
+    let s:text_green = "#b0e5ac"
+    let s:text_blue = "#accde5"
+    let s:text_brown = "#ccb484"
     let s:text_red = "#a51818"
-    let s:text_yellow = "#e4e5ac"
+    let s:text_yellow = "#e5e5ac"
     let s:text_darkgray = "#595959"
 else
     let s:bg_default = "#eaeaea"
@@ -48,7 +48,7 @@ endif
 
 call s:setbgfg("Normal", s:bg_default, s:text_normal)
 call s:setbgfg("NormalNC", s:bg_default, s:text_normal)
-call s:setfg("Comment", s:text_green)
+call s:setfg("Comment", s:text_darkgray)
 call s:setfg("Constant", s:text_normal)
 call s:setfg("Identifier", s:text_normal)
 call s:setfg("Special", s:text_normal)
