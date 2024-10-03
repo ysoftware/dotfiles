@@ -53,11 +53,37 @@ Plug 'mhinz/vim-startify' " Startup screen
 Plug 'tpope/vim-commentary' " Comment lines of code
 call plug#end()
 
+" Setup fzf
+let $FZF_DEFAULT_OPTS = '--bind ctrl-a:select-all'
 let g:fzf_history_dir = '~/.local/share/fzf-history'
+function! s:build_quickfix_list(lines)
+  call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
+  copen
+  cc
+endfunction
+let g:fzf_action = {
+  \ 'ctrl-q': function('s:build_quickfix_list'),
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-x': 'split',
+  \ 'ctrl-v': 'vsplit' }
 
 let g:bufferline_echo = 1
 let g:bufferline_inactive_highlight = 'StatusLineNC'
 let g:bufferline_solo_highlight = 0
+
+" Status line setup
+set noshowmode
+let g:lightline = { 'colorscheme': 'one', 
+      \   'active': {
+      \     'left': [[ 'mode', 'paste' ],
+      \              [ 'gitbranch', 'readonly', 'filename', 'modified' ]],
+      \     'right': [[ 'lineinfo' ],
+      \              [ 'fileencoding', 'filetype', 'charvaluehex' ]]
+      \   },
+      \   'component_function': {
+      \     'gitbranch': 'FugitiveHead'
+      \   },
+      \ }
 
 " LSP
 lua require("lspconfig").rust_analyzer.setup {}
@@ -112,17 +138,6 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
   silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
-
-set noshowmode
-let g:lightline = { 'colorscheme': 'one', 
-      \   'active': {
-      \     'left': [ [ 'mode', 'paste' ],
-      \               [ 'gitbranch', 'readonly', 'filename', 'modified' ]]
-      \   },
-      \   'component_function': {
-      \     'gitbranch': 'FugitiveHead'
-      \   },
-      \ }
 
 " weird auto-text wrapping to new line, this is horrible
 
@@ -273,6 +288,8 @@ elseif has('linux')
     nnoremap <C-p> :AgIn ~/Documents/<CR>
 endif
 
+" TODO: use current git repo root for <leader>p
+
 " Symbol under cursor
 if has('mac')
     nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @h<CR>
@@ -304,6 +321,8 @@ nnoremap <leader>k :lua vim.diagnostic.open_float()<CR>
 nnoremap <leader>d :lua vim.lsp.buf.definition()<CR>
 nnoremap <leader>D :lua vim.lsp.buf.references()<CR>
 
+command! Here execute 'cd %:p:h'
+
 if has('mac')
     " Xcodebuild
     lua require("xcodebuild").setup {}
@@ -319,3 +338,12 @@ if has('mac')
 else
     nnoremap Q :lua vim.lsp.buf.code_action()<CR>
 endif
+
+" hi link LspDiagnosticsDefaultError DiagnosticError
+" hi link LspDiagnosticsDefaultWarning DiagnosticWarn
+" hi link LspDiagnosticsDefaultInformation DiagnosticInfo
+" hi link LspDiagnosticsDefaultHint DiagnosticHint
+" hi link LspDiagnosticsUnderlineError DiagnosticUnderlineError
+" hi link LspDiagnosticsUnderlineWarning DiagnosticUnderlineWarn
+" hi link LspDiagnosticsUnderlineInformation DiagnosticUnderlineInfo
+" hi link LspDiagnosticsUnderlineHint DiagnosticUnderlineHint
