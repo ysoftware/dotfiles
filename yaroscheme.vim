@@ -21,7 +21,7 @@ if &background == "dark"
     let s:bg_green = "#263f23"
     let s:bg_red = "#3f0909"
 
-    let s:text_normal = "#e5e5e5"
+    let s:text_normal = "#fffff"
     let s:text_on_bg = "#e5e5e5"
     let s:text_green = "#b0e5ac"
     let s:text_blue = "#accde5"
@@ -30,20 +30,20 @@ if &background == "dark"
     let s:text_yellow = "#e5e5ac"
     let s:text_darkgray = "#595959"
 else
-    let s:bg_default = "#eaeaea"
+    let s:bg_default = "#f2f2f2"
     let s:bg_highlight = "#8fa9bf"
     let s:bg_select = "#6b8ba5"
     let s:bg_green = "#46a53a"
     let s:bg_red = "#a53a3a"
 
-    let s:text_normal = "#2b2b2b"
+    let s:text_normal = "#262626"
     let s:text_on_bg = "#ffffff"
-    let s:text_green = "#307228"
-    let s:text_blue = "#31638c"
-    let s:text_brown = "#593e0d"
+    let s:text_green = "#197211"
+    let s:text_blue = "#23608c"
+    let s:text_brown = "#725011"
     let s:text_red = "#bf1c1c"
-    let s:text_yellow = "#707205"
-    let s:text_darkgray = "#7f7f7f"
+    let s:text_yellow = "#727211"
+    let s:text_darkgray = "#566672"
 endif
 
 call s:setbgfg("Normal", s:bg_default, s:text_normal)
@@ -111,3 +111,12 @@ call s:setbgfg("DiffText", s:bg_default, s:text_on_bg)
 call s:setbgfg("diffAdded", s:bg_green, s:text_on_bg)
 call s:setbgfg("diffRemoved", s:bg_red, s:text_on_bg)
 endfunction
+
+" hi link LspDiagnosticsDefaultError DiagnosticError
+" hi link LspDiagnosticsDefaultWarning DiagnosticWarn
+" hi link LspDiagnosticsDefaultInformation DiagnosticInfo
+" hi link LspDiagnosticsDefaultHint DiagnosticHint
+" hi link LspDiagnosticsUnderlineError DiagnosticUnderlineError
+" hi link LspDiagnosticsUnderlineWarning DiagnosticUnderlineWarn
+" hi link LspDiagnosticsUnderlineInformation DiagnosticUnderlineInfo
+" hi link LspDiagnosticsUnderlineHint DiagnosticUnderlineHint

@@ -26,7 +26,7 @@ call plug#begin('~/.local/share/nvim/plugged')
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } } 
 Plug 'junegunn/fzf.vim'
 
-if has('mac') " Xcode stuff
+if has('mac') " Xcode stuff 
 Plug 'mfussenegger/nvim-dap' " Debug adapter protocol
 Plug 'nvim-neotest/nvim-nio' " dependency of DAP
 Plug 'rcarriga/nvim-dap-ui' " Dap UI
@@ -154,8 +154,6 @@ endif
 noremap <C-S-Right> :set background=light<CR><C-l>
 noremap <C-S-Left> :set background=dark<CR><C-l>
 autocmd OptionSet background call yaroscheme#apply()
-colorscheme yaroscheme
-call yaroscheme#apply()
 
 " Copy paste with system buffer
 noremap p "+p
@@ -337,11 +335,5 @@ else
     nnoremap Q :lua vim.lsp.buf.code_action()<CR>
 endif
 
-" hi link LspDiagnosticsDefaultError DiagnosticError
-" hi link LspDiagnosticsDefaultWarning DiagnosticWarn
-" hi link LspDiagnosticsDefaultInformation DiagnosticInfo
-" hi link LspDiagnosticsDefaultHint DiagnosticHint
-" hi link LspDiagnosticsUnderlineError DiagnosticUnderlineError
-" hi link LspDiagnosticsUnderlineWarning DiagnosticUnderlineWarn
-" hi link LspDiagnosticsUnderlineInformation DiagnosticUnderlineInfo
-" hi link LspDiagnosticsUnderlineHint DiagnosticUnderlineHint
+colorscheme yaroscheme
+call yaroscheme#apply()
