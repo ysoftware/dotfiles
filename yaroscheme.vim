@@ -28,7 +28,7 @@ if &background == "dark"
     let s:text_brown = "#ccb484"
     let s:text_red = "#a51818"
     let s:text_yellow = "#e5e5ac"
-    let s:text_darkgray = "#595959"
+    let s:text_gray = "#7f7f7f"
 else
     let s:bg_default = "#f2f2f2"
     let s:bg_highlight = "#8fa9bf"
@@ -43,12 +43,12 @@ else
     let s:text_brown = "#725011"
     let s:text_red = "#bf1c1c"
     let s:text_yellow = "#727211"
-    let s:text_darkgray = "#566672"
+    let s:text_gray = "#7f7f7f"
 endif
 
 call s:setbgfg("Normal", s:bg_default, s:text_normal)
 call s:setbgfg("NormalNC", s:bg_default, s:text_normal)
-call s:setfg("Comment", s:text_darkgray)
+call s:setfg("Comment", s:text_gray)
 call s:setfg("Constant", s:text_normal)
 call s:setfg("Identifier", s:text_normal)
 call s:setfg("Special", s:text_normal)
@@ -83,8 +83,8 @@ call s:setfg("Macro", s:text_brown)
 
 call s:setfg("LineNr", s:text_yellow)
 call s:setfg("Directory", s:text_blue)
-call s:setfg("LineNrAbove", s:text_darkgray)
-call s:setfg("LineNrBelow", s:text_darkgray)
+call s:setfg("LineNrAbove", s:text_gray)
+call s:setfg("LineNrBelow", s:text_gray)
 
 call s:setbgfg("Search", s:bg_select, s:text_normal)
 call s:setbgfg("IncSearch", s:bg_select, s:text_on_bg)
