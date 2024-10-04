@@ -92,13 +92,10 @@ lua require("lspconfig").clangd.setup {}
 
 if has('mac')
     lua require("lspconfig").sourcekit.setup {}
+    lua require("xcodebuild").setup({ auto_save= false })
+    lua require("xcodebuild.integrations.dap").setup("/Users/iaroslav.erokhin/Documents/Other/codelldb-x86_64-darwin/extension/adapter")
+    lua require("dapui").setup()
 endif
-
-lua << EOF
-require("xcodebuild").setup({ auto_save= false })
-require("xcodebuild.integrations.dap").setup("/Users/iaroslav.erokhin/Documents/Other/codelldb-x86_64-darwin/extension/adapter")
-require("dapui").setup()
-EOF
 
 " Files setup
 command! -bang -nargs=+ -complete=dir Files
@@ -165,7 +162,7 @@ noremap Y "+Y
 " On linux I use terminal, so font is set by that
 " Ligatures are also not supported, so whatever
 if has('mac')
-    set guifont=Fira_Code_Retina:h16
+    set guifont=Fira_Code_Retina:h15
 endif
 
 syntax on
@@ -177,7 +174,7 @@ set wildignorecase
 set scroll=15
 
 vnoremap // "hy/\C\V<C-R>=escape(@h, '\/')<CR><CR>
-vnoremap ts "hy:%s/\V<C-R>=escape(@h, '\/')<CR>//gcI<Left><Left><Left><Left>
+vnoremap ts "hy:%s/\V<C-R>=escape(@h, '\/')<CR>//gcI<Left><Left><Left><Left> 
 
 " Navigation
 let mapleader = " "
@@ -193,7 +190,7 @@ nnoremap tg gT
 nnoremap <leader>' :tabnew<CR>
 nnoremap <leader>q :bd<CR>
 
-" Brackets around selection
+" Brackets around selection 
 xnoremap <leader>[ <ESC>a]<ESC>gv`<<ESC>i[<ESC>
 xnoremap <leader>( <ESC>a)<ESC>gv`<<ESC>i(<ESC>
 xnoremap <leader>{ <ESC>a}<ESC>gv`<<ESC>i{<ESC>

@@ -6,11 +6,11 @@ endif
 let g:colors_name="yaro"
 
 function! s:setfg(group, color) 
-    exe "highlight " . a:group . " guibg=NONE guifg=" . a:color
+    exe "highlight " . a:group . " gui=NONE cterm=NONE term=NONE guibg=NONE guifg=" . a:color
 endfunction
 
 function! s:setbgfg(group, color_bg, color_fg) 
-    exe "highlight " . a:group . " guibg= " . a:color_bg . " guifg=" . a:color_fg
+    exe "highlight " . a:group . " gui=NONE cterm=NONE term=NONE guibg= " . a:color_bg . " guifg=" . a:color_fg
 endfunction
 
 function! yaroscheme#apply()
@@ -29,10 +29,11 @@ if &background == "dark"
     let s:text_red = "#a51818"
     let s:text_yellow = "#e5e5ac"
     let s:text_gray = "#7f7f7f"
+    let s:text_purple = "#9B2393"
 else
-    let s:bg_default = "#f2f2f2"
-    let s:bg_highlight = "#8fa9bf"
-    let s:bg_select = "#6b8ba5"
+    let s:bg_default = "#ffffff"
+    let s:bg_highlight = "#a2bfd8"
+    let s:bg_select = "#accbe5"
     let s:bg_green = "#46a53a"
     let s:bg_red = "#a53a3a"
 
@@ -43,7 +44,8 @@ else
     let s:text_brown = "#725011"
     let s:text_red = "#bf1c1c"
     let s:text_yellow = "#727211"
-    let s:text_gray = "#7f7f7f"
+    let s:text_gray = "#595959"
+    let s:text_purple = "#9B2393"
 endif
 
 call s:setbgfg("Normal", s:bg_default, s:text_normal)
@@ -110,13 +112,23 @@ call s:setbgfg("DiffText", s:bg_default, s:text_on_bg)
 " Git fugitive colors
 call s:setbgfg("diffAdded", s:bg_green, s:text_on_bg)
 call s:setbgfg("diffRemoved", s:bg_red, s:text_on_bg)
-endfunction
 
-" hi link LspDiagnosticsDefaultError DiagnosticError
-" hi link LspDiagnosticsDefaultWarning DiagnosticWarn
-" hi link LspDiagnosticsDefaultInformation DiagnosticInfo
-" hi link LspDiagnosticsDefaultHint DiagnosticHint
-" hi link LspDiagnosticsUnderlineError DiagnosticUnderlineError
-" hi link LspDiagnosticsUnderlineWarning DiagnosticUnderlineWarn
-" hi link LspDiagnosticsUnderlineInformation DiagnosticUnderlineInfo
-" hi link LspDiagnosticsUnderlineHint DiagnosticUnderlineHint
+" Swift
+call s:setfg("swiftKeywords", s:text_blue)
+call s:setfg("swiftAttributes", s:text_blue)
+call s:setfg("swiftImports", s:text_blue)
+
+" Lsp
+call s:setfg("DiagnosticError", s:text_red)
+call s:setfg("DiagnosticWarn", s:text_yellow)
+call s:setfg("DiagnosticHint", s:text_gray)
+
+hi link LspDiagnosticsDefaultError DiagnosticError
+hi link LspDiagnosticsDefaultWarning DiagnosticWarn
+hi link LspDiagnosticsDefaultInformation DiagnosticInfo
+hi link LspDiagnosticsDefaultHint DiagnosticHint
+hi link LspDiagnosticsUnderlineError DiagnosticUnderlineError
+hi link LspDiagnosticsUnderlineWarning DiagnosticUnderlineWarn
+hi link LspDiagnosticsUnderlineInformation DiagnosticUnderlineInfo
+hi link LspDiagnosticsUnderlineHint DiagnosticUnderlineHint
+endfunction
