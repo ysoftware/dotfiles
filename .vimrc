@@ -94,11 +94,11 @@ if has('mac')
     lua require("lspconfig").sourcekit.setup {}
 endif
 
-" DAP (debug adapter protocol)
-if has('mac')
-    lua require("xcodebuild.integrations.dap").setup("/Users/iaroslav.erokhin/Documents/Other/codelldb-x86_64-darwin/extension/adapter")
-    lua require("dapui").setup()
-endif
+lua << EOF
+require("xcodebuild").setup({ auto_save= false })
+require("xcodebuild.integrations.dap").setup("/Users/iaroslav.erokhin/Documents/Other/codelldb-x86_64-darwin/extension/adapter")
+require("dapui").setup()
+EOF
 
 " Files setup
 command! -bang -nargs=+ -complete=dir Files
@@ -324,8 +324,6 @@ nnoremap <leader>D :lua vim.lsp.buf.references()<CR>
 command! Here execute 'cd %:p:h'
 
 if has('mac')
-    " Xcodebuild
-    lua require("xcodebuild").setup {}
     nnoremap <leader>e :Telescope quickfix<CR><Esc>
     nnoremap <leader>r :Simo<CR> :XcodebuildBuildRun<CR>
     command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/Example/' 
