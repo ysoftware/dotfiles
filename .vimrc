@@ -92,9 +92,9 @@ lua require("lspconfig").clangd.setup {}
 
 if has('mac')
     lua require("lspconfig").sourcekit.setup {}
-    lua require("xcodebuild").setup({ auto_save= false })
     lua require("xcodebuild.integrations.dap").setup("/Users/iaroslav.erokhin/Documents/Other/codelldb-x86_64-darwin/extension/adapter")
     lua require("dapui").setup()
+    lua require("xcodebuild").setup({ auto_save= false })
 endif
 
 " Files setup
@@ -162,7 +162,7 @@ noremap Y "+Y
 " On linux I use terminal, so font is set by that
 " Ligatures are also not supported, so whatever
 if has('mac')
-    set guifont=Fira_Code_Retina:h15
+    set guifont=Fira_Code_Retina:h16
 endif
 
 syntax on
