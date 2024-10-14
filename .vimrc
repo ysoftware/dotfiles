@@ -182,8 +182,18 @@ nnoremap n nzzzv
 nnoremap N Nzzzv
 set switchbuf+=useopen
 
-nnoremap <leader>bn :bn<CR>
-nnoremap <leader>bv :bp<CR>
+function! SwitchToBuffer(n)
+  let buffers = getbufinfo({'buflisted': 1})
+  if a:n <= len(buffers)
+    execute 'buffer' buffers[a:n - 1].bufnr
+  endif
+endfunction
+
+nnoremap <leader>1 :call SwitchToBuffer(1)<CR>
+nnoremap <leader>2 :call SwitchToBuffer(2)<CR>
+nnoremap <leader>3 :call SwitchToBuffer(3)<CR>
+nnoremap <leader>4 :call SwitchToBuffer(4)<CR>
+nnoremap <leader>5 :call SwitchToBuffer(5)<CR>
 
 " Tabs
 nnoremap tg gT
