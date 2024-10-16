@@ -316,25 +316,28 @@ if has('mac')
     command! Setup :XcodebuildSetup
     command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
 else
-    nnoremap <leader>l :ccl<CR>
-    nnoremap <leader>e :copen<CR>
 endif
 
 " Vim LSP
+nnoremap <leader>l :ccl<CR>
+nnoremap <leader>e :copen<CR>
+nnoremap <leader>hj :lua vim.diagnostic.goto_next()<CR>
+
 nnoremap <leader>hh :lua vim.lsp.buf.hover()<CR>
 nnoremap <leader>k :lua vim.diagnostic.open_float()<CR>
 nnoremap <leader>d :lua vim.lsp.buf.definition()<CR>
 nnoremap <leader>D :lua vim.lsp.buf.references()<CR>
 
 command! Here execute 'cd %:p:h'
+command! Mess execute "put =execute('messages')"
 
 if has('mac')
-    nnoremap <leader>e :Telescope quickfix<CR><Esc>
     nnoremap <leader>r :Simo<CR> :XcodebuildBuildRun<CR>
+    nnoremap Q :XcodebuildCodeActions<CR>
+
     command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/Example/' 
     command! Set :XcodebuildPicker
     command! Lg :XcodebuildOpenLog
-    nnoremap Q :XcodebuildCodeActions
     
     " [Ticket] Take branch name as ticket number and put at the start of commit
     command! Tick execute 'keeppatterns normal /branch <CR>f/<Right>veeeyggpI[<Esc>A] '
