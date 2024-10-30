@@ -89,9 +89,9 @@ let g:lightline = { 'colorscheme': 'one',
 lua require("lspconfig").rust_analyzer.setup {}
 lua require("lspconfig").ols.setup {}
 lua require("lspconfig").clangd.setup {}
+lua require("lspconfig").sourcekit.setup {}
 
 if has('mac')
-    lua require("lspconfig").sourcekit.setup {}
     lua require("xcodebuild.integrations.dap").setup("/Users/iaroslav.erokhin/Documents/Other/codelldb-x86_64-darwin/extension/adapter")
     lua require("dapui").setup()
     lua require("xcodebuild").setup({ auto_save= false })
@@ -286,7 +286,7 @@ if has('mac')
     nnoremap <leader><C-]> :Files ~/Documents<CR>
     nnoremap <leader><C-p> :AgIn ~/Documents<CR>
 elseif has('linux')
-    nnoremap <C-S-down> :e ~/Documents/os-todos.txt<CR>
+    nnoremap <C-S-down> :e ~/Documents/Text/os-todos.txt<CR>
     nnoremap <C-S-up> :e ~/Documents/GitHub/vimrc/.vimrc<CR>
     nnoremap <C-]> :Files ~/Documents/<CR>
     nnoremap <leader><C-]> :Files ~/<CR>
