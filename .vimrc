@@ -139,12 +139,14 @@ endif
 " weird auto-text wrapping to new line, this is horrible
 
 if has('mac')
+    set colorcolumn=120
     if system('defaults read -g AppleInterfaceStyle') == "Dark\n"
         set background=dark
     else
         set background=light
     endif
 else
+    set colorcolumn=150
     set background=dark
 endif
 
@@ -194,6 +196,8 @@ nnoremap <leader>2 :call SwitchToBuffer(2)<CR>
 nnoremap <leader>3 :call SwitchToBuffer(3)<CR>
 nnoremap <leader>4 :call SwitchToBuffer(4)<CR>
 nnoremap <leader>5 :call SwitchToBuffer(5)<CR>
+nnoremap <leader>6 :call SwitchToBuffer(6)<CR>
+nnoremap <leader>7 :call SwitchToBuffer(7)<CR>
 
 " Tabs
 nnoremap tg gT
@@ -227,6 +231,9 @@ vnoremap > >gv
 let NERDTreeShowHidden=1
 let NERDTreeCustomOpenArgs={'file':{'keepopen': '0'}}
 let g:NERDTreeWinSize=50
+
+set wildignore+=*.pyc,*.o,*.obj,*.svn,*.swp,*.class,*.hg,*.DS_Store,*.min.*
+let NERDTreeRespectWildIgnore=1
 
 let g:NERDTreeGitStatusIndicatorMapCustom = {
     \ 'Modified'  :'m',
@@ -321,10 +328,9 @@ endif
 " Vim LSP
 nnoremap <leader>l :ccl<CR>
 nnoremap <leader>e :copen<CR>
-nnoremap <leader>hj :lua vim.diagnostic.goto_next()<CR>
-
 nnoremap <leader>hh :lua vim.lsp.buf.hover()<CR>
-nnoremap <leader>k :lua vim.diagnostic.open_float()<CR>
+nnoremap <leader>kk :lua vim.diagnostic.goto_next()<CR>
+nnoremap <leader>ko :lua vim.diagnostic.open_float()<CR>
 nnoremap <leader>d :lua vim.lsp.buf.definition()<CR>
 nnoremap <leader>D :lua vim.lsp.buf.references()<CR>
 
