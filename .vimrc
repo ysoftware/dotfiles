@@ -341,6 +341,43 @@ nnoremap <leader>D :lua vim.lsp.buf.references()<CR>
 command! Here execute 'cd %:p:h'
 command! Mess execute "put =execute('messages')"
 
+lua << EOF
+function BreakArguments()
+  local line = vim.api.nvim_get_current_line()
+  local new_lines = {}
+  local current_line = ""
+  local inside_parens = false
+
+  for i = 1, #line do
+    local char = line:sub(i, i)
+
+    if char == "(" and not inside_parens then
+      current_line = current_line .. char
+      table.insert(new_lines, current_line)
+      current_line = ""
+      inside_parens = true
+    elseif char == "," and inside_parens then
+      current_line = current_line .. char
+      table.insert(new_lines, current_line)
+      current_line = ""
+    elseif char == ")" and inside_parens then
+      table.insert(new_lines, current_line)
+      current_line = char
+      inside_parens = false
+    else
+      current_line = current_line .. char
+    end
+  end
+
+  table.insert(new_lines, current_line) -- add the last part
+  local row = vim.api.nvim_win_get_cursor(0)[1]
+  vim.api.nvim_buf_set_lines(0, row - 1, row, false, new_lines) -- replace current line with new lines
+  vim.cmd("normal! V%=") -- auto-format
+end
+EOF
+nnoremap <leader>M :lua BreakArguments()<CR>
+
+
 if has('mac')
     nnoremap <leader>r :w<CR> :Simo<CR> :XcodebuildBuildRun<CR>
     nnoremap Q :XcodebuildCodeActions<CR>
