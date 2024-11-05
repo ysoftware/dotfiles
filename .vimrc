@@ -3,6 +3,7 @@
 
 " TODO
 " - Disable FUCKING STUPID word wrapping (repro: when typing a long comment, it will auto break at 100th)
+" - vim-bufferline - show number of buffer in the visible list (not id of buffer)
 
 " Replace Xcode
 " - File explorer (with single state, where certain directories stay open)
@@ -17,6 +18,7 @@ if has('mac')
     autocmd FileType swift abbrev ws [weak self] in<Left><Left><Left>
     autocmd FileType swift abbrev gl guard let self else { return }
     autocmd FileType swift abbrev si .store(in: &subscribers)
+    autocmd FileType swift abbrev infii .frame(maxWidth: .infinity, alignment: .leading)
   augroup END
 endif
  
@@ -248,9 +250,9 @@ let g:NERDTreeGitStatusIndicatorMapCustom = {
     \ 'Unknown'   :'u',
     \ }
 
-nnoremap <C-f> :NERDTreeFind<CR>
+nnoremap <C-t> :NERDTreeFind<CR>
 nnoremap <leader><C-f> :NERDTreeVCS<CR>
-nnoremap <C-t> :NERDTreeToggle<CR>
+nnoremap <C-f> :NERDTreeToggle<CR>
 
 " Prettify json (depends on installed jq)
 command! Prettify :%!jq .
@@ -314,6 +316,8 @@ endif
 set ic " case insensitive search
 set gdefault
 let g:searchindex_line_limit=2000000
+nnoremap <silent> <leader>/ /fake-search-query<CR>
+nnoremap <C-l> :noh<CR><C-l>
 nnoremap <C-h> :History<CR>
 nnoremap <leader>n :cn<CR>
 nnoremap <C-b> :make<CR>
@@ -338,7 +342,7 @@ command! Here execute 'cd %:p:h'
 command! Mess execute "put =execute('messages')"
 
 if has('mac')
-    nnoremap <leader>r :Simo<CR> :XcodebuildBuildRun<CR>
+    nnoremap <leader>r :w<CR> :Simo<CR> :XcodebuildBuildRun<CR>
     nnoremap Q :XcodebuildCodeActions<CR>
 
     command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/Example/' 
