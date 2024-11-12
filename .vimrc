@@ -91,7 +91,7 @@ let g:lightline = { 'colorscheme': 'one',
 lua require("lspconfig").rust_analyzer.setup {}
 lua require("lspconfig").ols.setup {}
 lua require("lspconfig").clangd.setup {}
-lua require("lspconfig").sourcekit.setup {}
+lua require("lspconfig").sourcekit.setup { filetypes = { 'swift' }}
 
 if has('mac')
     lua require("xcodebuild.integrations.dap").setup("/Users/iaroslav.erokhin/Documents/Other/codelldb-x86_64-darwin/extension/adapter")
