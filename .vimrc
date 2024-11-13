@@ -148,7 +148,6 @@ if has('mac')
         set background=light
     endif
 else
-    set colorcolumn=150
     set background=dark
 endif
 
