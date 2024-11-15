@@ -335,14 +335,28 @@ endif
 nnoremap <leader>l :ccl<CR>
 nnoremap <leader>e :copen<CR>
 nnoremap <leader>hh :lua vim.lsp.buf.hover()<CR>
-nnoremap [g :lua vim.diagnostic.goto_prev()<CR>
-nnoremap ]g :lua vim.diagnostic.goto_next()<CR>
+nnoremap [g :lua goto_error_then_hint(vim.diagnostic.goto_prev)<CR>
+nnoremap ]g :lua goto_error_then_hint(vim.diagnostic.goto_next)<CR>
 nnoremap <leader>o :lua vim.diagnostic.open_float()<CR>
 nnoremap <leader>d :lua vim.lsp.buf.definition()<CR>
 nnoremap <leader>D :lua vim.lsp.buf.references()<CR>
 
 command! Here execute 'cd %:p:h'
 command! Mess execute "put =execute('messages')"
+
+lua << EOF
+function goto_error_then_hint(goto_func)
+  local pos = vim.api.nvim_win_get_cursor(0)
+  vim.diagnostic.goto_next( {severity=vim.diagnostic.severity.ERROR, wrap = true} )
+  local pos2 = vim.api.nvim_win_get_cursor(0)
+  local r1, c1 = unpack(pos)
+  local r2, c2 = unpack(pos2)
+  local condition = r1 == r2 and c1 == c2
+  if (condition) then
+    goto_func( {wrap = true} )
+  end
+end
+EOF
 
 lua << EOF
 function BreakArguments()
