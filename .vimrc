@@ -29,13 +29,14 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 
 if has('mac') " Xcode stuff 
-Plug 'mfussenegger/nvim-dap' " Debug adapter protocol
-Plug 'nvim-neotest/nvim-nio' " dependency of DAP
-Plug 'rcarriga/nvim-dap-ui' " Dap UI
+" Plug 'mfussenegger/nvim-dap' " Debug adapter protocol
+" Plug 'nvim-neotest/nvim-nio' " dependency of DAP
+" Plug 'rcarriga/nvim-dap-ui' " Dap UI
 Plug 'wojciech-kulik/xcodebuild.nvim' " Xcode tools
 Plug 'MunifTanjim/nui.nvim' " needed for xcodebuild
 Plug 'nvim-telescope/telescope.nvim' " needed for xcodebuild
 Plug 'nvim-lua/plenary.nvim' " Needed for telescope
+Plug 'mfussenegger/nvim-lint'
 endif
 
 " Syntax highlighting
@@ -45,7 +46,7 @@ Plug 'jansedivy/jai.vim' " Jai support
 Plug 'preservim/nerdtree' | " File browser
     \ Plug 'Xuyuanp/nerdtree-git-plugin' " Plugin with git status
 
-Plug 'neovim/nvim-lspconfig' " Lsp
+" Plug 'neovim/nvim-lspconfig' " Lsp
 Plug 'tpope/vim-fugitive' " Git
 Plug 'airblade/vim-gitgutter' " More Git
 Plug 'bling/vim-bufferline' " Show all open buffers
@@ -91,12 +92,14 @@ let g:lightline = { 'colorscheme': 'one',
 lua require("lspconfig").rust_analyzer.setup {}
 lua require("lspconfig").ols.setup {}
 lua require("lspconfig").clangd.setup {}
-lua require("lspconfig").sourcekit.setup { filetypes = { 'swift' }}
+lua require("lspconfig").sourcekit.setup {}
 
 if has('mac')
-    lua require("xcodebuild.integrations.dap").setup("/Users/iaroslav.erokhin/Documents/Other/codelldb-x86_64-darwin/extension/adapter")
-    lua require("dapui").setup()
+    " lua require("xcodebuild.integrations.dap").setup("/Users/iaroslav.erokhin/Documents/Other/codelldb-x86_64-darwin/extension/adapter")
+    " lua require("dapui").setup()
     lua require("xcodebuild").setup({ auto_save= false })
+    lua require('lint').linters_by_ft = { swift = {'swiftlint'} }
+    au BufWritePost * lua require('lint').try_lint()
 endif
 
 " Files setup
@@ -332,8 +335,9 @@ endif
 nnoremap <leader>l :ccl<CR>
 nnoremap <leader>e :copen<CR>
 nnoremap <leader>hh :lua vim.lsp.buf.hover()<CR>
-nnoremap <leader>kk :lua vim.diagnostic.goto_next()<CR>
-nnoremap <leader>ko :lua vim.diagnostic.open_float()<CR>
+nnoremap [g :lua vim.diagnostic.goto_prev()<CR>
+nnoremap ]g :lua vim.diagnostic.goto_next()<CR>
+nnoremap <leader>o :lua vim.diagnostic.open_float()<CR>
 nnoremap <leader>d :lua vim.lsp.buf.definition()<CR>
 nnoremap <leader>D :lua vim.lsp.buf.references()<CR>
 
