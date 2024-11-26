@@ -28,15 +28,12 @@ call plug#begin('~/.local/share/nvim/plugged')
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } } 
 Plug 'junegunn/fzf.vim'
 
-if has('mac') " Xcode stuff 
-" Plug 'mfussenegger/nvim-dap' " Debug adapter protocol
-" Plug 'nvim-neotest/nvim-nio' " dependency of DAP
-" Plug 'rcarriga/nvim-dap-ui' " Dap UI
+if has('mac') " iOS stuff
 Plug 'wojciech-kulik/xcodebuild.nvim' " Xcode tools
 Plug 'MunifTanjim/nui.nvim' " needed for xcodebuild
 Plug 'nvim-telescope/telescope.nvim' " needed for xcodebuild
 Plug 'nvim-lua/plenary.nvim' " Needed for telescope
-Plug 'mfussenegger/nvim-lint'
+Plug 'mfussenegger/nvim-lint' " Linters support (Swiftlint)
 endif
 
 " Syntax highlighting
@@ -95,8 +92,6 @@ lua require("lspconfig").clangd.setup {}
 lua require("lspconfig").sourcekit.setup {}
 
 if has('mac')
-    " lua require("xcodebuild.integrations.dap").setup("/Users/iaroslav.erokhin/Documents/Other/codelldb-x86_64-darwin/extension/adapter")
-    " lua require("dapui").setup()
     lua require("xcodebuild").setup({ auto_save= false })
     lua require('lint').linters_by_ft = { swift = {'swiftlint'} }
     au BufWritePost * lua require('lint').try_lint()
@@ -119,7 +114,6 @@ command! -bang -nargs=+ -complete=dir Files
 " AgIn setup
 function! s:ag_in(bang, ...)
     call fzf#vim#ag(join(a:000[1:], ' '),
-        \ '--ignore=*.pbxproj',
         \     fzf#vim#with_preview(
         \         {
         \             'dir': expand(a:1), 
@@ -163,13 +157,6 @@ noremap p "+p
 noremap P "+P
 noremap y "+y
 noremap Y "+Y
-
-" Visuals
-" On linux I use terminal, so font is set by that
-" Ligatures are also not supported, so whatever
-if has('mac')
-    set guifont=Fira_Code_Retina:h16
-endif
 
 syntax on
 set ruler
@@ -326,7 +313,7 @@ nnoremap <C-b> :make<CR>
 
 if has('mac')
     nnoremap <leader>l :XcodebuildCloseLogs<CR> :ccl<CR>
-    command! Setup :XcodebuildSetup
+    command! Setup :Simo :XcodebuildSetup
     command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
 else
 endif
@@ -411,3 +398,4 @@ endif
 
 colorscheme yaroscheme
 call yaroscheme#apply()
+set title 
