@@ -96,8 +96,6 @@ lua require("lspconfig").clangd.setup {}
 lua require("lspconfig").sourcekit.setup {}
 
 if has('mac')
-    " lua require("xcodebuild.integrations.dap").setup("/Users/iaroslav.erokhin/Documents/Other/codelldb-x86_64-darwin/extension/adapter")
-    " lua require("dapui").setup()
     lua require("xcodebuild").setup({ auto_save= false })
     lua require('lint').linters_by_ft = { swift = {'swiftlint'} }
     au BufWritePost * lua require('lint').try_lint()
@@ -120,7 +118,6 @@ command! -bang -nargs=+ -complete=dir Files
 " AgIn setup
 function! s:ag_in(bang, ...)
     call fzf#vim#ag(join(a:000[1:], ' '),
-        \ '--ignore=*.pbxproj',
         \     fzf#vim#with_preview(
         \         {
         \             'dir': expand(a:1), 
@@ -164,13 +161,6 @@ noremap p "+p
 noremap P "+P
 noremap y "+y
 noremap Y "+Y
-
-" Visuals
-" On linux I use terminal, so font is set by that
-" Ligatures are also not supported, so whatever
-if has('mac')
-    set guifont=Fira_Code_Retina:h16
-endif
 
 syntax on
 set ruler
@@ -327,7 +317,7 @@ nnoremap <C-b> :make<CR>
 
 if has('mac')
     nnoremap <leader>l :XcodebuildCloseLogs<CR> :ccl<CR>
-    command! Setup :XcodebuildSetup
+    command! Setup :Simo :XcodebuildSetup
     command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
 else
 endif
@@ -348,7 +338,7 @@ command! Mess execute "put =execute('messages')"
 lua << EOF
 function goto_error_then_hint(goto_func)
   local pos = vim.api.nvim_win_get_cursor(0)
-  vim.diagnostic.goto_next( {severity=vim.diagnostic.severity.ERROR, wrap = true} )
+  goto_func( {severity=vim.diagnostic.severity.ERROR, wrap = true} )
   local pos2 = vim.api.nvim_win_get_cursor(0)
   local r1, c1 = unpack(pos)
   local r2, c2 = unpack(pos2)
@@ -412,3 +402,4 @@ endif
 
 colorscheme yaroscheme
 call yaroscheme#apply()
+set title 
