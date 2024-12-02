@@ -334,7 +334,7 @@ command! Mess execute "put =execute('messages')"
 lua << EOF
 function goto_error_then_hint(goto_func)
   local pos = vim.api.nvim_win_get_cursor(0)
-  vim.diagnostic.goto_next( {severity=vim.diagnostic.severity.ERROR, wrap = true} )
+  goto_func( {severity=vim.diagnostic.severity.ERROR, wrap = true} )
   local pos2 = vim.api.nvim_win_get_cursor(0)
   local r1, c1 = unpack(pos)
   local r2, c2 = unpack(pos2)
