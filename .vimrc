@@ -29,14 +29,16 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 
 if has('mac') " Xcode stuff 
-" Plug 'mfussenegger/nvim-dap' " Debug adapter protocol
-" Plug 'nvim-neotest/nvim-nio' " dependency of DAP
-" Plug 'rcarriga/nvim-dap-ui' " Dap UI
-Plug 'wojciech-kulik/xcodebuild.nvim' " Xcode tools
-Plug 'MunifTanjim/nui.nvim' " needed for xcodebuild
-Plug 'nvim-telescope/telescope.nvim' " needed for xcodebuild
-Plug 'nvim-lua/plenary.nvim' " Needed for telescope
-Plug 'mfussenegger/nvim-lint'
+    " Plug 'mfussenegger/nvim-dap' " Debug adapter protocol
+    " Plug 'nvim-neotest/nvim-nio' " dependency of DAP
+    " Plug 'rcarriga/nvim-dap-ui' " Dap UI
+    Plug 'wojciech-kulik/xcodebuild.nvim' " Xcode tools
+    Plug 'MunifTanjim/nui.nvim' " needed for xcodebuild
+    Plug 'nvim-telescope/telescope.nvim' " needed for xcodebuild
+    Plug 'nvim-lua/plenary.nvim' " Needed for telescope
+    Plug 'mfussenegger/nvim-lint'
+else 
+    Plug 'neovim/nvim-lspconfig' " Lsp
 endif
 
 " Syntax highlighting
@@ -46,7 +48,6 @@ Plug 'jansedivy/jai.vim' " Jai support
 Plug 'preservim/nerdtree' | " File browser
     \ Plug 'Xuyuanp/nerdtree-git-plugin' " Plugin with git status
 
-" Plug 'neovim/nvim-lspconfig' " Lsp
 Plug 'tpope/vim-fugitive' " Git
 Plug 'airblade/vim-gitgutter' " More Git
 Plug 'bling/vim-bufferline' " Show all open buffers
