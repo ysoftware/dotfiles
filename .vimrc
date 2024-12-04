@@ -254,6 +254,10 @@ inoremap <S-up> <Esc>:m .-2<CR>==gi
 vnoremap <S-down> :m '>+1<CR>gv=gv
 vnoremap <S-up> :m '<-2<CR>gv=gv
 
+" Switch letters/words places (put cursor on the left one)
+nnoremap <leader>xl "qx"qph
+nnoremap <leader>xw viw"qdxea <Esc>"qpbb
+
 " Tabs and shit
 filetype plugin indent on
 set tabstop=4       " The width of a TAB is set to 4.
@@ -380,7 +384,6 @@ function BreakArguments()
 end
 EOF
 nnoremap <leader>M :lua BreakArguments()<CR>
-
 
 if has('mac')
     nnoremap <leader>r :w<CR> :Simo<CR> :XcodebuildBuildRun<CR>
