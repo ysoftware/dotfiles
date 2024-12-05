@@ -261,6 +261,7 @@ vnoremap <S-up> :m '<-2<CR>gv=gv
 " Switch letters/words places (put cursor on the left one)
 nnoremap <leader>xl "qx"qph
 nnoremap <leader>xw viw"qdxea <Esc>"qpbb
+nnoremap <leader>xe viw"qywwPlve"qdbbbviwpb
 
 " Tabs and shit
 filetype plugin indent on
