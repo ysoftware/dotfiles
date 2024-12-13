@@ -4,10 +4,6 @@
 " TODO
 " - Disable FUCKING STUPID word wrapping (repro: when typing a long comment, it will auto break at 100th)
 " - vim-bufferline - show number of buffer in the visible list (not id of buffer)
-
-" Replace Xcode
-" - File explorer (with single state, where certain directories stay open)
-" - Jump between edited/specific set of files
 " - Replace in multiple files
 
 " Snippets
@@ -197,7 +193,8 @@ nnoremap <leader>7 :call SwitchToBuffer(7)<CR>
 " Tabs
 nnoremap tg gT
 nnoremap <leader>' :tabnew<CR>
-nnoremap <leader>q :bd<CR>
+nnoremap <leader>q :bp<CR>:bd #<CR>
+nnoremap <leader>w <C-w>c
 
 " Brackets around selection 
 xnoremap <leader>[ <ESC>a]<ESC>gv`<<ESC>i[<ESC>
@@ -322,7 +319,7 @@ nnoremap <C-b> :make<CR>
 
 if has('mac')
     nnoremap <leader>l :XcodebuildCloseLogs<CR> :ccl<CR>
-    command! Setup :Simo :XcodebuildSetup
+    command! Cancel :XcodebuildCancel
     command! Worklog execute 'cd ' . expand('%:p:h') . ' | !git add . && git commit -m "-"'
 else
 endif

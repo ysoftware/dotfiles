@@ -120,6 +120,7 @@ call s:setfg("swiftKeywords", s:text_blue)
 call s:setfg("swiftAttributes", s:text_blue)
 call s:setfg("swiftImports", s:text_blue)
 call s:setfg("swiftProperty", s:text_yellow)
+call s:setfg("swiftMarker", s:text_yellow)
 
 " Lsp
 call s:setfg("DiagnosticError", s:text_red)
