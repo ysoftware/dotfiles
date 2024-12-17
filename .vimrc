@@ -224,8 +224,8 @@ nnoremap <leader>g :vertical:G<CR>
 command! Diff execute 'GitGutterDiff'
 
 " Show list of branches (if inside git file, then close it first)
-nnoremap <leader>b :Git branch<CR>
-autocmd FileType git nnoremap <buffer> <leader>b :bd<CR> :Git branch<CR>
+nnoremap gb :Git branch<CR>
+autocmd FileType git nnoremap <buffer> gb :bd<CR> :Git branch<CR>
 
 " Funny command to quit insert mode without escape
 imap jk <Esc>:cd %:p:h<CR>
