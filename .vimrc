@@ -45,6 +45,7 @@ Plug 'preservim/nerdtree' | " File browser
     \ Plug 'Xuyuanp/nerdtree-git-plugin' " Plugin with git status
 
 Plug 'tpope/vim-fugitive' " Git
+Plug 'bkad/CamelCaseMotion' " Jump to camel case words
 Plug 'airblade/vim-gitgutter' " More Git
 Plug 'bling/vim-bufferline' " Show all open buffers
 Plug 'kshenoy/vim-signature' " Show marks
@@ -174,6 +175,16 @@ let mapleader = " "
 nnoremap n nzzzv
 nnoremap N Nzzzv
 set switchbuf+=useopen
+
+" camel case navigation
+map <silent> ,w <Plug>CamelCaseMotion_w
+map <silent> ,b <Plug>CamelCaseMotion_b
+map <silent> ,e <Plug>CamelCaseMotion_e
+map <silent> ,ge <Plug>CamelCaseMotion_ge
+" sunmap w
+" sunmap b
+" sunmap e
+" sunmap ge
 
 function! SwitchToBuffer(n)
   let buffers = getbufinfo({'buflisted': 1})
@@ -313,7 +324,6 @@ set gdefault
 let g:searchindex_line_limit=2000000
 nnoremap <silent> <leader>/ /fake-search-query<CR>
 nnoremap <C-l> :noh<CR><C-l>
-nnoremap <C-h> :History<CR>
 nnoremap <leader>n :cn<CR>
 nnoremap <C-b> :make<CR>
 
@@ -327,7 +337,7 @@ endif
 " Vim LSP
 nnoremap <leader>l :ccl<CR>
 nnoremap <leader>e :copen<CR>
-nnoremap <leader>hh :lua vim.lsp.buf.hover()<CR>
+nnoremap <leader>h :lua vim.lsp.buf.hover()<CR>
 nnoremap [g :lua goto_error_then_hint(vim.diagnostic.goto_prev)<CR>
 nnoremap ]g :lua goto_error_then_hint(vim.diagnostic.goto_next)<CR>
 nnoremap <leader>o :lua vim.diagnostic.open_float()<CR>
