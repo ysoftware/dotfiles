@@ -45,6 +45,7 @@ Plug 'preservim/nerdtree' | " File browser
     \ Plug 'Xuyuanp/nerdtree-git-plugin' " Plugin with git status
 
 Plug 'tpope/vim-fugitive' " Git
+Plug 'bkad/CamelCaseMotion' " Jump to camel case words
 Plug 'airblade/vim-gitgutter' " More Git
 Plug 'bling/vim-bufferline' " Show all open buffers
 Plug 'kshenoy/vim-signature' " Show marks
@@ -175,6 +176,16 @@ nnoremap n nzzzv
 nnoremap N Nzzzv
 set switchbuf+=useopen
 
+" camel case navigation
+map <silent> ,w <Plug>CamelCaseMotion_w
+map <silent> ,b <Plug>CamelCaseMotion_b
+map <silent> ,e <Plug>CamelCaseMotion_e
+map <silent> ,ge <Plug>CamelCaseMotion_ge
+" sunmap w
+" sunmap b
+" sunmap e
+" sunmap ge
+
 function! SwitchToBuffer(n)
   let buffers = getbufinfo({'buflisted': 1})
   if a:n <= len(buffers)
@@ -211,6 +222,21 @@ nmap [h <Plug>(GitGutterPrevHunk)zz
 
 nnoremap <leader>g :vertical:G<CR>
 command! Diff execute 'GitGutterDiff'
+
+" Show list of branches (if inside git file, then close it first)
+nnoremap gb :Git branch<CR>
+autocmd FileType git nnoremap <buffer> gb :bd<CR> :Git branch<CR>
+autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
+autocmd FileType git nnoremap <buffer> gm 0w"hy$:exe 'Git merge ' . @h<CR>
+
+function! GitCheckoutFromBranchesView()
+  normal! 0w"hy$
+  let l:branch = @h
+  execute 'Git checkout ' . l:branch
+  execute 'bd'
+  execute 'Git branch'
+  redraw!
+endfunction
 
 " Funny command to quit insert mode without escape
 imap jk <Esc>:cd %:p:h<CR>
@@ -313,7 +339,6 @@ set gdefault
 let g:searchindex_line_limit=2000000
 nnoremap <silent> <leader>/ /fake-search-query<CR>
 nnoremap <C-l> :noh<CR><C-l>
-nnoremap <C-h> :History<CR>
 nnoremap <leader>n :cn<CR>
 nnoremap <C-b> :make<CR>
 
@@ -326,7 +351,7 @@ endif
 " Vim LSP
 nnoremap <leader>l :ccl<CR>
 nnoremap <leader>e :copen<CR>
-nnoremap <leader>hh :lua vim.lsp.buf.hover()<CR>
+nnoremap <leader>h :lua vim.lsp.buf.hover()<CR>
 nnoremap [g :lua goto_error_then_hint(vim.diagnostic.goto_prev)<CR>
 nnoremap ]g :lua goto_error_then_hint(vim.diagnostic.goto_next)<CR>
 nnoremap <leader>o :lua vim.diagnostic.open_float()<CR>
