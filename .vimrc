@@ -307,9 +307,11 @@ nnoremap <C-W>< :res -10<CR>
 " - SEARCH
 
 " File Search
+nnoremap <C-S-up> :e ~/Documents/GitHub/vimrc/.vimrc<CR>
+nnoremap <C-S-]> :e ~/Documents/GitHub/Notes/Notes.md<CR>
+
 if has('mac')
     nnoremap <C-S-down> :e ~/Documents/Check24/check24-worklog/worklog.txt<CR>
-    nnoremap <C-S-up> :e ~/Documents/GitHub/vimrc/.vimrc<CR>
 
     nnoremap <C-]> :Files ~/Documents/Check24/ios-pod-mobile-sim<CR>
     nnoremap <C-p> :AgIn ~/Documents/Check24/ios-pod-mobile-sim<CR>
@@ -317,7 +319,6 @@ if has('mac')
     nnoremap <leader><C-p> :AgIn ~/Documents<CR>
 elseif has('linux')
     nnoremap <C-S-down> :e ~/Documents/Text/os-todos.txt<CR>
-    nnoremap <C-S-up> :e ~/Documents/GitHub/vimrc/.vimrc<CR>
     nnoremap <C-]> :Files ~/Documents/<CR>
     nnoremap <leader><C-]> :Files ~/<CR>
     nnoremap <C-p> :AgIn ~/Documents/<CR>
