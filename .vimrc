@@ -337,10 +337,13 @@ endif
 set ic " case insensitive search
 set gdefault
 let g:searchindex_line_limit=2000000
-nnoremap <silent> <leader>/ /fake-search-query<CR>
 nnoremap <C-l> :noh<CR><C-l>
 nnoremap <leader>n :cn<CR>
 nnoremap <C-b> :make<CR>
+
+" Reset search
+nnoremap <silent> <leader>/ /fake-search-query<CR><C-l>
+autocmd FileType vim nnoremap <buffer> <silent> <leader>/ :noh<CR><C-l>
 
 if has('mac')
     nnoremap <leader>l :XcodebuildCloseLogs<CR> :ccl<CR>
