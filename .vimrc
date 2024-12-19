@@ -226,6 +226,17 @@ command! Diff execute 'GitGutterDiff'
 " Show list of branches (if inside git file, then close it first)
 nnoremap gb :Git branch<CR>
 autocmd FileType git nnoremap <buffer> gb :bd<CR> :Git branch<CR>
+autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
+autocmd FileType git nnoremap <buffer> gm 0w"hy$:exe 'Git merge ' . @h<CR>
+
+function! GitCheckoutFromBranchesView()
+  normal! 0w"hy$
+  let l:branch = @h
+  execute 'Git checkout ' . l:branch
+  execute 'bd'
+  execute 'Git branch'
+  redraw!
+endfunction
 
 " Funny command to quit insert mode without escape
 imap jk <Esc>:cd %:p:h<CR>
