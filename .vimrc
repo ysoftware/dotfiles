@@ -308,7 +308,7 @@ nnoremap <C-W>< :res -10<CR>
 
 " File Search
 nnoremap <C-S-up> :e ~/Documents/GitHub/vimrc/.vimrc<CR>
-nnoremap <C-S-]> :e ~/Documents/GitHub/Notes/Notes.md<CR>
+nnoremap <leader><Down> :e ~/Documents/GitHub/Notes/Notes.md<CR>
 
 if has('mac')
     nnoremap <C-S-down> :e ~/Documents/Check24/check24-worklog/worklog.txt<CR>
