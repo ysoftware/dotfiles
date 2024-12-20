@@ -38,7 +38,7 @@ else
 endif
 
 " Syntax highlighting
-Plug 'keith/swift.vim' " Swift support
+" Plug 'keith/swift.vim' " Swift support
 Plug 'jansedivy/jai.vim' " Jai support
 
 Plug 'preservim/nerdtree' | " File browser
@@ -52,6 +52,7 @@ Plug 'kshenoy/vim-signature' " Show marks
 Plug 'itchyny/lightline.vim' " Status line
 Plug 'mhinz/vim-startify' " Startup screen
 Plug 'tpope/vim-commentary' " Comment lines of code
+Plug 'MysticalDevil/inlay-hints.nvim' " Inlay hints (function argument names)
 call plug#end()
 
 " Setup fzf
@@ -85,12 +86,6 @@ let g:lightline = { 'colorscheme': 'one',
       \     'gitbranch': 'FugitiveHead'
       \   },
       \ }
-
-" LSP
-lua require("lspconfig").rust_analyzer.setup {}
-lua require("lspconfig").ols.setup {}
-lua require("lspconfig").clangd.setup {}
-lua require("lspconfig").sourcekit.setup {}
 
 if has('mac')
     lua require("xcodebuild").setup({ auto_save= false })
@@ -361,11 +356,56 @@ nnoremap ]g :lua goto_error_then_hint(vim.diagnostic.goto_next)<CR>
 nnoremap <leader>o :lua vim.diagnostic.open_float()<CR>
 nnoremap <leader>d :lua vim.lsp.buf.definition()<CR>
 nnoremap <leader>D :lua vim.lsp.buf.references()<CR>
+nnoremap <leader>M :lua BreakArguments()<CR>
+nnoremap <leader><C-A> :InlayHintsToggle<CR>
 
 command! Here execute 'cd %:p:h'
 command! Mess execute "put =execute('messages')"
 
+if has('mac')
+    nnoremap <leader>r :w<CR> :Simo<CR> :XcodebuildBuildRun<CR>
+    nnoremap Q :XcodebuildCodeActions<CR>
+
+    command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/Example/' 
+    command! Set :XcodebuildPicker
+    command! Lg :XcodebuildOpenLog
+    
+    " [Ticket] Take branch name as ticket number and put at the start of commit
+    command! Tick execute 'keeppatterns normal /branch <CR>f/<Right>veeeyggpI[<Esc>A] '
+else
+    nnoremap Q :lua vim.lsp.buf.code_action()<CR>
+endif
+
+colorscheme yaroscheme
+call yaroscheme#apply()
+set title 
+
 lua << EOF
+
+-- LSP
+require("lspconfig").rust_analyzer.setup {}
+require("lspconfig").ols.setup {}
+require("lspconfig").sourcekit.setup {}
+
+require("lspconfig").clangd.setup({
+  settings = {
+    clangd = {
+      InlayHints = {
+        Designators = true,
+        Enabled = true,
+        ParameterNames = true,
+        DeducedTypes = true,
+      },
+      fallbackFlags = { "-std=c++20" },
+    },
+  }
+})
+
+require("inlay-hints").setup({
+    commands = { enable = true },
+    autocmd = { enable = false } -- disabled by default
+})
+
 function goto_error_then_hint(goto_func)
   local pos = vim.api.nvim_win_get_cursor(0)
   goto_func( {severity=vim.diagnostic.severity.ERROR, wrap = true} )
@@ -377,9 +417,7 @@ function goto_error_then_hint(goto_func)
     goto_func( {wrap = true} )
   end
 end
-EOF
 
-lua << EOF
 function BreakArguments()
   local line = vim.api.nvim_get_current_line()
   local new_lines = {}
@@ -412,23 +450,5 @@ function BreakArguments()
   vim.api.nvim_buf_set_lines(0, row - 1, row, false, new_lines) -- replace current line with new lines
   vim.cmd("normal! V%=") -- auto-format
 end
+
 EOF
-nnoremap <leader>M :lua BreakArguments()<CR>
-
-if has('mac')
-    nnoremap <leader>r :w<CR> :Simo<CR> :XcodebuildBuildRun<CR>
-    nnoremap Q :XcodebuildCodeActions<CR>
-
-    command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/Example/' 
-    command! Set :XcodebuildPicker
-    command! Lg :XcodebuildOpenLog
-    
-    " [Ticket] Take branch name as ticket number and put at the start of commit
-    command! Tick execute 'keeppatterns normal /branch <CR>f/<Right>veeeyggpI[<Esc>A] '
-else
-    nnoremap Q :lua vim.lsp.buf.code_action()<CR>
-endif
-
-colorscheme yaroscheme
-call yaroscheme#apply()
-set title 
