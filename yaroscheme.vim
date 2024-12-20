@@ -91,7 +91,7 @@ call s:setfg("LineNrAbove", s:text_gray)
 call s:setfg("LineNrBelow", s:text_gray)
 
 call s:setbgfg("Search", s:bg_select, s:text_normal)
-call s:setbgfg("IncSearch", s:bg_select, s:text_on_bg)
+call s:setbgfg("IncSearch", s:bg_red, s:text_on_bg)
 call s:setbgfg("EndOfBuffer", s:bg_default, s:text_normal)
 
 call s:setfg("ErrorMsg", s:text_red)
