@@ -52,7 +52,7 @@ Plug 'kshenoy/vim-signature' " Show marks
 Plug 'itchyny/lightline.vim' " Status line
 Plug 'mhinz/vim-startify' " Startup screen
 Plug 'tpope/vim-commentary' " Comment lines of code
-Plug 'MysticalDevil/inlay-hints.nvim' " Inlay hints (function argument names)
+" Plug 'MysticalDevil/inlay-hints.nvim' " Inlay hints (function argument names)
 call plug#end()
 
 " Setup fzf
@@ -335,7 +335,7 @@ set gdefault
 let g:searchindex_line_limit=2000000
 nnoremap <C-l> :noh<CR><C-l>
 nnoremap <leader>n :cn<CR>
-nnoremap <C-b> :make<CR>
+nnoremap <C-b> :Gcd<CR> :make<CR>
 
 " Reset search
 nnoremap <silent> <leader>/ /fake-search-query<CR><C-l>
@@ -359,7 +359,6 @@ nnoremap <leader>D :lua vim.lsp.buf.references()<CR>
 nnoremap <leader>M :lua BreakArguments()<CR>
 nnoremap <leader><C-A> :InlayHintsToggle<CR>
 
-command! Here execute 'cd %:p:h'
 command! Mess execute "put =execute('messages')"
 
 if has('mac')
@@ -401,10 +400,10 @@ require("lspconfig").clangd.setup({
   }
 })
 
-require("inlay-hints").setup({
-    commands = { enable = true },
-    autocmd = { enable = false } -- disabled by default
-})
+-- require("inlay-hints").setup({
+--     commands = { enable = true },
+--     autocmd = { enable = false } -- disabled by default
+-- })
 
 function goto_error_then_hint(goto_func)
   local pos = vim.api.nvim_win_get_cursor(0)
