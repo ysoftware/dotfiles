@@ -52,7 +52,7 @@ Plug 'kshenoy/vim-signature' " Show marks
 Plug 'itchyny/lightline.vim' " Status line
 Plug 'mhinz/vim-startify' " Startup screen
 Plug 'tpope/vim-commentary' " Comment lines of code
-Plug 'MysticalDevil/inlay-hints.nvim' " Inlay hints (function argument names)
+" Plug 'MysticalDevil/inlay-hints.nvim' " Inlay hints (function argument names)
 call plug#end()
 
 " Setup fzf
@@ -223,6 +223,8 @@ nnoremap gb :Git branch<CR>
 autocmd FileType git nnoremap <buffer> gb :bd<CR> :Git branch<CR>
 autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
 autocmd FileType git nnoremap <buffer> gm 0w"hy$:exe 'Git merge ' . @h<CR>
+autocmd FileType git nnoremap <buffer> gp :Git pull<CR>
+autocmd FileType fugitive nnoremap <buffer> gp :Git pull<CR>
 
 function! GitCheckoutFromBranchesView()
   normal! 0w"hy$
@@ -388,23 +390,23 @@ require("lspconfig").ols.setup {}
 require("lspconfig").sourcekit.setup {}
 
 require("lspconfig").clangd.setup({
-  settings = {
-    clangd = {
-      InlayHints = {
-        Designators = true,
-        Enabled = true,
-        ParameterNames = true,
-        DeducedTypes = true,
-      },
-      fallbackFlags = { "-std=c++20" },
-    },
-  }
+--   settings = {
+--     clangd = {
+--       InlayHints = {
+--         Designators = true,
+--         Enabled = true,
+--         ParameterNames = true,
+--         DeducedTypes = true,
+--       },
+--       fallbackFlags = { "-std=c++20" },
+--     },
+--   }
 })
 
-require("inlay-hints").setup({
-    commands = { enable = true },
-    autocmd = { enable = false } -- disabled by default
-})
+-- require("inlay-hints").setup({
+--     commands = { enable = true },
+--     autocmd = { enable = false } -- disabled by default
+-- })
 
 function goto_error_then_hint(goto_func)
   local pos = vim.api.nvim_win_get_cursor(0)
