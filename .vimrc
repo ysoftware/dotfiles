@@ -305,7 +305,7 @@ nnoremap <C-W>< :res -10<CR>
 
 " File Search
 nnoremap <C-S-up> :e ~/Documents/GitHub/vimrc/.vimrc<CR>
-nnoremap <leader><Down> :e ~/Documents/GitHub/Notes/Notes.md<CR>
+nnoremap <leader><Down> :e ~/Documents/GitHub/Notes/Notes.txt<CR>
 
 if has('mac')
     nnoremap <C-S-down> :e ~/Documents/Check24/check24-worklog/worklog.txt<CR>
@@ -337,7 +337,7 @@ set gdefault
 let g:searchindex_line_limit=2000000
 nnoremap <C-l> :noh<CR><C-l>
 nnoremap <leader>n :cn<CR>
-nnoremap <C-b> :make<CR>
+nnoremap <C-b> :Gcd<CR> :make<CR>
 
 " Reset search
 nnoremap <silent> <leader>/ /fake-search-query<CR><C-l>
@@ -361,7 +361,6 @@ nnoremap <leader>D :lua vim.lsp.buf.references()<CR>
 nnoremap <leader>M :lua BreakArguments()<CR>
 nnoremap <leader><C-A> :InlayHintsToggle<CR>
 
-command! Here execute 'cd %:p:h'
 command! Mess execute "put =execute('messages')"
 
 if has('mac')
