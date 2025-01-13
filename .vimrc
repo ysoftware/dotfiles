@@ -218,14 +218,22 @@ nmap [h <Plug>(GitGutterPrevHunk)zz
 nnoremap <leader>g :vertical:G<CR>
 command! Diff execute 'GitGutterDiff'
 
-" Show list of branches (if inside git file, then close it first)
-nnoremap gb :Git branch<CR>
+" Show list of branches / remote branches (if inside git file, then close it first)
 autocmd FileType git nnoremap <buffer> gb :bd<CR> :Git branch<CR>
-autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
+nnoremap gb :Git branch<CR>
+autocmd FileType git nnoremap <buffer> grb :bd<CR> :Git branch -r<CR>
+nnoremap grb :Git branch -r<CR>
+
+" Pull and merge
 autocmd FileType git nnoremap <buffer> gm 0w"hy$:exe 'Git merge ' . @h<CR>
 autocmd FileType git nnoremap <buffer> gp :Git pull<CR>
+autocmd FileType fugitive nnoremap <buffer> gl :Git log<CR>
 autocmd FileType fugitive nnoremap <buffer> gp :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer> gP :Git push<CR>
+
+" Checkout commit
+autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
+autocmd FileType git nnoremap <buffer> grc :call GitCheckoutNewRemoteFromBranchesView()<CR>
 
 function! GitCheckoutFromBranchesView()
   normal! 0w"hy$
@@ -235,6 +243,16 @@ function! GitCheckoutFromBranchesView()
   execute 'Git branch'
   redraw!
 endfunction
+
+function! GitCheckoutNewRemoteFromBranchesView()
+    normal! 0www"hy$
+    let l:branch = @h
+    execute 'Git checkout -b ' . l:branch . ' origin/' . l:branch
+    execute 'bd'
+    execute 'Git branch'
+    redraw!
+endfunction
+
 
 " Funny command to quit insert mode without escape
 imap jk <Esc>:cd %:p:h<CR>
@@ -387,7 +405,10 @@ lua << EOF
 -- LSP
 require("lspconfig").rust_analyzer.setup {}
 require("lspconfig").ols.setup {}
-require("lspconfig").sourcekit.setup {}
+
+require("lspconfig").sourcekit.setup { 
+    filetypes = { "swift" }    
+}
 
 require("lspconfig").clangd.setup({
 --   settings = {
