@@ -225,6 +225,7 @@ autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR
 autocmd FileType git nnoremap <buffer> gm 0w"hy$:exe 'Git merge ' . @h<CR>
 autocmd FileType git nnoremap <buffer> gp :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer> gp :Git pull<CR>
+autocmd FileType fugitive nnoremap <buffer> gP :Git push<CR>
 
 function! GitCheckoutFromBranchesView()
   normal! 0w"hy$
@@ -337,7 +338,7 @@ set gdefault
 let g:searchindex_line_limit=2000000
 nnoremap <C-l> :noh<CR><C-l>
 nnoremap <leader>n :cn<CR>
-nnoremap <C-b> :Gcd<CR> :make<CR>
+nnoremap <C-b> :Gcd<CR> :make -B<CR>
 
 " Reset search
 nnoremap <silent> <leader>/ /fake-search-query<CR><C-l>
