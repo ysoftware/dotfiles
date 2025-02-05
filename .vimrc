@@ -25,7 +25,7 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 
 if has('mac') " Xcode stuff 
-    " Plug 'mfussenegger/nvim-dap' " Debug adapter protocol
+    Plug 'mfussenegger/nvim-dap' " Debug adapter protocol
     " Plug 'nvim-neotest/nvim-nio' " dependency of DAP
     " Plug 'rcarriga/nvim-dap-ui' " Dap UI
     Plug 'wojciech-kulik/xcodebuild.nvim' " Xcode tools
@@ -38,7 +38,7 @@ else
 endif
 
 " Syntax highlighting
-" Plug 'keith/swift.vim' " Swift support
+Plug 'keith/swift.vim' " Swift support
 Plug 'jansedivy/jai.vim' " Jai support
 
 Plug 'preservim/nerdtree' | " File browser
@@ -123,6 +123,21 @@ function! s:ag_in(bang, ...)
         \ a:bang)
 endfunction
 command! -bang -nargs=+ -complete=dir AgIn call s:ag_in(<bang>0, <f-args>)
+
+" Search and replace in git root
+function! s:Replace(...) abort
+  if a:0 < 2
+    echoerr "Usage: :Replace <pattern> <replacement>"
+    return
+  endif
+  let l:pattern = a:1
+  let l:replacement = a:2
+  let l:gitroot = trim(system('git rev-parse --show-toplevel'))
+  let l:cmd = 'grep -rl ' . shellescape(l:pattern) . ' ' . shellescape(l:gitroot)
+        \ . ' | xargs sed -i "s/' . l:pattern . '/' . l:replacement . '/g"'
+  call system(l:cmd)
+endfunction
+command! -nargs=+ Replace call s:Replace(<f-args>)
 
 " Setup Plugin Manager
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
@@ -356,7 +371,7 @@ set gdefault
 let g:searchindex_line_limit=2000000
 nnoremap <C-l> :noh<CR><C-l>
 nnoremap <leader>n :cn<CR>
-nnoremap <C-b> :Gcd<CR> :make -B<CR>
+nnoremap <C-b> :Gcd<CR> :make<CR>
 
 " Reset search
 nnoremap <silent> <leader>/ /fake-search-query<CR><C-l>
@@ -390,8 +405,8 @@ if has('mac')
     command! Set :XcodebuildPicker
     command! Lg :XcodebuildOpenLog
     
-    " [Ticket] Take branch name as ticket number and put at the start of commit
-    command! Tick execute 'keeppatterns normal /branch <CR>f/<Right>veeeyggpI[<Esc>A] '
+    " Take branch name as ticket number and put at the start of commit: feature/TEMOSO-19523-... -> [TEMOSO-19523] 
+    autocmd FileType gitcommit command! Ticket execute 'keeppatterns normal! /branch <CR>f/<Right>veee"qygg"qpI[<Esc>A] '
 else
     nnoremap Q :lua vim.lsp.buf.code_action()<CR>
 endif
