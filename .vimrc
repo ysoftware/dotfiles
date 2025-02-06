@@ -405,8 +405,8 @@ if has('mac')
     command! Set :XcodebuildPicker
     command! Lg :XcodebuildOpenLog
     
-    " Take branch name as ticket number and put at the start of commit: feature/TEMOSO-19523-... -> [TEMOSO-19523] 
     autocmd FileType gitcommit command! Ticket execute 'keeppatterns normal! /branch <CR>f/<Right>veee"qygg"qpI[<Esc>A] '
+    autocmd FileType gitcommit nnoremap T :Ticket<CR>
 else
     nnoremap Q :lua vim.lsp.buf.code_action()<CR>
 endif
