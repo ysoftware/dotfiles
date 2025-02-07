@@ -177,8 +177,11 @@ set autowrite
 set wildignorecase
 set scroll=15
 
-vnoremap // "hy/\C\V<C-R>=escape(@h, '\/')<CR><CR>
-vnoremap ts "hy:%s/\V<C-R>=escape(@h, '\/')<CR>//gcI<Left><Left><Left><Left> 
+" Comment style
+autocmd FileType c,cpp,h setlocal commentstring=//\ %s
+
+" Search&Replace in the file
+vnoremap ts "hy:%s/\V<C-R>=escape(@h, '\/')<CR>//gcI<Left><Left><Left><Left>
 
 " Navigation
 let mapleader = " "
@@ -406,7 +409,7 @@ if has('mac')
     command! Lg :XcodebuildOpenLog
     
     autocmd FileType gitcommit command! Ticket execute 'keeppatterns normal! /branch <CR>f/<Right>veee"qygg"qpI[<Esc>A] '
-    autocmd FileType gitcommit nnoremap T :Ticket<CR>
+    autocmd FileType gitcommit nnoremap T :Ticket<CR>A
 else
     nnoremap Q :lua vim.lsp.buf.code_action()<CR>
 endif
