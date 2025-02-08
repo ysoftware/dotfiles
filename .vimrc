@@ -44,6 +44,10 @@ Plug 'jansedivy/jai.vim' " Jai support
 Plug 'preservim/nerdtree' | " File browser
     \ Plug 'Xuyuanp/nerdtree-git-plugin' " Plugin with git status
 
+" Code completion
+Plug 'hrsh7th/nvim-cmp'
+Plug 'hrsh7th/cmp-nvim-lsp'
+
 Plug 'tpope/vim-fugitive' " Git
 Plug 'bkad/CamelCaseMotion' " Jump to camel case words
 Plug 'airblade/vim-gitgutter' " More Git
@@ -356,7 +360,7 @@ set gdefault
 let g:searchindex_line_limit=2000000
 nnoremap <C-l> :noh<CR><C-l>
 nnoremap <leader>n :cn<CR>
-nnoremap <C-b> :Gcd<CR> :make -B<CR>
+nnoremap <C-b> :Gcd<CR> :make<CR>
 
 " Reset search
 nnoremap <silent> <leader>/ /fake-search-query<CR><C-l>
@@ -405,29 +409,67 @@ lua << EOF
 -- LSP
 require("lspconfig").rust_analyzer.setup {}
 require("lspconfig").ols.setup {}
+require("lspconfig").clangd.setup {}
 
 require("lspconfig").sourcekit.setup { 
     filetypes = { "swift" }    
 }
 
-require("lspconfig").clangd.setup({
---   settings = {
---     clangd = {
---       InlayHints = {
---         Designators = true,
---         Enabled = true,
---         ParameterNames = true,
---         DeducedTypes = true,
---       },
---       fallbackFlags = { "-std=c++20" },
---     },
---   }
-})
+-- Code completion
+ local ELLIPSIS_CHAR = '…'
+  local MAX_LABEL_WIDTH = 80
+  local MIN_LABEL_WIDTH = 30
 
--- require("inlay-hints").setup({
---     commands = { enable = true },
---     autocmd = { enable = false } -- disabled by default
--- })
+local cmp = require'cmp'
+cmp.setup({
+  completion = {
+    autocomplete = false,
+  },
+  experimental = {
+    ghost_text = false,
+  },
+  window = {
+    completion = {
+      winhighlight = "Normal:ColorColumn,CursorLine:Search,Search:None",
+      scrollbar = false,
+    },
+    documentation = {
+      col_offset = 1,
+      side_padding = 0,
+      winhighlight = "Normal:ColorColumn,FloatBorder:ColorColumn",
+      max_width = 50,
+      max_height = 80,
+    },
+  },
+    formatting = {
+      format = function(entry, vim_item)
+        local label = vim_item.abbr
+        local truncated_label = vim.fn.strcharpart(label, 0, MAX_LABEL_WIDTH)
+        if truncated_label ~= label then
+          vim_item.abbr = truncated_label .. ELLIPSIS_CHAR
+        elseif string.len(label) < MIN_LABEL_WIDTH then
+          local padding = string.rep(' ', MIN_LABEL_WIDTH - string.len(label))
+          vim_item.abbr = label .. padding
+        end
+        return vim_item
+      end,
+    },
+  mapping = {
+    ['<C-e>'] = cmp.mapping.abort(),
+    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-n>'] = cmp.mapping.select_next_item(),
+    ['<C-p>'] = cmp.mapping.select_prev_item(),
+    ['<CR>'] = cmp.mapping.confirm({ select = false }),
+  },
+  sources = {
+    { name = 'nvim_lsp' },
+    { name = 'buffer' },
+    { name = 'path' },
+    { name = 'cmdline' },
+  },
+})
 
 function goto_error_then_hint(goto_func)
   local pos = vim.api.nvim_win_get_cursor(0)
