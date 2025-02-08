@@ -65,7 +65,7 @@ call s:setfg("PreProc", s:text_brown)
 call s:setfg("Error", s:text_red)
 
 call s:setfg("String", s:text_green)
-call s:setfg("Character", s:text_green)
+call s:setfg("Character", s:text_yellow)
 call s:setfg("Include", s:text_green)
 call s:setfg("Operator", s:text_normal)
 call s:setfg("SpecialChar", s:text_normal)

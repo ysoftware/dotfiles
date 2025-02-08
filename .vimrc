@@ -25,7 +25,7 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 
 if has('mac') " Xcode stuff 
-    " Plug 'mfussenegger/nvim-dap' " Debug adapter protocol
+    Plug 'mfussenegger/nvim-dap' " Debug adapter protocol
     " Plug 'nvim-neotest/nvim-nio' " dependency of DAP
     " Plug 'rcarriga/nvim-dap-ui' " Dap UI
     Plug 'wojciech-kulik/xcodebuild.nvim' " Xcode tools
@@ -38,7 +38,7 @@ else
 endif
 
 " Syntax highlighting
-" Plug 'keith/swift.vim' " Swift support
+Plug 'keith/swift.vim' " Swift support
 Plug 'jansedivy/jai.vim' " Jai support
 
 Plug 'preservim/nerdtree' | " File browser
@@ -128,6 +128,21 @@ function! s:ag_in(bang, ...)
 endfunction
 command! -bang -nargs=+ -complete=dir AgIn call s:ag_in(<bang>0, <f-args>)
 
+" Search and replace in git root
+function! s:Replace(...) abort
+  if a:0 < 2
+    echoerr "Usage: :Replace <pattern> <replacement>"
+    return
+  endif
+  let l:pattern = a:1
+  let l:replacement = a:2
+  let l:gitroot = trim(system('git rev-parse --show-toplevel'))
+  let l:cmd = 'grep -rl ' . shellescape(l:pattern) . ' ' . shellescape(l:gitroot)
+        \ . ' | xargs sed -i "s/' . l:pattern . '/' . l:replacement . '/g"'
+  call system(l:cmd)
+endfunction
+command! -nargs=+ Replace call s:Replace(<f-args>)
+
 " Setup Plugin Manager
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
 if empty(glob(data_dir . '/autoload/plug.vim'))
@@ -166,8 +181,11 @@ set autowrite
 set wildignorecase
 set scroll=15
 
-vnoremap // "hy/\C\V<C-R>=escape(@h, '\/')<CR><CR>
-vnoremap ts "hy:%s/\V<C-R>=escape(@h, '\/')<CR>//gcI<Left><Left><Left><Left> 
+" Comment style
+autocmd FileType c,cpp,h setlocal commentstring=//\ %s
+
+" Search&Replace in the file
+vnoremap ts "hy:%s/\V<C-R>=escape(@h, '\/')<CR>//gcI<Left><Left><Left><Left>
 
 " Navigation
 let mapleader = " "
@@ -394,8 +412,8 @@ if has('mac')
     command! Set :XcodebuildPicker
     command! Lg :XcodebuildOpenLog
     
-    " [Ticket] Take branch name as ticket number and put at the start of commit
-    command! Tick execute 'keeppatterns normal /branch <CR>f/<Right>veeeyggpI[<Esc>A] '
+    autocmd FileType gitcommit command! Ticket execute 'keeppatterns normal! /branch <CR>f/<Right>veee"qygg"qpI[<Esc>A] '
+    autocmd FileType gitcommit nnoremap T :Ticket<CR>A
 else
     nnoremap Q :lua vim.lsp.buf.code_action()<CR>
 endif
@@ -416,9 +434,9 @@ require("lspconfig").sourcekit.setup {
 }
 
 -- Code completion
- local ELLIPSIS_CHAR = '…'
-  local MAX_LABEL_WIDTH = 80
-  local MIN_LABEL_WIDTH = 30
+local ELLIPSIS_CHAR = '…'
+local MAX_LABEL_WIDTH = 80
+local MIN_LABEL_WIDTH = 30
 
 local cmp = require'cmp'
 cmp.setup({
@@ -441,19 +459,19 @@ cmp.setup({
       max_height = 80,
     },
   },
-    formatting = {
-      format = function(entry, vim_item)
-        local label = vim_item.abbr
-        local truncated_label = vim.fn.strcharpart(label, 0, MAX_LABEL_WIDTH)
-        if truncated_label ~= label then
-          vim_item.abbr = truncated_label .. ELLIPSIS_CHAR
-        elseif string.len(label) < MIN_LABEL_WIDTH then
-          local padding = string.rep(' ', MIN_LABEL_WIDTH - string.len(label))
-          vim_item.abbr = label .. padding
-        end
-        return vim_item
-      end,
-    },
+  formatting = {
+    format = function(entry, vim_item)
+      local label = vim_item.abbr
+      local truncated_label = vim.fn.strcharpart(label, 0, MAX_LABEL_WIDTH)
+      if truncated_label ~= label then
+        vim_item.abbr = truncated_label .. ELLIPSIS_CHAR
+      elseif string.len(label) < MIN_LABEL_WIDTH then
+        local padding = string.rep(' ', MIN_LABEL_WIDTH - string.len(label))
+        vim_item.abbr = label .. padding
+      end
+      return vim_item
+    end,
+  },
   mapping = {
     ['<C-e>'] = cmp.mapping.abort(),
     ['<C-b>'] = cmp.mapping.scroll_docs(-4),
