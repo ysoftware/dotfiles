@@ -93,8 +93,6 @@ let g:lightline = { 'colorscheme': 'one',
       \ }
 
 if has('mac')
-    lua require("xcodebuild").setup({ auto_save= false })
-    lua require('lint').linters_by_ft = { swift = {'swiftlint'} }
     au BufWritePost * lua require('lint').try_lint()
 endif
 
@@ -424,14 +422,51 @@ call yaroscheme#apply()
 set title 
 
 lua << EOF
+require("xcodebuild").setup({ auto_save= false })
+
+require('lint').linters_by_ft = { 
+    swift =      { "swiftlint" },
+    typescript = { "eslint" },
+    javascript = { "eslint" },
+}
 
 -- LSP
-require("lspconfig").rust_analyzer.setup {}
-require("lspconfig").ols.setup {}
-require("lspconfig").clangd.setup {}
-require("lspconfig").angularls.setup{}
 
-require("lspconfig").sourcekit.setup { 
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+local lspconfig = require('lspconfig')
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+
+require'lspconfig'.rust_analyzer.setup {
+    capabilities = capabilities,
+    filetypes = { "rs" }
+}
+
+require'lspconfig'.ols.setup {
+    capabilities = capabilities,
+    filetypes = { "odin" }
+}
+
+require'lspconfig'.clangd.setup {
+    capabilities = capabilities,
+    filetypes = { "c", "h" }
+}
+
+local project_library_path = "~/Documents/Check24/mfso-project-angular/"
+local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
+require'lspconfig'.tsserver.setup {
+    filetypes = { "typescript", "html", "scss", "css", "javascript" },  -- Ensure defaults are included
+}
+require'lspconfig'.angularls.setup {
+    cmd = cmd,
+    filetypes = { "typescript", "html", "scss", "css", "javascript" },  -- Ensure defaults are included
+    on_new_config = function(new_config,new_root_dir)
+      new_config.cmd = cmd
+    end,
+}
+
+require'lspconfig'.sourcekit.setup { 
+    capabilities = capabilities,
     filetypes = { "swift" }    
 }
 
