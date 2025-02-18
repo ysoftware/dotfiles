@@ -34,7 +34,7 @@ if &background == "dark"
 else
     let s:bg_default = "#ffffff"
     let s:bg_highlight = "#a2bfd8"
-    let s:bg_select = "#accbe5"
+    let s:bg_select = "#cee2f2"
     let s:bg_green = "#46a53a"
     let s:bg_red = "#a53a3a"
     let s:bg_almost_invisible = "#fcfcfc"

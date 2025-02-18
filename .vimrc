@@ -34,12 +34,13 @@ if has('mac') " Xcode stuff
     Plug 'nvim-lua/plenary.nvim' " Needed for telescope
     Plug 'mfussenegger/nvim-lint'
 else 
-    Plug 'neovim/nvim-lspconfig' " Lsp
 endif
 
 " Syntax highlighting
+Plug 'neovim/nvim-lspconfig' " Lsp
 Plug 'keith/swift.vim' " Swift support
 Plug 'jansedivy/jai.vim' " Jai support
+Plug 'angular/vscode-ng-language-service' " Angular support
 
 Plug 'preservim/nerdtree' | " File browser
     \ Plug 'Xuyuanp/nerdtree-git-plugin' " Plugin with git status
@@ -428,6 +429,7 @@ lua << EOF
 require("lspconfig").rust_analyzer.setup {}
 require("lspconfig").ols.setup {}
 require("lspconfig").clangd.setup {}
+require("lspconfig").angularls.setup{}
 
 require("lspconfig").sourcekit.setup { 
     filetypes = { "swift" }    
