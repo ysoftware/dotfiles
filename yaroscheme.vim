@@ -129,6 +129,7 @@ call s:setfg("DiagnosticHint", s:text_gray)
 
 " Additional VIM things
 call s:setbgfg("ColorColumn", s:bg_almost_invisible, s:text_normal) 
+call s:setbgfg("CursorLine", s:bg_select, s:text_normal) 
 
 hi link LspDiagnosticsDefaultError DiagnosticError
 hi link LspDiagnosticsDefaultWarning DiagnosticWarn

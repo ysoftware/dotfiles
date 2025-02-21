@@ -63,10 +63,11 @@ call plug#end()
 " Setup fzf
 let $FZF_DEFAULT_OPTS = '--bind ctrl-a:select-all'
 let g:fzf_history_dir = '~/.local/share/fzf-history'
+
 function! s:build_quickfix_list(lines)
-  call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
-  copen
-  cc
+    call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
+    copen
+    cc
 endfunction
 let g:fzf_action = {
   \ 'ctrl-q': function('s:build_quickfix_list'),
@@ -74,23 +75,44 @@ let g:fzf_action = {
   \ 'ctrl-x': 'split',
   \ 'ctrl-v': 'vsplit' }
 
+" for fzf preview window
+let $BAT_THEME = 'GitHub' 
+
+let g:fzf_colors = {
+  \ 'fg':         ['fg', 'Normal'],
+  \ 'bg':         ['bg', 'Normal'],
+  \ 'preview-fg': ['fg', 'Normal'],
+  \ 'preview-bg': ['bg', 'Normal'],
+  \ 'hl':         ['fg', 'Comment'],
+  \ 'fg+':        ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':        ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':        ['fg', 'Statement'],
+  \ 'gutter':     ['bg', 'ColorColumn'],
+  \ 'info':       ['fg', 'PreProc'],
+  \ 'border':     ['fg', 'Ignore'],
+  \ 'prompt':     ['fg', 'Conditional'],
+  \ 'pointer':    ['fg', 'Exception'],
+  \ 'marker':     ['fg', 'Keyword'],
+  \ 'spinner':    ['fg', 'Label'],
+  \ 'header':     ['fg', 'Comment'] }
+
+" Status line setup
 let g:bufferline_echo = 1
 let g:bufferline_inactive_highlight = 'StatusLineNC'
 let g:bufferline_solo_highlight = 0
 
-" Status line setup
 set noshowmode
 let g:lightline = { 'colorscheme': 'one', 
-      \   'active': {
-      \     'left': [[ 'mode', 'paste' ],
-      \              [ 'gitbranch', 'readonly', 'filename', 'modified' ]],
-      \     'right': [[ 'lineinfo' ],
-      \              [ 'fileencoding', 'filetype', 'charvaluehex' ]]
-      \   },
-      \   'component_function': {
-      \     'gitbranch': 'FugitiveHead'
-      \   },
-      \ }
+  \   'active': {
+  \     'left': [[ 'mode', 'paste' ],
+  \              [ 'gitbranch', 'readonly', 'filename', 'modified' ]],
+  \     'right': [[ 'lineinfo' ],
+  \              [ 'fileencoding', 'filetype', 'charvaluehex' ]]
+  \   },
+  \   'component_function': {
+  \     'gitbranch': 'FugitiveHead'
+  \   },
+  \ }
 
 if has('mac')
     au BufWritePost * lua require('lint').try_lint()
@@ -102,7 +124,7 @@ command! -bang -nargs=+ -complete=dir Files
     \     fzf#vim#with_preview(
     \         {
     \             'options': [
-    \                 '--reverse', '-i', '--info=inline',
+    \                 '--reverse', '-i', '--info=inline', 
     \                 '--keep-right', '--preview="bat -p --color always {}"'
     \             ]
     \         },
@@ -115,7 +137,7 @@ function! s:ag_in(bang, ...)
     call fzf#vim#ag(join(a:000[1:], ' '),
         \     fzf#vim#with_preview(
         \         {
-        \             'dir': expand(a:1), 
+        \             'dir': expand(a:1),
         \             'options': [
         \                 '--reverse', '-i', '--info=inline', 
         \                 '--keep-right', '--preview="bat -p --color always {}"' 
