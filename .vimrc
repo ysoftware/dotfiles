@@ -33,6 +33,7 @@ if has('mac') " Xcode stuff
     Plug 'nvim-telescope/telescope.nvim' " needed for xcodebuild
     Plug 'nvim-lua/plenary.nvim' " Needed for telescope
     Plug 'mfussenegger/nvim-lint'
+    Plug 'angular/vscode-ng-language-service' " Angular support
 else 
 endif
 
@@ -40,7 +41,6 @@ endif
 Plug 'neovim/nvim-lspconfig' " Lsp
 Plug 'keith/swift.vim' " Swift support
 Plug 'jansedivy/jai.vim' " Jai support
-Plug 'angular/vscode-ng-language-service' " Angular support
 
 Plug 'preservim/nerdtree' | " File browser
     \ Plug 'Xuyuanp/nerdtree-git-plugin' " Plugin with git status
@@ -443,7 +443,7 @@ if has('mac')
     command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/Example/' 
     command! Set :XcodebuildPicker
     command! Lg :XcodebuildOpenLog
-    
+
     autocmd FileType gitcommit command! Ticket execute 'keeppatterns normal! /branch <CR>f/<Right>veee"qygg"qpI[<Esc>A] '
     autocmd FileType gitcommit nnoremap T :Ticket<CR>A
 else
@@ -455,15 +455,30 @@ call yaroscheme#apply()
 set title 
 
 lua << EOF
-require("xcodebuild").setup({ auto_save= false })
+if vim.fn.has('mac') == 1 then
+    require("xcodebuild").setup({ auto_save = false })
 
-require('lint').linters_by_ft = { 
-    swift =      { "swiftlint" },
-    typescript = { "eslint" },
-    javascript = { "eslint" },
-}
+    require('lint').linters_by_ft = { 
+        swift =      { "swiftlint" },
+        typescript = { "eslint" },
+        javascript = { "eslint" },
+    }
 
--- LSP
+    local project_library_path = "~/Documents/Check24/mfso-project-angular/"
+    local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
+    require'lspconfig'.tsserver.setup {
+        capabilities = capabilities,
+        filetypes = { "typescript", "html", "scss", "css", "javascript" },
+    }
+    require'lspconfig'.angularls.setup {
+        cmd = cmd,
+        capabilities = capabilities,
+        filetypes = { "typescript", "html", "scss", "css", "javascript" },
+        on_new_config = function(new_config,new_root_dir)
+          new_config.cmd = cmd
+        end,
+    }
+end
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 local lspconfig = require('lspconfig')
@@ -483,21 +498,6 @@ require'lspconfig'.ols.setup {
 require'lspconfig'.clangd.setup {
     capabilities = capabilities,
     filetypes = { "c", "h", "cpp" }
-}
-
-local project_library_path = "~/Documents/Check24/mfso-project-angular/"
-local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
-require'lspconfig'.tsserver.setup {
-    capabilities = capabilities,
-    filetypes = { "typescript", "html", "scss", "css", "javascript" },
-}
-require'lspconfig'.angularls.setup {
-    cmd = cmd,
-    capabilities = capabilities,
-    filetypes = { "typescript", "html", "scss", "css", "javascript" },
-    on_new_config = function(new_config,new_root_dir)
-      new_config.cmd = cmd
-    end,
 }
 
 require'lspconfig'.sourcekit.setup { 
