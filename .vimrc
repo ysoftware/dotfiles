@@ -180,6 +180,7 @@ set number
 set autowrite
 set wildignorecase
 set scroll=15
+set invlist
 
 " Comment style
 autocmd FileType c,cpp,h setlocal commentstring=//\ %s
