@@ -75,9 +75,6 @@ let g:fzf_action = {
   \ 'ctrl-x': 'split',
   \ 'ctrl-v': 'vsplit' }
 
-" for fzf preview window
-let $BAT_THEME = 'GitHub' 
-
 let g:fzf_colors = {
   \ 'fg':         ['fg', 'Normal'],
   \ 'bg':         ['bg', 'Normal'],
@@ -171,22 +168,32 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
-" weird auto-text wrapping to new line, this is horrible
+" Vim theme
+function! SetCorrectBatThemeForFzf()
+    if &background == "dark"
+        let $BAT_THEME = 'DarkNeon'
+    else
+        let $BAT_THEME = 'GitHub'
+    endif
+endfunction
 
 if has('mac')
     set colorcolumn=120
     if system('defaults read -g AppleInterfaceStyle') == "Dark\n"
         set background=dark
+        call SetCorrectBatThemeForFzf()
     else
         set background=light
+        call SetCorrectBatThemeForFzf()
     endif
 else
     set background=dark
+    call SetCorrectBatThemeForFzf()
 endif
 
-noremap <C-S-Right> :set background=light<CR><C-l>
-noremap <C-S-Left> :set background=dark<CR><C-l>
-autocmd OptionSet background call yaroscheme#apply()
+noremap <C-S-Right> :set background=light<CR>:call SetCorrectBatThemeForFzf()<CR><C-l>
+noremap <C-S-Left> :set background=dark<CR>:call SetCorrectBatThemeForFzf()<CR><C-l>
+autocmd OptionSet background call SetCorrectBatThemeForFzf() | call yaroscheme#apply()
 
 " Copy paste with system buffer
 noremap p "+p
@@ -471,17 +478,19 @@ require'lspconfig'.ols.setup {
 
 require'lspconfig'.clangd.setup {
     capabilities = capabilities,
-    filetypes = { "c", "h" }
+    filetypes = { "c", "h", "cpp" }
 }
 
 local project_library_path = "~/Documents/Check24/mfso-project-angular/"
 local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
 require'lspconfig'.tsserver.setup {
-    filetypes = { "typescript", "html", "scss", "css", "javascript" },  -- Ensure defaults are included
+    capabilities = capabilities,
+    filetypes = { "typescript", "html", "scss", "css", "javascript" },
 }
 require'lspconfig'.angularls.setup {
     cmd = cmd,
-    filetypes = { "typescript", "html", "scss", "css", "javascript" },  -- Ensure defaults are included
+    capabilities = capabilities,
+    filetypes = { "typescript", "html", "scss", "css", "javascript" },
     on_new_config = function(new_config,new_root_dir)
       new_config.cmd = cmd
     end,
