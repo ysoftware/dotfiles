@@ -117,16 +117,16 @@ endif
 
 " Files setup
 command! -bang -nargs=+ -complete=dir Files
-	\ call fzf#vim#files(<q-args>, 
+    \ call fzf#vim#files(<q-args>,
     \     fzf#vim#with_preview(
     \         {
     \             'options': [
-    \                 '--reverse', '-i', '--info=inline', 
+    \                 '--reverse', '-i', '--info=inline',
     \                 '--keep-right', '--preview="bat -p --color always {}"'
     \             ]
     \         },
     \         'right:40%'
-    \     ), 
+    \     ),
     \ <bang>0)
 
 " AgIn setup
@@ -136,12 +136,12 @@ function! s:ag_in(bang, ...)
         \         {
         \             'dir': expand(a:1),
         \             'options': [
-        \                 '--reverse', '-i', '--info=inline', 
-        \                 '--keep-right', '--preview="bat -p --color always {}"' 
+        \                 '--reverse', '-i', '--info=inline',
+        \                 '--keep-right', '--preview="bat -p --color always {}"'
         \             ]
-        \         }, 
+        \         },
         \         'down:70%'
-        \     ), 
+        \     ),
         \ a:bang)
 endfunction
 command! -bang -nargs=+ -complete=dir AgIn call s:ag_in(<bang>0, <f-args>)
@@ -204,11 +204,14 @@ noremap Y "+Y
 syntax on
 set ruler
 set rnu
-set number 
+set number
 set autowrite
 set wildignorecase
 set scroll=15
-set invlist
+
+" show invisible characters
+set listchars=tab:»-,trail:·,nbsp:␣,extends:>,precedes:< 
+set list
 
 " Comment style
 autocmd FileType c,cpp,h setlocal commentstring=//\ %s

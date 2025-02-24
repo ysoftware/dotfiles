@@ -20,7 +20,9 @@ if &background == "dark"
     let s:bg_select = "#424f59"
     let s:bg_green = "#263f23"
     let s:bg_red = "#3f0909"
+
     let s:bg_almost_invisible = "#202020"
+    let s:text_invisible_chars = "#303030"
 
     let s:text_normal = "#fffff"
     let s:text_on_bg = "#e5e5e5"
@@ -37,7 +39,9 @@ else
     let s:bg_select = "#cee2f2"
     let s:bg_green = "#46a53a"
     let s:bg_red = "#a53a3a"
+
     let s:bg_almost_invisible = "#fcfcfc"
+    let s:text_invisible_chars = "#eaeaea"
 
     let s:text_normal = "#262626"
     let s:text_on_bg = "#ffffff"
@@ -129,6 +133,7 @@ call s:setfg("DiagnosticHint", s:text_gray)
 
 " Additional VIM things
 call s:setbgfg("ColorColumn", s:bg_almost_invisible, s:text_normal) 
+call s:setfg("NonText", s:text_invisible_chars)
 call s:setbgfg("CursorLine", s:bg_select, s:text_normal) 
 
 hi link LspDiagnosticsDefaultError DiagnosticError
