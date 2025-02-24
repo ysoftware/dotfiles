@@ -34,12 +34,13 @@ if has('mac') " Xcode stuff
     Plug 'nvim-lua/plenary.nvim' " Needed for telescope
     Plug 'mfussenegger/nvim-lint'
 else 
-    Plug 'neovim/nvim-lspconfig' " Lsp
 endif
 
 " Syntax highlighting
+Plug 'neovim/nvim-lspconfig' " Lsp
 Plug 'keith/swift.vim' " Swift support
 Plug 'jansedivy/jai.vim' " Jai support
+Plug 'angular/vscode-ng-language-service' " Angular support
 
 Plug 'preservim/nerdtree' | " File browser
     \ Plug 'Xuyuanp/nerdtree-git-plugin' " Plugin with git status
@@ -62,10 +63,11 @@ call plug#end()
 " Setup fzf
 let $FZF_DEFAULT_OPTS = '--bind ctrl-a:select-all'
 let g:fzf_history_dir = '~/.local/share/fzf-history'
+
 function! s:build_quickfix_list(lines)
-  call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
-  copen
-  cc
+    call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
+    copen
+    cc
 endfunction
 let g:fzf_action = {
   \ 'ctrl-q': function('s:build_quickfix_list'),
@@ -73,27 +75,43 @@ let g:fzf_action = {
   \ 'ctrl-x': 'split',
   \ 'ctrl-v': 'vsplit' }
 
+let g:fzf_colors = {
+  \ 'fg':         ['fg', 'Normal'],
+  \ 'bg':         ['bg', 'Normal'],
+  \ 'preview-fg': ['fg', 'Normal'],
+  \ 'preview-bg': ['bg', 'Normal'],
+  \ 'hl':         ['fg', 'Comment'],
+  \ 'fg+':        ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':        ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':        ['fg', 'Statement'],
+  \ 'gutter':     ['bg', 'ColorColumn'],
+  \ 'info':       ['fg', 'PreProc'],
+  \ 'border':     ['fg', 'Ignore'],
+  \ 'prompt':     ['fg', 'Conditional'],
+  \ 'pointer':    ['fg', 'Exception'],
+  \ 'marker':     ['fg', 'Keyword'],
+  \ 'spinner':    ['fg', 'Label'],
+  \ 'header':     ['fg', 'Comment'] }
+
+" Status line setup
 let g:bufferline_echo = 1
 let g:bufferline_inactive_highlight = 'StatusLineNC'
 let g:bufferline_solo_highlight = 0
 
-" Status line setup
 set noshowmode
 let g:lightline = { 'colorscheme': 'one', 
-      \   'active': {
-      \     'left': [[ 'mode', 'paste' ],
-      \              [ 'gitbranch', 'readonly', 'filename', 'modified' ]],
-      \     'right': [[ 'lineinfo' ],
-      \              [ 'fileencoding', 'filetype', 'charvaluehex' ]]
-      \   },
-      \   'component_function': {
-      \     'gitbranch': 'FugitiveHead'
-      \   },
-      \ }
+  \   'active': {
+  \     'left': [[ 'mode', 'paste' ],
+  \              [ 'gitbranch', 'readonly', 'filename', 'modified' ]],
+  \     'right': [[ 'lineinfo' ],
+  \              [ 'fileencoding', 'filetype', 'charvaluehex' ]]
+  \   },
+  \   'component_function': {
+  \     'gitbranch': 'FugitiveHead'
+  \   },
+  \ }
 
 if has('mac')
-    lua require("xcodebuild").setup({ auto_save= false })
-    lua require('lint').linters_by_ft = { swift = {'swiftlint'} }
     au BufWritePost * lua require('lint').try_lint()
 endif
 
@@ -103,7 +121,7 @@ command! -bang -nargs=+ -complete=dir Files
     \     fzf#vim#with_preview(
     \         {
     \             'options': [
-    \                 '--reverse', '-i', '--info=inline',
+    \                 '--reverse', '-i', '--info=inline', 
     \                 '--keep-right', '--preview="bat -p --color always {}"'
     \             ]
     \         },
@@ -116,7 +134,7 @@ function! s:ag_in(bang, ...)
     call fzf#vim#ag(join(a:000[1:], ' '),
         \     fzf#vim#with_preview(
         \         {
-        \             'dir': expand(a:1), 
+        \             'dir': expand(a:1),
         \             'options': [
         \                 '--reverse', '-i', '--info=inline', 
         \                 '--keep-right', '--preview="bat -p --color always {}"' 
@@ -150,22 +168,32 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
-" weird auto-text wrapping to new line, this is horrible
+" Vim theme
+function! SetCorrectBatThemeForFzf()
+    if &background == "dark"
+        let $BAT_THEME = 'DarkNeon'
+    else
+        let $BAT_THEME = 'GitHub'
+    endif
+endfunction
 
 if has('mac')
     set colorcolumn=120
     if system('defaults read -g AppleInterfaceStyle') == "Dark\n"
         set background=dark
+        call SetCorrectBatThemeForFzf()
     else
         set background=light
+        call SetCorrectBatThemeForFzf()
     endif
 else
     set background=dark
+    call SetCorrectBatThemeForFzf()
 endif
 
-noremap <C-S-Right> :set background=light<CR><C-l>
-noremap <C-S-Left> :set background=dark<CR><C-l>
-autocmd OptionSet background call yaroscheme#apply()
+noremap <C-S-Right> :set background=light<CR>:call SetCorrectBatThemeForFzf()<CR><C-l>
+noremap <C-S-Left> :set background=dark<CR>:call SetCorrectBatThemeForFzf()<CR><C-l>
+autocmd OptionSet background call SetCorrectBatThemeForFzf() | call yaroscheme#apply()
 
 " Copy paste with system buffer
 noremap p "+p
@@ -424,13 +452,53 @@ call yaroscheme#apply()
 set title 
 
 lua << EOF
+require("xcodebuild").setup({ auto_save= false })
+
+require('lint').linters_by_ft = { 
+    swift =      { "swiftlint" },
+    typescript = { "eslint" },
+    javascript = { "eslint" },
+}
 
 -- LSP
-require("lspconfig").rust_analyzer.setup {}
-require("lspconfig").ols.setup {}
-require("lspconfig").clangd.setup {}
 
-require("lspconfig").sourcekit.setup { 
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+local lspconfig = require('lspconfig')
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+
+require'lspconfig'.rust_analyzer.setup {
+    capabilities = capabilities,
+    filetypes = { "rs" }
+}
+
+require'lspconfig'.ols.setup {
+    capabilities = capabilities,
+    filetypes = { "odin" }
+}
+
+require'lspconfig'.clangd.setup {
+    capabilities = capabilities,
+    filetypes = { "c", "h", "cpp" }
+}
+
+local project_library_path = "~/Documents/Check24/mfso-project-angular/"
+local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
+require'lspconfig'.tsserver.setup {
+    capabilities = capabilities,
+    filetypes = { "typescript", "html", "scss", "css", "javascript" },
+}
+require'lspconfig'.angularls.setup {
+    cmd = cmd,
+    capabilities = capabilities,
+    filetypes = { "typescript", "html", "scss", "css", "javascript" },
+    on_new_config = function(new_config,new_root_dir)
+      new_config.cmd = cmd
+    end,
+}
+
+require'lspconfig'.sourcekit.setup { 
+    capabilities = capabilities,
     filetypes = { "swift" }    
 }
 
