@@ -171,7 +171,7 @@ endif
 " Vim theme
 function! SetCorrectBatThemeForFzf()
     if &background == "dark"
-        let $BAT_THEME = 'DarkNeon'
+        let $BAT_THEME = 'OneHalfDark'
     else
         let $BAT_THEME = 'GitHub'
     endif
