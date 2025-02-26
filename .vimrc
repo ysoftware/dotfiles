@@ -60,7 +60,30 @@ Plug 'tpope/vim-commentary' " Comment lines of code
 " Plug 'MysticalDevil/inlay-hints.nvim' " Inlay hints (function argument names)
 call plug#end()
 
+" Status line setup
+let g:bufferline_echo = 1
+let g:bufferline_inactive_highlight = 'StatusLineNC'
+let g:bufferline_solo_highlight = 0
+
+set noshowmode
+let g:lightline = { 'colorscheme': 'one', 
+  \   'active': {
+  \     'left': [[ 'mode', 'paste' ],
+  \              [ 'gitbranch', 'readonly', 'filename', 'modified' ]],
+  \     'right': [[ 'lineinfo' ],
+  \              [ 'fileencoding', 'filetype', 'charvaluehex' ]]
+  \   },
+  \   'component_function': {
+  \     'gitbranch': 'FugitiveHead'
+  \   },
+  \ }
+
+if has('mac')
+    au BufWritePost * lua require('lint').try_lint()
+endif
+
 " Setup fzf
+
 let $FZF_DEFAULT_OPTS = '--bind ctrl-a:select-all'
 let g:fzf_history_dir = '~/.local/share/fzf-history'
 
@@ -93,28 +116,6 @@ let g:fzf_colors = {
   \ 'spinner':    ['fg', 'Label'],
   \ 'header':     ['fg', 'Comment'] }
 
-" Status line setup
-let g:bufferline_echo = 1
-let g:bufferline_inactive_highlight = 'StatusLineNC'
-let g:bufferline_solo_highlight = 0
-
-set noshowmode
-let g:lightline = { 'colorscheme': 'one', 
-  \   'active': {
-  \     'left': [[ 'mode', 'paste' ],
-  \              [ 'gitbranch', 'readonly', 'filename', 'modified' ]],
-  \     'right': [[ 'lineinfo' ],
-  \              [ 'fileencoding', 'filetype', 'charvaluehex' ]]
-  \   },
-  \   'component_function': {
-  \     'gitbranch': 'FugitiveHead'
-  \   },
-  \ }
-
-if has('mac')
-    au BufWritePost * lua require('lint').try_lint()
-endif
-
 " Files setup
 command! -bang -nargs=+ -complete=dir Files
     \ call fzf#vim#files(<q-args>,
@@ -137,7 +138,7 @@ function! s:ag_in(bang, ...)
         \             'dir': expand(a:1),
         \             'options': [
         \                 '--reverse', '-i', '--info=inline',
-        \                 '--keep-right', '--preview="bat -p --color always {}"'
+        \                 '--keep-right', '--preview="bats -p --color always {}"'
         \             ]
         \         },
         \         'down:70%'
@@ -145,6 +146,21 @@ function! s:ag_in(bang, ...)
         \ a:bang)
 endfunction
 command! -bang -nargs=+ -complete=dir AgIn call s:ag_in(<bang>0, <f-args>)
+
+nnoremap <C-]> :Files <C-R>=substitute(system('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel'), '\n', '', '')<CR><CR>
+nnoremap <leader><C-]> :Files ~/Documents<CR>
+
+nnoremap <C-p> :AgIn <C-R>=substitute(system('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel'), '\n', '', '')<CR><CR>
+nnoremap <leader><C-p> :AgIn ~/Documents<CR>
+
+if has('mac')
+
+    nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @h<CR>
+    nnoremap <leader>P "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ^.*(actor\|enum\|func\|var\|let\|class\|struct\|protocol\|case)(\s+)'.@h<CR>
+elseif has('linux')
+    nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents ' . @h<CR>
+    nnoremap <leader>P "hyiw:exe 'AgIn ~/Documents ^.*(fun\|fn\|void\|int\|struct\|enum)(\s+)'.@h<CR>
+endif
 
 " Search and replace in git root
 function! s:Replace(...) abort
@@ -383,27 +399,11 @@ nnoremap <leader><Down> :e ~/Documents/GitHub/Notes/Notes.txt<CR>
 if has('mac')
     nnoremap <C-S-down> :e ~/Documents/Check24/check24-worklog/worklog.txt<CR>
 
-    nnoremap <C-]> :Files ~/Documents/Check24/ios-pod-mobile-sim<CR>
-    nnoremap <C-p> :AgIn ~/Documents/Check24/ios-pod-mobile-sim<CR>
-    nnoremap <leader><C-]> :Files ~/Documents<CR>
-    nnoremap <leader><C-p> :AgIn ~/Documents<CR>
 elseif has('linux')
     nnoremap <C-S-down> :e ~/Documents/Text/os-todos.txt<CR>
-    nnoremap <C-]> :Files ~/Documents/<CR>
-    nnoremap <leader><C-]> :Files ~/<CR>
-    nnoremap <C-p> :AgIn ~/Documents/<CR>
 endif
 
 " TODO: use current git repo root for <leader>p
-
-" Symbol under cursor
-if has('mac')
-    nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @h<CR>
-    nnoremap <leader>P "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ^.*(actor\|enum\|func\|var\|let\|class\|struct\|protocol\|case)(\s+)'.@h<CR>
-elseif has('linux')
-    nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents ' . @h<CR>
-    nnoremap <leader>P "hyiw:exe 'AgIn ~/Documents ^.*(fun\|fn\|void\|int\|struct\|enum)(\s+)'.@h<CR>
-endif
 
 set ic " case insensitive search
 set gdefault
