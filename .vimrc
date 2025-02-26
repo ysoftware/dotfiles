@@ -84,8 +84,9 @@ endif
 
 " Setup fzf
 
-let $FZF_DEFAULT_OPTS = '--bind ctrl-a:select-all'
+let $FZF_DEFAULT_OPTS = '--bind ?:toggle-preview --bind ctrl-j:down --bind ctrl-k:up --bind ctrl-d:half-page-down --bind ctrl-u:half-page-up --bind ctrl-a:select-all'
 let g:fzf_history_dir = '~/.local/share/fzf-history'
+let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.9 } }
 
 function! s:build_quickfix_list(lines)
     call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
@@ -126,7 +127,7 @@ command! -bang -nargs=+ -complete=dir Files
     \                 '--keep-right', '--preview="bat -p --color always {}"'
     \             ]
     \         },
-    \         'right:40%'
+    \         'right:30%'
     \     ),
     \ <bang>0)
 
