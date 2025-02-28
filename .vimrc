@@ -6,6 +6,8 @@
 " - vim-bufferline - show number of buffer in the visible list (not id of buffer)
 " - Replace in multiple files
 
+let mapleader = " "
+
 " Snippets
 if has('mac')
   augroup SwiftSnippets
@@ -148,14 +150,13 @@ function! s:ag_in(bang, ...)
 endfunction
 command! -bang -nargs=+ -complete=dir AgIn call s:ag_in(<bang>0, <f-args>)
 
-nnoremap <C-]> :Files <C-R>=substitute(system('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel'), '\n', '', '')<CR><CR>
+nnoremap <C-]> :Files <C-R>=substitute(system('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel'), '\n', '', '')<CR><CR><CR>
 nnoremap <leader><C-]> :Files ~/Documents<CR>
 
-nnoremap <C-p> :AgIn <C-R>=substitute(system('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel'), '\n', '', '')<CR><CR>
+nnoremap <C-p> :AgIn <C-R>=substitute(system('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel'), '\n', '', '')<CR><CR><CR>
 nnoremap <leader><C-p> :AgIn ~/Documents<CR>
 
 if has('mac')
-
     nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @h<CR>
     nnoremap <leader>P "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ^.*(actor\|enum\|func\|var\|let\|class\|struct\|protocol\|case)(\s+)'.@h<CR>
 elseif has('linux')
@@ -237,7 +238,6 @@ autocmd FileType c,cpp,h setlocal commentstring=//\ %s
 vnoremap ts "hy:%s/\V<C-R>=escape(@h, '\/')<CR>//gcI<Left><Left><Left><Left>
 
 " Navigation
-let mapleader = " "
 nnoremap n nzzzv
 nnoremap N Nzzzv
 set switchbuf+=useopen
@@ -446,7 +446,7 @@ if has('mac')
     command! Set :XcodebuildPicker
     command! Lg :XcodebuildOpenLog
 
-    autocmd FileType gitcommit command! Ticket execute 'keeppatterns normal! /branch <CR>f/<Right>veee"qygg"qpI[<Esc>A] '
+    autocmd FileType gitcommit command! Ticket execute 'keeppatterns normal! /TEMOSO<CR>veee"qygg"qpI[<Esc>A] '
     autocmd FileType gitcommit nnoremap T :Ticket<CR>A
 else
     nnoremap Q :lua vim.lsp.buf.code_action()<CR>
