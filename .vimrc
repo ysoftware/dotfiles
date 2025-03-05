@@ -437,10 +437,11 @@ nnoremap <leader>M :lua BreakArguments()<CR>
 nnoremap <leader><C-A> :InlayHintsToggle<CR>
 
 command! Mess execute "put =execute('messages')"
+nnoremap Q :lua vim.lsp.buf.code_action()<CR>
 
 if has('mac')
     nnoremap <leader>r :w<CR> :Simo<CR> :XcodebuildBuildRun<CR>
-    nnoremap Q :XcodebuildCodeActions<CR>
+    " nnoremap Q :XcodebuildCodeActions<CR>
 
     command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/Example/' 
     command! Set :XcodebuildPicker
@@ -449,7 +450,6 @@ if has('mac')
     autocmd FileType gitcommit command! Ticket execute 'keeppatterns normal! /TEMOSO<CR>veee"qygg"qpI[<Esc>A] '
     autocmd FileType gitcommit nnoremap T :Ticket<CR>A
 else
-    nnoremap Q :lua vim.lsp.buf.code_action()<CR>
 endif
 
 colorscheme yaroscheme
@@ -457,6 +457,8 @@ call yaroscheme#apply()
 set title 
 
 lua << EOF
+vim.keymap.set('n', '<leader><C-d>', function() vim.cmd('tab split | lua vim.lsp.buf.definition()') end, { noremap = true, silent = true })
+
 if vim.fn.has('mac') == 1 then
     require("xcodebuild").setup({ auto_save = false })
 
