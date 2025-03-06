@@ -238,6 +238,7 @@ autocmd FileType c,cpp,h setlocal commentstring=//\ %s
 vnoremap ts "hy:%s/\V<C-R>=escape(@h, '\/')<CR>//gcI<Left><Left><Left><Left>
 
 " Navigation
+nnoremap <C-h> :History<CR>
 nnoremap n nzzzv
 nnoremap N Nzzzv
 set switchbuf+=useopen
@@ -462,12 +463,27 @@ vim.keymap.set('n', '<leader><C-d>', function() vim.cmd('tab split | lua vim.lsp
 if vim.fn.has('mac') == 1 then
     require("xcodebuild").setup({ auto_save = false })
 
-    require('lint').linters_by_ft = { 
-        swift =      { "swiftlint" },
-        typescript = { "eslint" },
-        javascript = { "eslint" },
+    -- linter + downgrade errors to warnings
+    local lint = require("lint")
+    lint.linters_by_ft = {
+      javascript = { "eslint" },
+      typescript = { "eslint" },
+      swift      = { "swiftlint" },
     }
+    lint.linters.eslint = require("lint.util").wrap(lint.linters.eslint, function(diagnostic)
+      if diagnostic.source and diagnostic.source:lower() == "eslint" then
+        diagnostic.severity = vim.diagnostic.severity.WARN
+      end
+      return diagnostic
+    end)
+    lint.linters.swiftlint = require("lint.util").wrap(lint.linters.swiftlint, function(diagnostic)
+      if diagnostic.source and diagnostic.source:lower() == "swiftlint" then
+        diagnostic.severity = vim.diagnostic.severity.WARN
+      end
+      return diagnostic
+    end)
 
+    -- angular lsp
     local project_library_path = "~/Documents/Check24/mfso-project-angular/"
     local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
     require'lspconfig'.tsserver.setup {
