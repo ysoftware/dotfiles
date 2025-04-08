@@ -150,10 +150,10 @@ function! s:ag_in(bang, ...)
 endfunction
 command! -bang -nargs=+ -complete=dir AgIn call s:ag_in(<bang>0, <f-args>)
 
-nnoremap <C-]> :Files <C-R>=substitute(system('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel'), '\n', '', '')<CR><CR><CR>
+nnoremap <C-]> :Files <C-R>=substitute(system('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel'), '\n', '', '')<CR><CR>
 nnoremap <leader><C-]> :Files ~/Documents<CR>
 
-nnoremap <C-p> :AgIn <C-R>=substitute(system('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel'), '\n', '', '')<CR><CR><CR>
+nnoremap <C-p> :AgIn <C-R>=substitute(system('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel'), '\n', '', '')<CR><CR>
 nnoremap <leader><C-p> :AgIn ~/Documents<CR>
 
 if has('mac')
@@ -302,6 +302,7 @@ autocmd FileType git nnoremap <buffer> gp :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer> gl :Git log<CR>
 autocmd FileType fugitive nnoremap <buffer> gp :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer> gP :Git push<CR>
+autocmd FileType fugitive nnoremap <buffer> q :q<CR>
 
 " Checkout commit
 autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
