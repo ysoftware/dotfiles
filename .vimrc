@@ -442,7 +442,7 @@ nnoremap Q :lua vim.lsp.buf.code_action()<CR>
 
 if has('mac')
     nnoremap <leader>r :w<CR> :Simo<CR> :XcodebuildBuildRun<CR>
-    " nnoremap Q :XcodebuildCodeActions<CR>
+    nnoremap <leader>Q :XcodebuildCodeActions<CR>
 
     command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/Example/' 
     command! Set :XcodebuildPicker
