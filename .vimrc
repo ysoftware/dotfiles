@@ -445,7 +445,7 @@ if has('mac')
     nnoremap <leader>r :w<CR> :Simo<CR> :XcodebuildBuildRun<CR>
     nnoremap <leader>Q :XcodebuildCodeActions<CR>
 
-    command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/Example/' 
+    command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/' 
     command! Set :XcodebuildPicker
     command! Lg :XcodebuildOpenLog
 
@@ -521,9 +521,11 @@ require'lspconfig'.clangd.setup {
     filetypes = { "c", "h", "cpp" }
 }
 
+local util = require'lspconfig.util'
 require'lspconfig'.sourcekit.setup { 
     capabilities = capabilities,
-    filetypes = { "swift" }    
+    filetypes = { "swift" },
+    root_dir = util.root_pattern("buildServer.json", ".git")
 }
 
 -- Code completion
