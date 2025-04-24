@@ -68,6 +68,7 @@ let g:bufferline_inactive_highlight = 'StatusLineNC'
 let g:bufferline_solo_highlight = 0
 
 set noshowmode
+set termguicolors
 let g:lightline = { 'colorscheme': 'one', 
   \   'active': {
   \     'left': [[ 'mode', 'paste' ],
