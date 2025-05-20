@@ -59,6 +59,7 @@ Plug 'kshenoy/vim-signature' " Show marks
 Plug 'itchyny/lightline.vim' " Status line
 Plug 'mhinz/vim-startify' " Startup screen
 Plug 'tpope/vim-commentary' " Comment lines of code
+Plug 'm4xshen/hardtime.nvim' "Learn vim's commands better
 " Plug 'MysticalDevil/inlay-hints.nvim' " Inlay hints (function argument names)
 call plug#end()
 
@@ -383,6 +384,7 @@ set tabstop=4
 set softtabstop=4
 set sw=4
 set expandtab
+set cinoptions=l1
 
 " web slop
 autocmd FileType typescript,html,scss,css,javascript setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab
@@ -461,6 +463,18 @@ set title
 lua << EOF
 vim.keymap.set('n', '<leader><C-d>', function() vim.cmd('tab split | lua vim.lsp.buf.definition()') end, { noremap = true, silent = true })
 
+require("hardtime").setup({
+    disable_mouse = false,
+    max_count = 5,
+    disabled_keys = {
+        ["<Up>"] = false,
+        ["<Down>"] = false,
+        ["<Left>"] = false,
+        ["<Right>"] = false,
+    },
+    restriction_mode = "block", -- "hint",
+})
+
 if vim.fn.has('mac') == 1 then
     require("xcodebuild").setup({ auto_save = false })
 
@@ -508,7 +522,7 @@ capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
 require'lspconfig'.rust_analyzer.setup {
     capabilities = capabilities,
-    filetypes = { "rs" }
+    filetypes = { "rust" }
 }
 
 require'lspconfig'.ols.setup {
