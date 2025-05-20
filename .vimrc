@@ -69,6 +69,7 @@ let g:bufferline_inactive_highlight = 'StatusLineNC'
 let g:bufferline_solo_highlight = 0
 
 set noshowmode
+set termguicolors
 let g:lightline = { 'colorscheme': 'one', 
   \   'active': {
   \     'left': [[ 'mode', 'paste' ],
@@ -445,9 +446,9 @@ nnoremap Q :lua vim.lsp.buf.code_action()<CR>
 
 if has('mac')
     nnoremap <leader>r :w<CR> :Simo<CR> :XcodebuildBuildRun<CR>
-    " nnoremap Q :XcodebuildCodeActions<CR>
+    nnoremap <leader>Q :XcodebuildCodeActions<CR>
 
-    command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/Example/' 
+    command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/' 
     command! Set :XcodebuildPicker
     command! Lg :XcodebuildOpenLog
 
@@ -535,9 +536,11 @@ require'lspconfig'.clangd.setup {
     filetypes = { "c", "h", "cpp" }
 }
 
+local util = require'lspconfig.util'
 require'lspconfig'.sourcekit.setup { 
     capabilities = capabilities,
-    filetypes = { "swift" }    
+    filetypes = { "swift" },
+    root_dir = util.root_pattern("buildServer.json", ".git")
 }
 
 -- Code completion
