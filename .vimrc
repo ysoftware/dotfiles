@@ -54,18 +54,27 @@ Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'tpope/vim-fugitive' " Git
 Plug 'bkad/CamelCaseMotion' " Jump to camel case words
 Plug 'airblade/vim-gitgutter' " More Git
-Plug 'bling/vim-bufferline' " Show all open buffers
+Plug 'ysoftware/vim-bufferline' " Show all open buffers
 Plug 'kshenoy/vim-signature' " Show marks
 Plug 'itchyny/lightline.vim' " Status line
 Plug 'mhinz/vim-startify' " Startup screen
 Plug 'tpope/vim-commentary' " Comment lines of code
-" Plug 'MysticalDevil/inlay-hints.nvim' " Inlay hints (function argument names)
 call plug#end()
 
 " Status line setup
 let g:bufferline_echo = 1
+let g:bufferline_show_bufnr = 0
+let g:bufferline_show_bufpos = 1
 let g:bufferline_inactive_highlight = 'StatusLineNC'
+let g:bufferline_active_highlight = 'Search'
+let g:bufferline_active_buffer_left = '•'
+let g:bufferline_active_buffer_right = ''
 let g:bufferline_solo_highlight = 0
+let g:bufferline_custom_pattern_indicator = [[
+  \ ['/mobile/', 'm'],
+  \ ['/desktop/', 'd'],
+  \ ['/shared/', 's'],
+  \ ]]
 
 set noshowmode
 set termguicolors
@@ -197,7 +206,7 @@ function! SetCorrectBatThemeForFzf()
 endfunction
 
 if has('mac')
-    set colorcolumn=120
+    set colorcolumn=140
     if system('defaults read -g AppleInterfaceStyle') == "Dark\n"
         set background=dark
         call SetCorrectBatThemeForFzf()
@@ -227,6 +236,7 @@ set number
 set autowrite
 set wildignorecase
 set scroll=15
+set scrolloff=5
 
 " show invisible characters
 set listchars=tab:»-,trail:·,nbsp:␣,extends:>,precedes:< 
@@ -526,7 +536,9 @@ local util = require'lspconfig.util'
 require'lspconfig'.sourcekit.setup { 
     capabilities = capabilities,
     filetypes = { "swift" },
-    root_dir = util.root_pattern("buildServer.json", ".git")
+    root_dir = function(idk)
+        return "/Users/iaroslav.erokhin/Documents/Check24/ios-pod-mobile-sim"
+    end
 }
 
 -- Code completion
