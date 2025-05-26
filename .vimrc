@@ -394,6 +394,7 @@ set tabstop=4
 set softtabstop=4
 set sw=4
 set expandtab
+set cinoptions=l1
 
 " web slop
 autocmd FileType typescript,html,scss,css,javascript setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab
@@ -519,7 +520,7 @@ capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
 require'lspconfig'.rust_analyzer.setup {
     capabilities = capabilities,
-    filetypes = { "rs" }
+    filetypes = { "rust" }
 }
 
 require'lspconfig'.ols.setup {
