@@ -67,14 +67,15 @@ let g:bufferline_show_bufnr = 0
 let g:bufferline_show_bufpos = 1
 let g:bufferline_inactive_highlight = 'StatusLineNC'
 let g:bufferline_active_highlight = 'Search'
-let g:bufferline_active_buffer_left = '•'
+let g:bufferline_active_buffer_left = ' ▶︎'
 let g:bufferline_active_buffer_right = ''
 let g:bufferline_solo_highlight = 0
-let g:bufferline_custom_pattern_indicator = [[
-  \ ['/mobile/', 'm'],
-  \ ['/desktop/', 'd'],
-  \ ['/shared/', 's'],
-  \ ]]
+
+" for my work with angular
+let g:bufferline_custom_pattern_indicator = [
+  \ ['*/mobile/*', 'm:'],
+  \ ['*/desktop/*', 'd:'],
+  \ ]
 
 set noshowmode
 set termguicolors
