@@ -10,17 +10,17 @@ switch_audio_output() {
 }
 
 set_workspace_desk() {
-    gnome-monitor-config set -LM DP-5 -m 1920x1080@60.000 -LpM HDMI-4 -m 2560x1440@143.912 -x 1920 -y 500
+    gnome-monitor-config set -LM DP-2 -m 1920x1080@60.000 -LpM HDMI-1 -m 2560x1440@143.912 -x 1920 -y 500
     switch_audio_output "direct"
 }
 
 set_workspace_sofa() {
-    gnome-monitor-config set -LpM HDMI-5 -m 4096x2160@119.880 -s 2
+    gnome-monitor-config set -LpM HDMI-2 -m 4096x2160@119.880 -s 2
     switch_audio_output "hdmi"
 }
 
 set_workspace_all() {
-    gnome-monitor-config set -LM DP-5 -m 1920x1080@60.000 -LpM HDMI-4 -m 2560x1440@143.912 -x 1920 -y 500 -LM HDMI-5 -m 4096x2160@119.880 -x 4480 -y 200 -s2
+    gnome-monitor-config set -LM DP-2 -m 1920x1080@60.000 -LpM HDMI-1 -m 2560x1440@143.912 -x 1920 -y 500 -LM HDMI-2 -m 4096x2160@119.880 -x 4480 -y 200 -s2
     switch_audio_output "hdmi"
 }
 
