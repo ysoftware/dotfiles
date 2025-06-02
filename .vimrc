@@ -67,14 +67,14 @@ let g:bufferline_show_bufnr = 0
 let g:bufferline_show_bufpos = 1
 let g:bufferline_inactive_highlight = 'StatusLineNC'
 let g:bufferline_active_highlight = 'Search'
-let g:bufferline_active_buffer_left = ' ▶︎'
+let g:bufferline_active_buffer_left = '▶︎'
 let g:bufferline_active_buffer_right = ''
 let g:bufferline_solo_highlight = 0
 
 " for my work with angular
 let g:bufferline_custom_pattern_indicator = [
-  \ ['*/mobile/*', 'm:'],
-  \ ['*/desktop/*', 'd:'],
+  \ ['*/angular/*/mobile/*', '◆'],
+  \ ['*/angular/*/desktop/*', '◻︎'],
   \ ]
 
 set noshowmode
@@ -279,6 +279,8 @@ nnoremap <leader>4 :call SwitchToBuffer(4)<CR>
 nnoremap <leader>5 :call SwitchToBuffer(5)<CR>
 nnoremap <leader>6 :call SwitchToBuffer(6)<CR>
 nnoremap <leader>7 :call SwitchToBuffer(7)<CR>
+nnoremap <leader>8 :call SwitchToBuffer(8)<CR>
+nnoremap <leader>9 :call SwitchToBuffer(9)<CR>
 
 " Tabs
 nnoremap tg gT
@@ -314,7 +316,10 @@ autocmd FileType git nnoremap <buffer> gp :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer> gl :Git log<CR>
 autocmd FileType fugitive nnoremap <buffer> gp :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer> gP :Git push<CR>
-autocmd FileType fugitive nnoremap <buffer> q :q<CR>
+
+if has('mac') " this doesn't work on Linux
+    autocmd FileType fugitive nnoremap <buffer> q :q<CR>
+endif
 
 " Checkout commit
 autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
@@ -502,12 +507,12 @@ if vim.fn.has('mac') == 1 then
     local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
     require'lspconfig'.tsserver.setup {
         capabilities = capabilities,
-        filetypes = { "typescript", "html", "scss", "css", "javascript" },
+        filetypes = { "typescript", "html", "scss", "css", "javascript", "htmlangular" },
     }
     require'lspconfig'.angularls.setup {
         cmd = cmd,
         capabilities = capabilities,
-        filetypes = { "typescript", "html", "scss", "css", "javascript" },
+        filetypes = { "typescript", "html", "scss", "css", "javascript", "htmlangular" },
         on_new_config = function(new_config,new_root_dir)
           new_config.cmd = cmd
         end,
