@@ -275,15 +275,15 @@ function! SwitchToBuffer(n)
   endif
 endfunction
 
-nnoremap <leader>1 :call SwitchToBuffer(1)<CR>
-nnoremap <leader>2 :call SwitchToBuffer(2)<CR>
-nnoremap <leader>3 :call SwitchToBuffer(3)<CR>
-nnoremap <leader>4 :call SwitchToBuffer(4)<CR>
-nnoremap <leader>5 :call SwitchToBuffer(5)<CR>
-nnoremap <leader>6 :call SwitchToBuffer(6)<CR>
-nnoremap <leader>7 :call SwitchToBuffer(7)<CR>
-nnoremap <leader>8 :call SwitchToBuffer(8)<CR>
-nnoremap <leader>9 :call SwitchToBuffer(9)<CR>
+nnoremap <silent> <leader>1 :call SwitchToBuffer(1)<CR>
+nnoremap <silent> <leader>2 :call SwitchToBuffer(2)<CR>
+nnoremap <silent> <leader>3 :call SwitchToBuffer(3)<CR>
+nnoremap <silent> <leader>4 :call SwitchToBuffer(4)<CR>
+nnoremap <silent> <leader>5 :call SwitchToBuffer(5)<CR>
+nnoremap <silent> <leader>6 :call SwitchToBuffer(6)<CR>
+nnoremap <silent> <leader>7 :call SwitchToBuffer(7)<CR>
+nnoremap <silent> <leader>8 :call SwitchToBuffer(8)<CR>
+nnoremap <silent> <leader>9 :call SwitchToBuffer(9)<CR>
 
 " Tabs
 nnoremap tg gT
@@ -449,7 +449,7 @@ endif
 
 " Vim LSP
 nnoremap <leader>l :ccl<CR>
-nnoremap <leader>e :copen<CR>
+nnoremap <leader>e :lua vim.diagnostic.setqflist({ severity = vim.diagnostic.severity.ERROR })<CR> :copen<CR>
 nnoremap <leader>h :lua vim.lsp.buf.hover()<CR>
 nnoremap [g :lua goto_error_then_hint(vim.diagnostic.goto_prev)<CR>
 nnoremap ]g :lua goto_error_then_hint(vim.diagnostic.goto_next)<CR>
