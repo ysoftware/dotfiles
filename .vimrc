@@ -71,6 +71,9 @@ let g:bufferline_active_buffer_left = '▶︎'
 let g:bufferline_active_buffer_right = ''
 let g:bufferline_solo_highlight = 0
 
+" Start page
+let g:startify_custom_header = ['   mmm burgies!']
+
 " for my work with angular
 let g:bufferline_custom_pattern_indicator = [
   \ ['*/angular/*/mobile/*', '◆'],
