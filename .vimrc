@@ -63,22 +63,21 @@ call plug#end()
 
 " Status line setup
 let g:bufferline_echo = 1
+let g:bufferline_modified = ''
 let g:bufferline_show_bufnr = 0
 let g:bufferline_show_bufpos = 1
 let g:bufferline_inactive_highlight = 'StatusLineNC'
 let g:bufferline_active_highlight = 'Search'
-let g:bufferline_active_buffer_left = '▶︎'
+let g:bufferline_active_buffer_left = ''
 let g:bufferline_active_buffer_right = ''
 let g:bufferline_solo_highlight = 0
+let g:bufferline_custom_pattern_indicator = [
+  \ ['*/angular/*/mobile/*',  'BufferLineType1'],
+  \ ['*/angular/*/desktop/*', 'BufferLineType2'],
+  \ ]
 
 " Start page
 let g:startify_custom_header = ['   mmm burgies!']
-
-" for my work with angular
-let g:bufferline_custom_pattern_indicator = [
-  \ ['*/angular/*/mobile/*', '◆'],
-  \ ['*/angular/*/desktop/*', '◻︎'],
-  \ ]
 
 set noshowmode
 set termguicolors
@@ -234,6 +233,8 @@ noremap y "+y
 noremap Y "+Y
 
 syntax on
+set nocompatible
+set path+=**
 set ruler
 set rnu
 set number
@@ -433,7 +434,7 @@ endif
 set ic " case insensitive search
 set gdefault
 let g:searchindex_line_limit=2000000
-nnoremap <C-l> :noh<CR><C-l>
+nnoremap <silent> <C-l> :noh<CR><C-l>
 nnoremap <leader>n :cn<CR>
 nnoremap <C-b> :Gcd<CR> :make<CR>
 
