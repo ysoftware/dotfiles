@@ -321,9 +321,9 @@ autocmd FileType fugitive nnoremap <buffer> gl :Git log<CR>
 autocmd FileType fugitive nnoremap <buffer> gp :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer> gP :Git push<CR>
 
-if has('mac') " this doesn't work on Linux
-    autocmd FileType fugitive nnoremap <buffer> q :q<CR>
-endif
+" q to quit some buffers
+autocmd FileType fugitive nnoremap <buffer> q :q<CR>
+autocmd FileType git nnoremap <buffer> q :q<CR>
 
 " Checkout commit
 autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
