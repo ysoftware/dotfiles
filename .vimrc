@@ -1,5 +1,9 @@
 " Notes
 " - To see search count above 100 - :%s///gn
+" 
+" Custom name for remote branch:
+" :Git push origin HEAD:TEMOSO-22079
+" :Git branch --set-upstream-to=origin/TEMOSO-22079
 
 " TODO
 " - Disable FUCKING STUPID word wrapping (repro: when typing a long comment, it will auto break at 100th)
@@ -242,9 +246,6 @@ set scrolloff=5
 set listchars=tab:»-,trail:·,nbsp:␣,extends:>,precedes:< 
 set list
 
-" Comment style
-autocmd FileType c,cpp,h setlocal commentstring=//\ %s
-
 " Search&Replace in the file
 vnoremap ts "hy:%s/\V<C-R>=escape(@h, '\/')<CR>//gcI<Left><Left><Left><Left>
 
@@ -399,9 +400,9 @@ set tabstop=4
 set softtabstop=4
 set sw=4
 set expandtab
-set cinoptions=l1
 
-" web slop
+" Code formatting
+autocmd FileType c,cpp,h setlocal commentstring=//\ %s
 autocmd FileType typescript,html,scss,css,javascript setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab
 
 " buffers
