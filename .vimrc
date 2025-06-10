@@ -3,7 +3,6 @@
 
 " TODO
 " - Disable FUCKING STUPID word wrapping (repro: when typing a long comment, it will auto break at 100th)
-" - vim-bufferline - show number of buffer in the visible list (not id of buffer)
 " - Replace in multiple files
 
 let mapleader = " "
@@ -27,9 +26,6 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 
 if has('mac') " Xcode stuff 
-    Plug 'mfussenegger/nvim-dap' " Debug adapter protocol
-    " Plug 'nvim-neotest/nvim-nio' " dependency of DAP
-    " Plug 'rcarriga/nvim-dap-ui' " Dap UI
     Plug 'wojciech-kulik/xcodebuild.nvim' " Xcode tools
     Plug 'MunifTanjim/nui.nvim' " needed for xcodebuild
     Plug 'nvim-telescope/telescope.nvim' " needed for xcodebuild
@@ -50,7 +46,6 @@ Plug 'preservim/nerdtree' | " File browser
 " Code completion
 Plug 'hrsh7th/nvim-cmp'
 Plug 'hrsh7th/cmp-nvim-lsp'
-
 Plug 'tpope/vim-fugitive' " Git
 Plug 'bkad/CamelCaseMotion' " Jump to camel case words
 Plug 'airblade/vim-gitgutter' " More Git
