@@ -319,6 +319,7 @@ autocmd FileType fugitive nnoremap <buffer> gP :Git push<CR>
 
 " q to quit some buffers
 autocmd FileType fugitive nnoremap <buffer> q :q<CR>
+autocmd FileType fugitiveblame nnoremap <buffer> q :q<CR>
 autocmd FileType git nnoremap <buffer> q :q<CR>
 
 " Checkout commit
