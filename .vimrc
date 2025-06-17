@@ -137,7 +137,7 @@ command! -bang -nargs=+ -complete=dir Files
     \     fzf#vim#with_preview(
     \         {
     \             'options': [
-    \                 '--reverse', '-i', '--info=inline',
+    \                 '--reverse', '-i', '--info=inline', '--exact',
     \                 '--keep-right', '--preview="bat -p --color always {}"'
     \             ]
     \         },
@@ -152,8 +152,8 @@ function! s:ag_in(bang, ...)
         \         {
         \             'dir': expand(a:1),
         \             'options': [
-        \                 '--reverse', '-i', '--info=inline',
-        \                 '--keep-right', '--preview="bats -p --color always {}"'
+        \                 '--reverse', '-i', '--info=inline', '--exact',
+        \                 '--keep-right', '--preview="bat -p --color always {}"'
         \             ]
         \         },
         \         'down:70%'
@@ -538,6 +538,11 @@ require'lspconfig'.ols.setup {
 require'lspconfig'.clangd.setup {
     capabilities = capabilities,
     filetypes = { "c", "h", "cpp" }
+}
+
+require'lspconfig'.lua_ls.setup {
+    capabilities = capabilities,
+    filetypes = { "lua" }
 }
 
 local util = require'lspconfig.util'
