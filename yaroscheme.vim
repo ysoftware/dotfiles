@@ -119,6 +119,11 @@ call s:setbgfg("DiffText", s:bg_default, s:text_on_bg)
 call s:setbgfg("diffAdded", s:bg_green, s:text_on_bg)
 call s:setbgfg("diffRemoved", s:bg_red, s:text_on_bg)
 
+" Merge conflict highlighting
+call s:setbgfg("ConflictMarkerOurs", s:bg_green, s:text_on_bg)
+call s:setbgfg("ConflictMarkerTheirs", s:bg_red, s:text_on_bg)
+call s:setbgfg("ConflictMarkerSeparator", s:bg_highlight, s:text_on_bg)
+
 " Swift
 call s:setfg("swiftKeywords", s:text_blue)
 call s:setfg("swiftAttributes", s:text_blue)

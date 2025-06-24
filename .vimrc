@@ -137,7 +137,7 @@ command! -bang -nargs=+ -complete=dir Files
     \     fzf#vim#with_preview(
     \         {
     \             'options': [
-    \                 '--reverse', '-i', '--info=inline', '--exact',
+    \                 '--reverse', '-i', '--info=inline',
     \                 '--keep-right', '--preview="bat -p --color always {}"'
     \             ]
     \         },
@@ -344,6 +344,16 @@ function! GitCheckoutNewRemoteFromBranchesView()
     redraw!
 endfunction
 
+" Highlight merge conflicted blocks
+augroup MergeConflictHighlight
+  autocmd!
+  autocmd BufReadPost,BufNewFile * call s:SetupMergeConflictHighlight()
+augroup END
+function! s:SetupMergeConflictHighlight() abort
+  syn region ConflictMarkerOurs start=/^<<<<<<< .*$/ end=/^\ze\(=======$\||||||||\)/
+  syn region ConflictMarkerSeparator start=/^||||||| .*$/ end=/^\ze=======$/
+  syn region ConflictMarkerTheirs start=/^\(=======$\||||||| |\)/ end=/^>>>>>>> .*$/
+endfunction
 
 " Funny command to quit insert mode without escape
 imap jk <Esc>:cd %:p:h<CR>
