@@ -4,6 +4,8 @@
 " Custom name for remote branch:
 " :Git push origin HEAD:TEMOSO-22079
 " :Git branch --set-upstream-to=origin/TEMOSO-22079
+"
+"
 
 " TODO
 " - Disable FUCKING STUPID word wrapping (repro: when typing a long comment, it will auto break at 100th)
@@ -260,10 +262,6 @@ map <silent> ,w <Plug>CamelCaseMotion_w
 map <silent> ,b <Plug>CamelCaseMotion_b
 map <silent> ,e <Plug>CamelCaseMotion_e
 map <silent> ,ge <Plug>CamelCaseMotion_ge
-" sunmap w
-" sunmap b
-" sunmap e
-" sunmap ge
 
 function! SwitchToBuffer(n)
   let buffers = getbufinfo({'buflisted': 1})
