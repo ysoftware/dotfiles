@@ -663,4 +663,58 @@ function BreakArguments()
   vim.cmd("normal! V%=") -- auto-format
 end
 
+-- Function to create and setup a new git branch with different local and remote names
+local function create_branch()
+  -- Get ticket number
+  vim.ui.input({ prompt = "Enter ticket number (e.g., TEMOSO-22524): " }, function(ticket)
+    if not ticket or ticket == "" then
+      print("Branch creation cancelled - no ticket number provided")
+      return
+    end
+
+    -- Get extra information for local branch
+    vim.ui.input({ prompt = "Enter extra info for local branch: " }, function(extra_info)
+      if not extra_info or extra_info == "" then
+        print("Branch creation cancelled - no extra info provided")
+        return
+      end
+
+      local local_branch = ticket .. "-" .. extra_info
+      local remote_branch = ticket
+
+      -- Execute git commands
+      local commands = {
+        "git checkout -b " .. local_branch,
+        "git push origin HEAD:" .. remote_branch,
+        "git branch --set-upstream-to=origin/" .. remote_branch
+      }
+
+      for i, cmd in ipairs(commands) do
+        print("Executing: " .. cmd)
+        local result = vim.fn.system(cmd)
+
+        -- Check if command failed
+        if vim.v.shell_error ~= 0 then
+          print("Error executing command: " .. cmd)
+          print("Error output: " .. result)
+          return
+        end
+
+        if i == 1 then
+          print("Local branch created: " .. local_branch)
+        elseif i == 2 then
+          print("Pushed to remote: " .. remote_branch)
+        elseif i == 3 then
+          print("Upstream tracking set")
+        end
+      end
+
+      print("Branch setup complete!")
+    end)
+  end)
+end
+vim.api.nvim_create_user_command('Branch', create_branch, {
+  desc = 'Create a new git branch with different local and remote names'
+})
+
 EOF
