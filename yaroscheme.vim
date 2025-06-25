@@ -142,21 +142,22 @@ call s:setfg("NonText", s:text_invisible_chars)
 call s:setbgfg("CursorLine", s:bg_select, s:text_normal) 
 
 " Bufferline colors
-call s:setbgfg("BufferLineActive", s:bg_select, s:text_normal) 
-call s:setbgfg("BufferLineInactive", s:bg_almost_invisible, s:text_normal) 
-execute 'highlight BufferLineNormalActiveModified   gui=bold guibg='   . s:bg_select . ' guifg=' . s:text_normal
-execute 'highlight BufferLineNormalInactiveModified   gui=bold guibg='   . s:bg_almost_invisible . ' guifg=' . s:text_normal
+execute 'highlight BufferLineActive                    guibg='   . s:bg_select . ' guifg=' . s:text_normal
+execute 'highlight BufferLineActiveModified   gui=bold guibg='   . s:bg_select . ' guifg=' . s:text_normal
+
+execute 'highlight BufferLine                  guibg='   . s:bg_almost_invisible . ' guifg=' . s:text_normal
+execute 'highlight BufferLineModified gui=bold guibg='   . s:bg_almost_invisible . ' guifg=' . s:text_normal
 
 " Bufferline custom colors
-execute 'highlight BufferLineType1Active                    guibg='   . s:bg_select . '           guifg=' . s:text_blue
-execute 'highlight BufferLineType1ActiveModified   gui=bold guibg='   . s:bg_select . '           guifg=' . s:text_blue
-execute 'highlight BufferLineType1                  guibg='   . s:bg_almost_invisible . ' guifg=' . s:text_blue
-execute 'highlight BufferLineType1Modified gui=bold guibg='   . s:bg_almost_invisible . ' guifg=' . s:text_blue
+execute 'highlight BufferLineType1Active                     guibg='   . s:bg_select . '           guifg=' . s:text_blue
+execute 'highlight BufferLineType1ActiveModified    gui=bold guibg='   . s:bg_select . '           guifg=' . s:text_blue
+execute 'highlight BufferLineType1                           guibg='   . s:bg_almost_invisible . ' guifg=' . s:text_blue
+execute 'highlight BufferLineType1Modified gui=bold gui=bold guibg='   . s:bg_almost_invisible . ' guifg=' . s:text_blue
 
-execute 'highlight BufferLineType2Active                    guibg='   . s:bg_select . '           guifg=' . s:text_red
-execute 'highlight BufferLineType2ActiveModified   gui=bold guibg='   . s:bg_select . '           guifg=' . s:text_red
-execute 'highlight BufferLineType2                  guibg='   . s:bg_almost_invisible . ' guifg=' . s:text_red
-execute 'highlight BufferLineType2Modified gui=bold guibg='   . s:bg_almost_invisible . ' guifg=' . s:text_red
+execute 'highlight BufferLineType2Active                     guibg=' . s:bg_select . '           guifg=' . s:text_red
+execute 'highlight BufferLineType2ActiveModified    gui=bold guibg=' . s:bg_select . '           guifg=' . s:text_red
+execute 'highlight BufferLineType2                           guibg=' . s:bg_almost_invisible . ' guifg=' . s:text_red
+execute 'highlight BufferLineType2Modified gui=bold gui=bold guibg=' . s:bg_almost_invisible . ' guifg=' . s:text_red
 
 hi link LspDiagnosticsDefaultError DiagnosticError
 hi link LspDiagnosticsDefaultWarning DiagnosticWarn
