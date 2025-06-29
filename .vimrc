@@ -316,9 +316,9 @@ autocmd FileType fugitive nnoremap <buffer> gp :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer> gP :Git push<CR>
 
 " q to quit some buffers
-autocmd FileType fugitive nnoremap <buffer> q :q<CR>
-autocmd FileType fugitiveblame nnoremap <buffer> q :q<CR>
-autocmd FileType git nnoremap <buffer> q :q<CR>
+autocmd FileType fugitive nnoremap <buffer> q :bd<CR>
+autocmd FileType fugitiveblame nnoremap <buffer> q :bd<CR>
+autocmd FileType git nnoremap <buffer> q :bd<CR>
 
 " Checkout commit
 autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
