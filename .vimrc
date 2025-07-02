@@ -381,6 +381,10 @@ let g:NERDTreeGitStatusIndicatorMapCustom = {
     \ 'Unknown'   :'u',
     \ }
 
+augroup NerdTreeTabWidth
+  autocmd!
+  autocmd FileType nerdtree setlocal tabstop=2 shiftwidth=2 softtabstop=2 noexpandtab
+augroup END
 nnoremap <C-t> :NERDTreeFind<CR>
 nnoremap <leader><C-f> :NERDTreeVCS<CR>
 nnoremap <C-f> :NERDTreeToggle<CR>
