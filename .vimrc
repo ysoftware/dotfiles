@@ -28,7 +28,7 @@ endif
 call plug#begin('~/.local/share/nvim/plugged')
 
 " Fuzzy finder
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } } 
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 
 if has('mac') " Xcode stuff 
@@ -98,11 +98,19 @@ if has('mac')
     au BufWritePost * lua require('lint').try_lint()
 endif
 
-" Setup fzf
+" TODO: highlight fzf's /desktop or /mobile
 
+" Setup fzf
 let $FZF_DEFAULT_OPTS = '--bind ?:toggle-preview --bind ctrl-j:down --bind ctrl-k:up --bind ctrl-d:half-page-down --bind ctrl-u:half-page-up --bind ctrl-a:select-all'
-let g:fzf_history_dir = '~/.local/share/fzf-history'
 let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.9 } }
+
+let g:fzf_history_dir = '~/.local/share/fzf-history'
+if has('nvim')
+  set shada=!,'1000,<5000,s200,h
+else
+  set viminfo='1000,<5000,s200,h
+endif
+autocmd BufWritePost * silent! execute(has('nvim') ? 'shada' : 'wviminfo')
 
 function! s:build_quickfix_list(lines)
     call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
@@ -133,6 +141,9 @@ let g:fzf_colors = {
   \ 'spinner':    ['fg', 'Label'],
   \ 'header':     ['fg', 'Comment'] }
 
+" History setup
+nnoremap <C-h> :History<CR>
+
 " Files setup
 command! -bang -nargs=+ -complete=dir Files
     \ call fzf#vim#files(<q-args>,
@@ -146,6 +157,8 @@ command! -bang -nargs=+ -complete=dir Files
     \         'right:30%'
     \     ),
     \ <bang>0)
+nnoremap <C-]> :Files <C-R>=substitute(system('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel'), '\n', '', '')<CR><CR>
+nnoremap <leader><C-]> :Files ~/Documents<CR>
 
 " AgIn setup
 function! s:ag_in(bang, ...)
@@ -163,10 +176,6 @@ function! s:ag_in(bang, ...)
         \ a:bang)
 endfunction
 command! -bang -nargs=+ -complete=dir AgIn call s:ag_in(<bang>0, <f-args>)
-
-nnoremap <C-]> :Files <C-R>=substitute(system('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel'), '\n', '', '')<CR><CR>
-nnoremap <leader><C-]> :Files ~/Documents<CR>
-
 nnoremap <C-p> :AgIn <C-R>=substitute(system('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel'), '\n', '', '')<CR><CR>
 nnoremap <leader><C-p> :AgIn ~/Documents<CR>
 
@@ -252,7 +261,6 @@ set list
 vnoremap ts "hy:%s/\V<C-R>=escape(@h, '\/')<CR>//gcI<Left><Left><Left><Left>
 
 " Navigation
-nnoremap <C-h> :History<CR>
 nnoremap n nzzzv
 nnoremap N Nzzzv
 set switchbuf+=useopen
@@ -675,35 +683,27 @@ local function create_branch()
       print("Branch creation cancelled - no ticket number provided")
       return
     end
-
-    -- Get extra information for local branch
     vim.ui.input({ prompt = "Enter extra info for local branch: " }, function(extra_info)
       if not extra_info or extra_info == "" then
         print("Branch creation cancelled - no extra info provided")
         return
       end
-
       local local_branch = ticket .. "-" .. extra_info
       local remote_branch = ticket
-
-      -- Execute git commands
       local commands = {
         "git checkout -b " .. local_branch,
         "git push origin HEAD:" .. remote_branch,
         "git branch --set-upstream-to=origin/" .. remote_branch
       }
-
       for i, cmd in ipairs(commands) do
         print("Executing: " .. cmd)
         local result = vim.fn.system(cmd)
 
-        -- Check if command failed
         if vim.v.shell_error ~= 0 then
           print("Error executing command: " .. cmd)
           print("Error output: " .. result)
           return
         end
-
         if i == 1 then
           print("Local branch created: " .. local_branch)
         elseif i == 2 then
@@ -712,7 +712,6 @@ local function create_branch()
           print("Upstream tracking set")
         end
       end
-
       print("Branch setup complete!")
     end)
   end)
@@ -720,5 +719,42 @@ end
 vim.api.nvim_create_user_command('Branch', create_branch, {
   desc = 'Create a new git branch with different local and remote names'
 })
+
+
+-- highlight mobile and desktop in fzf ----------
+if vim.loop.os_uname().sysname == "Darwin" then
+  local timer = nil
+  
+  local function apply_highlight()
+    vim.cmd([[syntax region BufferLineType1 start=/[^\/]\+\/mobile\// end=/$/]])
+    vim.cmd([[syntax region BufferLineType2 start=/[^\/]\+\/desktop\// end=/$/]])
+  end
+  
+  local function start_timer()
+    if timer then
+      timer:stop()
+      timer:close()
+    end
+  
+    apply_highlight()
+    timer = vim.loop.new_timer()
+    timer:start(0, 1000, vim.schedule_wrap(function()
+      if vim.bo.filetype ~= "fzf" then
+        timer:stop()
+        timer:close()
+        timer = nil
+        return
+      end
+      apply_highlight()
+    end))
+  end
+  
+  vim.api.nvim_create_augroup("FzfCustomHighlight", { clear = true })
+  vim.api.nvim_create_autocmd("FileType", {
+    group = "FzfCustomHighlight",
+    pattern = "fzf",
+    callback = start_timer,
+  })
+end
 
 EOF
