@@ -16,6 +16,7 @@ endfunction
 function! yaroscheme#apply()
 if &background == "dark"
     let s:bg_default = "#181818"
+    let s:bg_secondary = "#494949"
     let s:bg_highlight = "#302f2b"
     let s:bg_select = "#424f59"
     let s:bg_green = "#263f23"
@@ -35,6 +36,7 @@ if &background == "dark"
     let s:text_purple = "#9B2393"
 else
     let s:bg_default = "#ffffff"
+    let s:bg_secondary = "#cccccc"
     let s:bg_highlight = "#a2bfd8"
     let s:bg_select = "#cee2f2"
     let s:bg_green = "#46a53a"
@@ -111,9 +113,17 @@ call s:setbgfg("PmenuSbar", s:bg_default, s:text_normal)
 call s:setbgfg("PmenuKind", s:bg_default, s:text_normal)
 
 call s:setbgfg("DiffAdd", s:bg_green, s:text_on_bg)
+call s:setbgfg("DiffAdd", s:bg_green, s:text_on_bg)
 call s:setbgfg("DiffChange", s:bg_green, s:text_on_bg)
 call s:setbgfg("DiffDelete", s:bg_red, s:text_on_bg)
-call s:setbgfg("DiffText", s:bg_default, s:text_on_bg)
+call s:setbgfg("DiffText", s:bg_default, s:text_normal)
+
+call s:setbgfg("DiffFile", s:bg_highlight, s:text_on_bg)
+call s:setbgfg("DiffIndexLine", s:bg_secondary, s:text_on_bg)
+call s:setbgfg("DiffOldFile", s:bg_secondary, s:text_on_bg)
+call s:setbgfg("DiffNewFile", s:bg_secondary, s:text_on_bg)
+call s:setbgfg("DiffLine", s:bg_secondary, s:text_normal)
+call s:setbgfg("DiffSubname", s:bg_secondary, s:text_normal)
 
 " Git fugitive colors
 call s:setbgfg("diffAdded", s:bg_green, s:text_on_bg)
