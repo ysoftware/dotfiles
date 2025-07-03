@@ -154,7 +154,7 @@ command! -bang -nargs=+ -complete=dir Files
     \                 '--keep-right', '--preview="bat -p --color always {}"'
     \             ]
     \         },
-    \         'right:30%'
+    \         'right:20%'
     \     ),
     \ <bang>0)
 nnoremap <C-]> :Files <C-R>=substitute(system('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel'), '\n', '', '')<CR><CR>
