@@ -11,6 +11,26 @@
 " - Disable FUCKING STUPID word wrapping (repro: when typing a long comment, it will auto break at 100th)
 " - Replace in multiple files
 
+" Tabs and shit
+filetype plugin indent on
+set tabstop=4
+set shiftwidth=4
+set tabstop=4
+set softtabstop=4
+set sw=4
+set expandtab
+
+" Code formatting
+autocmd FileType c,cpp,h setlocal commentstring=//\ %s
+autocmd FileType typescript,html,scss,css,javascript setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab
+
+" buffers
+command! Bufo silent! execute "%bd|e#|bd#"
+nnoremap <C-W>. :vertical res +10<CR>
+nnoremap <C-W>, :vertical res -10<CR>
+nnoremap <C-W>> :res +10<CR>
+nnoremap <C-W>< :res -10<CR>
+
 let mapleader = " "
 
 " Snippets
@@ -371,7 +391,7 @@ vnoremap > >gv
 " Nerd tree
 let NERDTreeShowHidden=1
 let NERDTreeCustomOpenArgs={'file':{'keepopen': '0'}}
-let g:NERDTreeWinSize=50
+let g:NERDTreeWinSize=60
 
 set wildignore+=*.pyc,*.o,*.obj,*.svn,*.swp,*.class,*.hg,*.DS_Store,*.min.*
 let NERDTreeRespectWildIgnore=1
@@ -391,7 +411,7 @@ let g:NERDTreeGitStatusIndicatorMapCustom = {
 
 augroup NerdTreeTabWidth
   autocmd!
-  autocmd FileType nerdtree setlocal tabstop=2 shiftwidth=2 softtabstop=2 noexpandtab
+  autocmd FileType nerdtree setlocal tabstop=1 shiftwidth=1 softtabstop=1 noexpandtab
 augroup END
 nnoremap <C-t> :NERDTreeFind<CR>
 nnoremap <leader><C-f> :NERDTreeVCS<CR>
@@ -412,26 +432,6 @@ vnoremap <S-up> :m '<-2<CR>gv=gv
 nnoremap <leader>xl "qx"qph
 nnoremap <leader>xw viw"qdxea <Esc>"qpbb
 nnoremap <leader>xe viw"qywwPlve"qdbbbviwpb
-
-" Tabs and shit
-filetype plugin indent on
-set tabstop=4
-set shiftwidth=4
-set tabstop=4
-set softtabstop=4
-set sw=4
-set expandtab
-
-" Code formatting
-autocmd FileType c,cpp,h setlocal commentstring=//\ %s
-autocmd FileType typescript,html,scss,css,javascript setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab
-
-" buffers
-command! Bufo silent! execute "%bd|e#|bd#"
-nnoremap <C-W>. :vertical res +10<CR>
-nnoremap <C-W>, :vertical res -10<CR>
-nnoremap <C-W>> :res +10<CR>
-nnoremap <C-W>< :res -10<CR>
 
 " - SEARCH
 
@@ -524,7 +524,7 @@ if vim.fn.has('mac') == 1 then
     end)
 
     -- angular lsp
-    local project_library_path = "~/Documents/Check24/mfso-project-angular/"
+    local project_library_path = "~/Documents/Check24/angular/"
     local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
     require'lspconfig'.tsserver.setup {
         capabilities = capabilities,
