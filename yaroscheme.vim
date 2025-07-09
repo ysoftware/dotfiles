@@ -169,6 +169,8 @@ execute 'highlight BufferLineType2ActiveModified    gui=bold guibg=' . s:bg_sele
 execute 'highlight BufferLineType2                           guibg=' . s:bg_almost_invisible . ' guifg=' . s:text_red
 execute 'highlight BufferLineType2Modified gui=bold gui=bold guibg=' . s:bg_almost_invisible . ' guifg=' . s:text_red
 
+hi link @lsp.type.macro.cpp Macro
+
 hi link LspDiagnosticsDefaultError DiagnosticError
 hi link LspDiagnosticsDefaultWarning DiagnosticWarn
 hi link LspDiagnosticsDefaultInformation DiagnosticInfo
