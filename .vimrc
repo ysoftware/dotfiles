@@ -92,6 +92,7 @@ let g:bufferline_active_highlight = 'Search'
 let g:bufferline_active_buffer_left = ''
 let g:bufferline_active_buffer_right = ''
 let g:bufferline_solo_highlight = 0
+let g:bufferline_rotate = 2
 let g:bufferline_custom_pattern_indicator = [
   \ ['*/angular/*/mobile/*',  'BufferLineType1'],
   \ ['*/angular/*/desktop/*', 'BufferLineType2'],
@@ -307,6 +308,8 @@ nnoremap <silent> <leader>6 :call SwitchToBuffer(6)<CR>
 nnoremap <silent> <leader>7 :call SwitchToBuffer(7)<CR>
 nnoremap <silent> <leader>8 :call SwitchToBuffer(8)<CR>
 nnoremap <silent> <leader>9 :call SwitchToBuffer(9)<CR>
+nnoremap <silent> <leader>0 :call SwitchToBuffer(10)<CR>
+nnoremap <silent> <leader>- :call SwitchToBuffer(11)<CR>
 
 " Tabs
 nnoremap tg gT
@@ -344,9 +347,9 @@ autocmd FileType fugitive nnoremap <buffer> gp :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer> gP :Git push<CR>
 
 " q to quit some buffers
-autocmd FileType fugitive nnoremap <buffer> q :bd<CR>
-autocmd FileType fugitiveblame nnoremap <buffer> q :bd<CR>
-autocmd FileType git nnoremap <buffer> q :bd<CR>
+autocmd FileType fugitive nnoremap <buffer> q <C-w>c
+autocmd FileType fugitiveblame nnoremap <buffer> q <C-w>c
+autocmd FileType git nnoremap <buffer> q <C-w>c
 
 " Checkout commit
 autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
@@ -529,6 +532,12 @@ if vim.fn.has('mac') == 1 then
     require'lspconfig'.tsserver.setup {
         capabilities = capabilities,
         filetypes = { "typescript", "html", "scss", "css", "javascript", "htmlangular" },
+        init_options = {
+            preferences = {
+                importModuleSpecifier = "non-relative",
+                importModuleSpecifierPreference = "non-relative",
+            },
+        },
     }
     require'lspconfig'.angularls.setup {
         cmd = cmd,
