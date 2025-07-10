@@ -342,14 +342,14 @@ nnoremap grb :Git branch -r<CR>
 " Pull and merge
 autocmd FileType git nnoremap <buffer> gm 0w"hy$:exe 'Git merge ' . @h<CR>
 autocmd FileType git nnoremap <buffer> gp :Git pull<CR>
-autocmd FileType fugitive nnoremap <buffer> gl :Git log<CR>
+autocmd FileType fugitive nnoremap <buffer> gl :Git log -100<CR>
 autocmd FileType fugitive nnoremap <buffer> gp :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer> gP :Git push<CR>
 
 " q to quit some buffers
-autocmd FileType fugitive nnoremap <buffer> q <C-w>c
-autocmd FileType fugitiveblame nnoremap <buffer> q <C-w>c
-autocmd FileType git nnoremap <buffer> q <C-w>c
+autocmd FileType fugitive nnoremap <buffer> q :bd<CR>q <C-w>c
+autocmd FileType fugitiveblame nnoremap <buffer> q :bd<CR>q <C-w>c
+autocmd FileType git nnoremap <buffer> q :bd<CR>q <C-w>c
 
 " Checkout commit
 autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
