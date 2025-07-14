@@ -65,6 +65,7 @@ endif
 Plug 'neovim/nvim-lspconfig' " Lsp
 Plug 'keith/swift.vim' " Swift support
 Plug 'jansedivy/jai.vim' " Jai support
+Plug 'norcalli/nvim-colorizer.lua' " Hex Colors
 
 Plug 'preservim/nerdtree' | " File browser
     \ Plug 'Xuyuanp/nerdtree-git-plugin' " Plugin with git status
@@ -501,6 +502,8 @@ call yaroscheme#apply()
 set title 
 
 lua << EOF
+require'colorizer'.setup()
+
 vim.keymap.set('n', '<leader><C-d>', function() vim.cmd('tab split | lua vim.lsp.buf.definition()') end, { noremap = true, silent = true })
 
 if vim.fn.has('mac') == 1 then
