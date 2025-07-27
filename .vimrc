@@ -100,7 +100,7 @@ let g:bufferline_custom_pattern_indicator = [
   \ ]
 
 " Start page
-let g:startify_custom_header = ['   mmm burgies!']
+let g:startify_custom_header = ['   neovim']
 
 set noshowmode
 set termguicolors
@@ -179,8 +179,6 @@ command! -bang -nargs=+ -complete=dir Files
     \         'right:20%'
     \     ),
     \ <bang>0)
-nnoremap <C-]> :Files <C-R>=substitute(system('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel'), '\n', '', '')<CR><CR>
-nnoremap <leader><C-]> :Files ~/Documents<CR>
 
 " AgIn setup
 function! s:ag_in(bang, ...)
@@ -198,8 +196,6 @@ function! s:ag_in(bang, ...)
         \ a:bang)
 endfunction
 command! -bang -nargs=+ -complete=dir AgIn call s:ag_in(<bang>0, <f-args>)
-nnoremap <C-p> :AgIn <C-R>=substitute(system('git -C ' . shellescape(expand('%:p:h')) . ' rev-parse --show-toplevel'), '\n', '', '')<CR><CR>
-nnoremap <leader><C-p> :AgIn ~/Documents<CR>
 
 if has('mac')
     nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents/Check24/ios-pod-mobile-sim ' . @h<CR>
@@ -416,7 +412,9 @@ let g:NERDTreeGitStatusIndicatorMapCustom = {
 augroup NerdTreeTabWidth
   autocmd!
   autocmd FileType nerdtree setlocal tabstop=1 shiftwidth=1 softtabstop=1 noexpandtab
+  autocmd VimEnter * if &filetype ==# 'nerdtree' | setlocal tabstop=1 shiftwidth=1 softtabstop=1 noexpandtab | endif
 augroup END
+
 nnoremap <C-t> :NERDTreeFind<CR>
 nnoremap <leader><C-f> :NERDTreeVCS<CR>
 nnoremap <C-f> :NERDTreeToggle<CR>
@@ -450,14 +448,12 @@ elseif has('linux')
     nnoremap <C-S-down> :e ~/Documents/Text/os-todos.txt<CR>
 endif
 
-" TODO: use current git repo root for <leader>p
-
 set ic " case insensitive search
 set gdefault
 let g:searchindex_line_limit=2000000
 nnoremap <silent> <C-l> :noh<CR><C-l>
 nnoremap <leader>n :cn<CR>
-nnoremap <C-b> :Gcd<CR> :make<CR>
+nnoremap <C-b> :make<CR>
 
 " Reset search
 nnoremap <silent> <leader>/ /fake-search-query<CR><C-l>
@@ -768,5 +764,52 @@ if vim.loop.os_uname().sysname == "Darwin" then
     callback = start_timer,
   })
 end
+
+-- Smart directory search: git root -> current dir -> ~/Documents fallback with special buffer handling
+local function get_search_directory()
+  local current_file = vim.fn.expand('%:p:h')
+  local buftype = vim.bo.buftype
+  local filetype = vim.bo.filetype
+  
+  if buftype ~= '' or filetype == 'fugitive' or filetype == 'git' or current_file:match('^fugitive://') then
+    current_file = vim.fn.getcwd()
+  elseif current_file == '' or not vim.fn.isdirectory(current_file) then
+    current_file = vim.fn.getcwd()
+  end
+  
+  local git_root = vim.fn.system('git -C ' .. vim.fn.shellescape(current_file) .. ' rev-parse --show-toplevel 2>/dev/null')
+  
+  if vim.v.shell_error == 0 and git_root ~= '' then
+    local clean_root = vim.fn.substitute(git_root, '\n', '', '')
+    if vim.fn.isdirectory(clean_root) == 1 then
+      return clean_root
+    end
+  end
+  
+  if vim.fn.isdirectory(current_file) == 1 then
+    return current_file
+  else
+    return vim.fn.expand('~/Documents')
+  end
+end
+
+local function files_search()
+  local search_dir = get_search_directory()
+  local cmd = 'Files ' .. search_dir
+  vim.cmd('echo ":' .. cmd .. '"')
+  vim.cmd(cmd)
+end
+
+local function ag_search()
+  local search_dir = get_search_directory()
+  local cmd = 'AgIn ' .. search_dir
+  vim.cmd('echo ":' .. cmd .. '"')
+  vim.cmd(cmd)
+end
+
+vim.keymap.set('n', '<C-]>', files_search, { noremap = true, silent = true })
+vim.keymap.set('n', '<leader><C-]>', function() vim.cmd('Files ~/Documents') end, { noremap = true, silent = true })
+vim.keymap.set('n', '<C-p>', ag_search, { noremap = true, silent = true })
+vim.keymap.set('n', '<leader><C-p>', function() vim.cmd('AgIn ~/Documents') end, { noremap = true, silent = true })
 
 EOF
