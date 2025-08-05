@@ -169,6 +169,16 @@ execute 'highlight BufferLineType2ActiveModified    gui=bold guibg=' . s:bg_sele
 execute 'highlight BufferLineType2                           guibg=' . s:bg_almost_invisible . ' guifg=' . s:text_red
 execute 'highlight BufferLineType2Modified gui=bold gui=bold guibg=' . s:bg_almost_invisible . ' guifg=' . s:text_red
 
+execute 'highlight BufferLineType3Active                     guibg='   . s:bg_select . '           guifg=' . s:text_green
+execute 'highlight BufferLineType3ActiveModified    gui=bold guibg='   . s:bg_select . '           guifg=' . s:text_green
+execute 'highlight BufferLineType3                           guibg='   . s:bg_almost_invisible . ' guifg=' . s:text_green
+execute 'highlight BufferLineType3Modified gui=bold gui=bold guibg='   . s:bg_almost_invisible . ' guifg=' . s:text_green
+
+execute 'highlight BufferLineType4Active                     guibg=' . s:bg_select . '           guifg=' . s:text_purple
+execute 'highlight BufferLineType4ActiveModified    gui=bold guibg=' . s:bg_select . '           guifg=' . s:text_purple
+execute 'highlight BufferLineType4                           guibg=' . s:bg_almost_invisible . ' guifg=' . s:text_purple
+execute 'highlight BufferLineType4Modified gui=bold gui=bold guibg=' . s:bg_almost_invisible . ' guifg=' . s:text_purple
+
 hi link @lsp.type.macro.cpp Macro
 
 hi link LspDiagnosticsDefaultError DiagnosticError
