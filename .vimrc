@@ -281,8 +281,8 @@ set list
 vnoremap ts "hy:%s/\V<C-R>=escape(@h, '\/')<CR>//gcI<Left><Left><Left><Left>
 
 " Navigation
-nnoremap n nzzzv
-nnoremap N Nzzzv
+nnoremap n nzz
+nnoremap N Nzz
 set switchbuf+=useopen
 
 " camel case navigation
@@ -438,6 +438,10 @@ nnoremap <leader>xw viw"qdxea <Esc>"qpbb
 nnoremap <leader>xe viw"qywwPlve"qdbbbviwpb
 
 " - SEARCH
+
+" Don't search in folded code
+set fdo-=search
+set fdo-=jump
 
 " File Search
 nnoremap <C-S-up> :e ~/Documents/GitHub/vimrc/.vimrc<CR>
