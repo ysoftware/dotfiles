@@ -89,6 +89,8 @@ let g:bufferline_rotate = 2
 let g:bufferline_custom_pattern_indicator = [
   \ ['*/angular/*/mobile/*',  'BufferLineType1'],
   \ ['*/angular/*/desktop/*', 'BufferLineType2'],
+  \ ['*/frontend-client/*/mobile/*',  'BufferLineType3'],
+  \ ['*/frontend-client/*/desktop/*', 'BufferLineType4'],
   \ ]
 
 " Start page
@@ -269,8 +271,8 @@ set list
 vnoremap ts "hy:%s/\V<C-R>=escape(@h, '\/')<CR>//gcI<Left><Left><Left><Left>
 
 " Navigation
-nnoremap n nzzzv
-nnoremap N Nzzzv
+nnoremap n nzz
+nnoremap N Nzz
 set switchbuf+=useopen
 
 " camel case navigation
@@ -334,9 +336,9 @@ autocmd FileType fugitive nnoremap <buffer> gp :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer> gP :Git push<CR>
 
 " q to quit some buffers
-autocmd FileType fugitive nnoremap <buffer> q :bd<CR>q <C-w>c
-autocmd FileType fugitiveblame nnoremap <buffer> q :bd<CR>q <C-w>c
-autocmd FileType git nnoremap <buffer> q :bd<CR>q <C-w>c
+autocmd FileType fugitive nnoremap <buffer> q <C-w>c
+autocmd FileType fugitiveblame nnoremap <buffer> <C-w>c
+autocmd FileType git nnoremap <buffer> q <C-w>c
 
 " Checkout commit
 autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
@@ -426,6 +428,10 @@ nnoremap <leader>xw viw"qdxea <Esc>"qpbb
 nnoremap <leader>xe viw"qywwPlve"qdbbbviwpb
 
 " - SEARCH
+
+" Don't search in folded code
+set fdo-=search
+set fdo-=jump
 
 " File Search
 nnoremap <C-S-up> :e ~/Documents/GitHub/vimrc/.vimrc<CR>
@@ -801,5 +807,36 @@ vim.keymap.set('n', '<C-]>', files_search, { noremap = true, silent = true })
 vim.keymap.set('n', '<leader><C-]>', function() vim.cmd('Files ~/Documents') end, { noremap = true, silent = true })
 vim.keymap.set('n', '<C-p>', ag_search, { noremap = true, silent = true })
 vim.keymap.set('n', '<leader><C-p>', function() vim.cmd('AgIn ~/Documents') end, { noremap = true, silent = true })
+
+-- Jump between mobile and desktop files of the same name
+local function web_jump()
+  local current_file = vim.fn.expand('%:p')
+  if current_file == '' then
+    return
+  end
+  local filename = vim.fn.expand('%:t')
+  local base_path = nil
+  local target_platform = nil
+  if current_file:find('/mobile/') then
+    base_path = current_file:match('(.*)/mobile/')
+    target_platform = 'desktop'
+  elseif current_file:find('/desktop/') then
+    base_path = current_file:match('(.*)/desktop/')
+    target_platform = 'mobile'
+  else
+    return
+  end
+  local search_pattern = base_path .. '/' .. target_platform .. '/**/' .. filename
+  local matches = vim.fn.glob(search_pattern, 0, 1)
+  if #matches > 0 then
+    vim.cmd('edit ' .. vim.fn.fnameescape(matches[1]))
+  else
+    print("Target file does not exist: " .. search_pattern)
+  end
+end
+
+vim.api.nvim_create_user_command('WebJump', web_jump, {
+  desc = 'Jump between mobile and desktop versions of Angular files'
+})
 
 EOF
