@@ -178,7 +178,7 @@ command! -bang -nargs=+ -complete=dir Files
     \                 '--keep-right', '--preview="bat -p --color always {}"'
     \             ]
     \         },
-    \         'right:20%'
+    \         'down:30%'
     \     ),
     \ <bang>0)
 
