@@ -126,7 +126,7 @@ endif
 
 " Setup fzf
 let $FZF_DEFAULT_OPTS = '--bind ?:toggle-preview --bind ctrl-j:down --bind ctrl-k:up --bind ctrl-d:half-page-down --bind ctrl-u:half-page-up --bind ctrl-a:select-all'
-let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.9 } }
+let g:fzf_layout = { 'window': { 'width': 1.0, 'height': 1.0 } }
 
 let g:fzf_history_dir = '~/.local/share/fzf-history'
 if has('nvim')
@@ -848,5 +848,41 @@ end
 vim.api.nvim_create_user_command('WebJump', web_jump, {
   desc = 'Jump between mobile and desktop versions of Angular files'
 })
+
+vim.api.nvim_create_user_command('GitFileHistory', function(command_opts)
+  local target_file = (command_opts.args and command_opts.args ~= '' and vim.fn.expand(command_opts.args)) or vim.fn.expand('%:p')
+  if not target_file or target_file == '' then
+    print("No file selected")
+    return
+  end
+
+  local file_dir = vim.fn.fnamemodify(target_file, ':p:h')
+  local git_root_lines = vim.fn.systemlist({ 'git', '-C', file_dir, 'rev-parse', '--show-toplevel' })
+  if vim.v.shell_error ~= 0 or #git_root_lines == 0 then
+    print("File not in a git repository")
+    return
+  end
+  local git_root = vim.fn.fnamemodify(git_root_lines[1], ':p')
+  target_file = vim.fn.fnamemodify(target_file, ':p')
+
+  local relpath
+  if string.sub(target_file, 1, #git_root + 1) == git_root .. '/' then
+    relpath = string.sub(target_file, #git_root + 2)
+  elseif target_file == git_root then
+    relpath = vim.fn.fnamemodify(target_file, ':t')
+  else
+    relpath = target_file
+  end
+
+  local git_cmd = { 'git', '-C', git_root, 'log', '--follow', '-p', '-n', '50', '--', relpath }
+
+  local output_lines = vim.fn.systemlist(git_cmd)
+  local buf_handle = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_option(buf_handle, 'buftype', 'nofile')
+  vim.api.nvim_buf_set_option(buf_handle, 'bufhidden', 'wipe')
+  vim.api.nvim_buf_set_option(buf_handle, 'filetype', 'git')
+  vim.api.nvim_buf_set_lines(buf_handle, 0, -1, false, output_lines)
+  vim.api.nvim_set_current_buf(buf_handle)
+end, { nargs = '?', complete = 'file' })
 
 EOF
