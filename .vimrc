@@ -1,11 +1,5 @@
 " Notes
 " - To see search count above 100 - :%s///gn
-" 
-" Custom name for remote branch:
-" :Git push origin HEAD:TEMOSO-22079
-" :Git branch --set-upstream-to=origin/TEMOSO-22079
-"
-"
 
 " TODO
 " - Disable FUCKING STUPID word wrapping (repro: when typing a long comment, it will auto break at 100th)
@@ -44,7 +38,7 @@ if has('mac')
     autocmd FileType swift abbrev infii .frame(maxWidth: .infinity, alignment: .leading)
   augroup END
 endif
- 
+
 call plug#begin('~/.local/share/nvim/plugged')
 
 " Fuzzy finder
@@ -58,13 +52,11 @@ if has('mac') " Xcode stuff
     Plug 'nvim-lua/plenary.nvim' " Needed for telescope
     Plug 'mfussenegger/nvim-lint'
     Plug 'angular/vscode-ng-language-service' " Angular support
-else 
+    Plug 'keith/swift.vim' " Swift support
 endif
 
 " Syntax highlighting
 Plug 'neovim/nvim-lspconfig' " Lsp
-Plug 'keith/swift.vim' " Swift support
-Plug 'jansedivy/jai.vim' " Jai support
 Plug 'norcalli/nvim-colorizer.lua' " Hex Colors
 
 Plug 'preservim/nerdtree' | " File browser
@@ -121,8 +113,6 @@ let g:lightline = { 'colorscheme': 'one',
 if has('mac')
     au BufWritePost * lua require('lint').try_lint()
 endif
-
-" TODO: highlight fzf's /desktop or /mobile
 
 " Setup fzf
 let $FZF_DEFAULT_OPTS = '--bind ?:toggle-preview --bind ctrl-j:down --bind ctrl-k:up --bind ctrl-d:half-page-down --bind ctrl-u:half-page-up --bind ctrl-a:select-all'
