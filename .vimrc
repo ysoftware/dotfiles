@@ -62,7 +62,7 @@ Plug 'norcalli/nvim-colorizer.lua' " Hex Colors
 Plug 'preservim/nerdtree' | " File browser
     \ Plug 'Xuyuanp/nerdtree-git-plugin' " Plugin with git status
 
-" Code completion
+Plug 'mg979/vim-visual-multi'
 Plug 'hrsh7th/nvim-cmp'
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'tpope/vim-fugitive' " Git
@@ -385,7 +385,7 @@ let NERDTreeShowHidden=1
 let NERDTreeCustomOpenArgs={'file':{'keepopen': '0'}}
 let g:NERDTreeWinSize=60
 
-set wildignore+=*.pyc,*.o,*.obj,*.svn,*.swp,*.class,*.hg,*.DS_Store,*.min.*
+set wildignore+=*.pyc,*.o,*.obj,*.svn,*.swp,*.hg,*.DS_Store,*.min.*
 let NERDTreeRespectWildIgnore=1
 
 let g:NERDTreeGitStatusIndicatorMapCustom = {
