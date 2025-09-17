@@ -319,6 +319,10 @@ noremap { <Cmd>call search('^\s*$\\|\%^', 'Wb')<CR>
 nmap ]h <Plug>(GitGutterNextHunk)zz
 nmap [h <Plug>(GitGutterPrevHunk)zz
 
+" Uppercase / lowercase one letter
+nnoremap <leader>u vu
+nnoremap <leader>U vU
+
 nnoremap <leader>g :vertical:G<CR>
 command! Diff execute 'GitGutterDiff'
 
