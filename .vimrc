@@ -525,6 +525,33 @@ if vim.fn.has('mac') == 1 then
       return diagnostic
     end)
 
+
+    -- LSP progress handler with debug
+    -- vim.lsp.handlers["$/progress"] = function(_, result, ctx)
+    --     local client = vim.lsp.get_client_by_id(ctx.client_id)
+    --     if client then
+    --         print(string.format("LSP Debug - Client: %s, Result: %s", client.name, vim.inspect(result)))
+    --         if result.value then
+    --             local message = result.value.message or ""
+    --             local percentage = result.value.percentage and string.format(" (%d%%)", result.value.percentage) or ""
+    --             print(string.format("[%s] %s%s", client.name, message, percentage))
+    --         end
+    --     end
+    -- end
+
+    -- php lsp (phpactor - free alternative with code actions)
+    require'lspconfig'.phpactor.setup {
+        capabilities = capabilities,
+        cmd = { "/Users/iaroslav.erokhin/.composer/vendor/bin/phpactor", "language-server" },
+        root_dir = function()
+            return "/Users/iaroslav.erokhin/Documents/Check24/core-api/"
+        end,
+        init_options = {
+            ["language_server_phpstan.enabled"] = false,
+            ["language_server_psalm.enabled"] = false,
+        },
+    }
+
     -- angular lsp
     local project_library_path = "~/Documents/Check24/angular/"
     local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
