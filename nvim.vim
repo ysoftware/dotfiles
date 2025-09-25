@@ -1,4 +1,12 @@
 " Notes
+
+" Checkout commit
+autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
+autocmd FileType git nnoremap <buffer> ggc :call GitCheckoutNewRemoteFromBranchesView()<CR>
+
+" Checkout commit
+autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
+autocmd FileType git nnoremap <buffer> ggc :call GitCheckoutNewRemoteFromBranchesView()<CR>
 " - To see search count above 100 - :%s///gn
 
 " TODO
@@ -327,26 +335,27 @@ nnoremap <leader>g :vertical:G<CR>
 command! Diff execute 'GitGutterDiff'
 
 " Show list of branches / remote branches (if inside git file, then close it first)
-autocmd FileType git nnoremap <buffer> gb :bd<CR> :Git branch<CR>
-nnoremap gb :Git branch<CR>
-autocmd FileType git nnoremap <buffer> grb :bd<CR> :Git branch -r<CR>
-nnoremap grb :Git branch -r<CR>
+nnoremap                                       gb  :Git branch<CR>
+nnoremap                                       grb :Git branch -r<CR>
+autocmd FileType git nnoremap <buffer>         gb  :bd<CR> :Git branch<CR>
+autocmd FileType git nnoremap <buffer>         grb :bd<CR> :Git branch -r<CR>
 
-" Pull and merge
-autocmd FileType git nnoremap <buffer> gm 0w"hy$:exe 'Git merge ' . @h<CR>
-autocmd FileType git nnoremap <buffer> gp :Git pull<CR>
-autocmd FileType fugitive nnoremap <buffer> gl :Git log -100<CR>
-autocmd FileType fugitive nnoremap <buffer> gp :Git pull<CR>
-autocmd FileType fugitive nnoremap <buffer> gP :Git push<CR>
+" Checkout commit
+autocmd FileType git nnoremap <buffer>         gc  :call GitCheckoutFromBranchesView()<CR>
+autocmd FileType git nnoremap <buffer>         grc :call GitCheckoutNewRemoteFromBranchesView()<CR>
+
+" Fetch, Pull, Merge, Log
+autocmd FileType git nnoremap <buffer> gm 0w"hy$   :exe 'Git merge ' . @h<CR>
+autocmd FileType git nnoremap <buffer>         gp  :Git pull<CR>
+autocmd FileType fugitive nnoremap <buffer>    gp  :Git pull<CR>
+autocmd FileType fugitive nnoremap <buffer>    gP  :Git push<CR>
+autocmd FileType fugitive nnoremap <buffer>    grp :Git fetch<CR>
+autocmd FileType fugitive nnoremap <buffer>    gl  :Git log -100<CR>
 
 " q to quit some buffers
 autocmd FileType fugitive nnoremap <buffer> q <C-w>c
 autocmd FileType fugitiveblame nnoremap <buffer> <C-w>c
 autocmd FileType git nnoremap <buffer> q <C-w>c
-
-" Checkout commit
-autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
-autocmd FileType git nnoremap <buffer> grc :call GitCheckoutNewRemoteFromBranchesView()<CR>
 
 function! GitCheckoutFromBranchesView()
   normal! 0w"hy$
@@ -438,7 +447,7 @@ set fdo-=search
 set fdo-=jump
 
 " File Search
-nnoremap <C-S-up> :e ~/Documents/GitHub/vimrc/nvim.vim<CR>
+nnoremap <C-S-up> :e ~/Documents/GitHub/dotfiles/nvim.vim<CR>
 nnoremap <leader><Down> :e ~/Documents/GitHub/Notes/Notes.txt<CR>
 
 if has('mac')
@@ -468,6 +477,7 @@ endif
 " Vim LSP
 nnoremap <leader>l :ccl<CR>
 nnoremap <leader>e :lua vim.diagnostic.setqflist({ severity = vim.diagnostic.severity.ERROR })<CR> :copen<CR>
+nnoremap <leader>E :lua vim.diagnostic.setqflist()<CR> :copen<CR>
 nnoremap <leader>h :lua vim.lsp.buf.hover()<CR>
 nnoremap [g :lua goto_error_then_hint(vim.diagnostic.goto_prev)<CR>
 nnoremap ]g :lua goto_error_then_hint(vim.diagnostic.goto_next)<CR>
