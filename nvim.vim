@@ -438,7 +438,7 @@ set fdo-=search
 set fdo-=jump
 
 " File Search
-nnoremap <C-S-up> :e ~/Documents/GitHub/vimrc/nvim.vim<CR>
+nnoremap <C-S-up> :e ~/Documents/GitHub/dotfiles/nvim.vim<CR>
 nnoremap <leader><Down> :e ~/Documents/GitHub/Notes/Notes.txt<CR>
 
 if has('mac')
