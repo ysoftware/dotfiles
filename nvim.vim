@@ -205,21 +205,6 @@ elseif has('linux')
     nnoremap <leader>P "hyiw:exe 'AgIn ~/Documents ^.*(fun\|fn\|void\|int\|struct\|enum)(\s+)'.@h<CR>
 endif
 
-" Search and replace in git root
-function! s:Replace(...) abort
-  if a:0 < 2
-    echoerr "Usage: :Replace <pattern> <replacement>"
-    return
-  endif
-  let l:pattern = a:1
-  let l:replacement = a:2
-  let l:gitroot = trim(system('git rev-parse --show-toplevel'))
-  let l:cmd = 'grep -rl ' . shellescape(l:pattern) . ' ' . shellescape(l:gitroot)
-        \ . ' | xargs sed -i "s/' . l:pattern . '/' . l:replacement . '/g"'
-  call system(l:cmd)
-endfunction
-command! -nargs=+ Replace call s:Replace(<f-args>)
-
 " Setup Plugin Manager
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
 if empty(glob(data_dir . '/autoload/plug.vim'))
@@ -915,5 +900,66 @@ vim.api.nvim_create_user_command('GitFileHistory', function(command_opts)
   vim.api.nvim_buf_set_lines(buf_handle, 0, -1, false, output_lines)
   vim.api.nvim_set_current_buf(buf_handle)
 end, { nargs = '?', complete = 'file' })
+
+-- Search and replace in git root (checks for unstaged changes first)
+local function replace_in_git_root()
+  local git_root = vim.fn.system('git rev-parse --show-toplevel 2>/dev/null'):gsub('\n', '')
+  if vim.v.shell_error ~= 0 or git_root == '' then
+    print("Error: Not in a git repository")
+    return
+  end
+
+  vim.fn.system('git diff --quiet 2>/dev/null')
+  if vim.v.shell_error ~= 0 then
+    print("Error: You have unstaged changes. For safety this is not allowed.")
+    return
+  end
+
+  vim.ui.input({ prompt = "Search for: " }, function(search_term)
+    if not search_term or search_term == "" then
+      return
+    end
+
+    vim.ui.input({ prompt = "Replace with: " }, function(replace_term)
+      if not replace_term then
+        return
+      end
+
+      vim.cmd('redraw')
+      print("Searching in " .. git_root .. "...")
+
+      local search_escaped = vim.fn.shellescape(search_term)
+      local files = vim.fn.systemlist('grep -Frl ' .. search_escaped .. ' ' .. vim.fn.shellescape(git_root))
+
+      if vim.v.shell_error ~= 0 or #files == 0 then
+        print("No matches found")
+        return
+      end
+
+      local temp_search = vim.fn.tempname()
+      local temp_replace = vim.fn.tempname()
+      vim.fn.writefile({search_term}, temp_search, 'b')
+      vim.fn.writefile({replace_term}, temp_replace, 'b')
+
+      for i, file in ipairs(files) do
+        local perl_cmd = "perl -i -pe 'BEGIN{open S,q[" .. temp_search .. "];$/=undef;$s=<S>;open R,q[" .. temp_replace .. "];$r=<R>}s/\\Q$s\\E/$r/g' " .. vim.fn.shellescape(file)
+        vim.fn.system(perl_cmd)
+
+        if vim.v.shell_error ~= 0 then
+          vim.fn.delete(temp_search)
+          vim.fn.delete(temp_replace)
+          print("Error: Failed to replace in " .. file)
+          return
+        end
+      end
+
+      vim.fn.delete(temp_search)
+      vim.fn.delete(temp_replace)
+      print("Modified " .. #files .. " file(s)")
+      vim.cmd('checktime')
+    end)
+  end)
+end
+vim.api.nvim_create_user_command('Replace', replace_in_git_root, {})
 
 EOF
