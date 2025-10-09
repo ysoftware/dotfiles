@@ -35,10 +35,19 @@ fi
 
 # load bash config
 BASH_IN="$DIR/bashrc"
-BASH_OUT="$HOME/.bash_profile"
-if ! grep -Fsq "source $BASH_IN" "$BASH_OUT"; then
-    echo "\nsource $BASH_IN # from: $DIR/install.sh" >> "$BASH_OUT"
-    echo "'source $BASH_IN' -> $BASH_OUT"
+BASHPROFILE_OUT="$HOME/.bash_profile"
+if ! grep -Fsq "source $BASH_IN" "$BASHPROFILE_OUT"; then
+    echo "source $BASH_IN # from: $DIR/install.sh" >> "$BASHPROFILE_OUT"
+    echo "'source $BASH_IN' -> $BASHPROFILE_OUT"
 else
-    echo "${UP_TO_DATE_MSG}${BASH_OUT}"
+    echo "${UP_TO_DATE_MSG}${BASHPROFILE_OUT}"
+fi
+
+# load bash config
+BASHRC_OUT="$HOME/.bashrc"
+if ! grep -Fsq "source $BASH_IN" "$BASHRC_OUT"; then
+    echo "source $BASH_IN # from: $DIR/install.sh" >> "$BASHRC_OUT"
+    echo "'source $BASH_IN' -> $BASHRC_OUT"
+else
+    echo "${UP_TO_DATE_MSG}${BASHRC_OUT}"
 fi
