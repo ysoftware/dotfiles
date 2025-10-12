@@ -498,15 +498,19 @@ call yaroscheme#apply()
 set title 
 
 lua << EOF
+vim.deprecate = function() end
 require'colorizer'.setup()
 
 vim.keymap.set('n', '<leader><C-d>', function() vim.cmd('tab split | lua vim.lsp.buf.definition()') end, { noremap = true, silent = true })
 
-if vim.fn.has('mac') == 1 then
-    require("xcodebuild").setup({ auto_save = false })
+local ok, xcodebuild = pcall(require, 'xcodebuild')
+if ok and xcodebuild then
+    xcodebuild.setup({ auto_save = false })
+end
 
-    -- linter + downgrade errors to warnings
-    local lint = require("lint")
+-- linter + downgrade errors to warnings
+local ok, lint = pcall(require, 'lint')
+if ok and lint then
     lint.linters_by_ft = {
       javascript = { "eslint" },
       typescript = { "eslint" },
@@ -524,23 +528,12 @@ if vim.fn.has('mac') == 1 then
       end
       return diagnostic
     end)
+end
 
-
-    -- LSP progress handler with debug
-    -- vim.lsp.handlers["$/progress"] = function(_, result, ctx)
-    --     local client = vim.lsp.get_client_by_id(ctx.client_id)
-    --     if client then
-    --         print(string.format("LSP Debug - Client: %s, Result: %s", client.name, vim.inspect(result)))
-    --         if result.value then
-    --             local message = result.value.message or ""
-    --             local percentage = result.value.percentage and string.format(" (%d%%)", result.value.percentage) or ""
-    --             print(string.format("[%s] %s%s", client.name, message, percentage))
-    --         end
-    --     end
-    -- end
-
-    -- php lsp (phpactor - free alternative with code actions)
-    require'lspconfig'.phpactor.setup {
+-- php lsp (phpactor - free alternative with code actions)
+local phpactor_lsp = require'lspconfig'.phpactor
+if phpactor_lsp then
+    phpactor_lsp.setup {
         capabilities = capabilities,
         cmd = { "/Users/iaroslav.erokhin/.composer/vendor/bin/phpactor", "language-server" },
         root_dir = function()
@@ -551,11 +544,14 @@ if vim.fn.has('mac') == 1 then
             ["language_server_psalm.enabled"] = false,
         },
     }
+end
 
-    -- angular lsp
-    local project_library_path = "~/Documents/Check24/angular/"
-    local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
-    require'lspconfig'.tsserver.setup {
+-- angular lsp
+local project_library_path = "~/Documents/Check24/angular/"
+local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
+local tsserver_lsp = require'lspconfig'.tsserver
+if tsserver_lsp then
+    tsserver_lsp.setup {
         capabilities = capabilities,
         filetypes = { "typescript", "html", "scss", "css", "javascript", "htmlangular" },
         init_options = {
@@ -565,7 +561,11 @@ if vim.fn.has('mac') == 1 then
             },
         },
     }
-    require'lspconfig'.angularls.setup {
+end
+
+local angularls_lsp = require'lspconfig'.angularls
+if angularls_lsp then
+    angularls_lsp.setup {
         cmd = cmd,
         capabilities = capabilities,
         filetypes = { "typescript", "html", "scss", "css", "javascript", "htmlangular" },
