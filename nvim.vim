@@ -1,4 +1,12 @@
 " Notes
+
+" Checkout commit
+autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
+autocmd FileType git nnoremap <buffer> ggc :call GitCheckoutNewRemoteFromBranchesView()<CR>
+
+" Checkout commit
+autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
+autocmd FileType git nnoremap <buffer> ggc :call GitCheckoutNewRemoteFromBranchesView()<CR>
 " - To see search count above 100 - :%s///gn
 
 " TODO
@@ -197,21 +205,6 @@ elseif has('linux')
     nnoremap <leader>P "hyiw:exe 'AgIn ~/Documents ^.*(fun\|fn\|void\|int\|struct\|enum)(\s+)'.@h<CR>
 endif
 
-" Search and replace in git root
-function! s:Replace(...) abort
-  if a:0 < 2
-    echoerr "Usage: :Replace <pattern> <replacement>"
-    return
-  endif
-  let l:pattern = a:1
-  let l:replacement = a:2
-  let l:gitroot = trim(system('git rev-parse --show-toplevel'))
-  let l:cmd = 'grep -rl ' . shellescape(l:pattern) . ' ' . shellescape(l:gitroot)
-        \ . ' | xargs sed -i "s/' . l:pattern . '/' . l:replacement . '/g"'
-  call system(l:cmd)
-endfunction
-command! -nargs=+ Replace call s:Replace(<f-args>)
-
 " Setup Plugin Manager
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
 if empty(glob(data_dir . '/autoload/plug.vim'))
@@ -327,26 +320,27 @@ nnoremap <leader>g :vertical:G<CR>
 command! Diff execute 'GitGutterDiff'
 
 " Show list of branches / remote branches (if inside git file, then close it first)
-autocmd FileType git nnoremap <buffer> gb :bd<CR> :Git branch<CR>
-nnoremap gb :Git branch<CR>
-autocmd FileType git nnoremap <buffer> grb :bd<CR> :Git branch -r<CR>
-nnoremap grb :Git branch -r<CR>
+nnoremap                                       gb  :Git branch<CR>
+nnoremap                                       grb :Git branch -r<CR>
+autocmd FileType git nnoremap <buffer>         gb  :bd<CR> :Git branch<CR>
+autocmd FileType git nnoremap <buffer>         grb :bd<CR> :Git branch -r<CR>
 
-" Pull and merge
-autocmd FileType git nnoremap <buffer> gm 0w"hy$:exe 'Git merge ' . @h<CR>
-autocmd FileType git nnoremap <buffer> gp :Git pull<CR>
-autocmd FileType fugitive nnoremap <buffer> gl :Git log -100<CR>
-autocmd FileType fugitive nnoremap <buffer> gp :Git pull<CR>
-autocmd FileType fugitive nnoremap <buffer> gP :Git push<CR>
+" Checkout commit
+autocmd FileType git nnoremap <buffer>         gc  :call GitCheckoutFromBranchesView()<CR>
+autocmd FileType git nnoremap <buffer>         grc :call GitCheckoutNewRemoteFromBranchesView()<CR>
+
+" Fetch, Pull, Merge, Log
+autocmd FileType git nnoremap <buffer> gm 0w"hy$   :exe 'Git merge ' . @h<CR>
+autocmd FileType git nnoremap <buffer>         gp  :Git pull<CR>
+autocmd FileType fugitive nnoremap <buffer>    gp  :Git pull<CR>
+autocmd FileType fugitive nnoremap <buffer>    gP  :Git push<CR>
+autocmd FileType fugitive nnoremap <buffer>    grp :Git fetch<CR>
+autocmd FileType fugitive nnoremap <buffer>    gl  :Git log -100<CR>
 
 " q to quit some buffers
 autocmd FileType fugitive nnoremap <buffer> q <C-w>c
 autocmd FileType fugitiveblame nnoremap <buffer> <C-w>c
 autocmd FileType git nnoremap <buffer> q <C-w>c
-
-" Checkout commit
-autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
-autocmd FileType git nnoremap <buffer> grc :call GitCheckoutNewRemoteFromBranchesView()<CR>
 
 function! GitCheckoutFromBranchesView()
   normal! 0w"hy$
@@ -468,6 +462,7 @@ endif
 " Vim LSP
 nnoremap <leader>l :ccl<CR>
 nnoremap <leader>e :lua vim.diagnostic.setqflist({ severity = vim.diagnostic.severity.ERROR })<CR> :copen<CR>
+nnoremap <leader>E :lua vim.diagnostic.setqflist()<CR> :copen<CR>
 nnoremap <leader>h :lua vim.lsp.buf.hover()<CR>
 nnoremap [g :lua goto_error_then_hint(vim.diagnostic.goto_prev)<CR>
 nnoremap ]g :lua goto_error_then_hint(vim.diagnostic.goto_next)<CR>
@@ -905,5 +900,66 @@ vim.api.nvim_create_user_command('GitFileHistory', function(command_opts)
   vim.api.nvim_buf_set_lines(buf_handle, 0, -1, false, output_lines)
   vim.api.nvim_set_current_buf(buf_handle)
 end, { nargs = '?', complete = 'file' })
+
+-- Search and replace in git root (checks for unstaged changes first)
+local function replace_in_git_root()
+  local git_root = vim.fn.system('git rev-parse --show-toplevel 2>/dev/null'):gsub('\n', '')
+  if vim.v.shell_error ~= 0 or git_root == '' then
+    print("Error: Not in a git repository")
+    return
+  end
+
+  vim.fn.system('git diff --quiet 2>/dev/null')
+  if vim.v.shell_error ~= 0 then
+    print("Error: You have unstaged changes. For safety this is not allowed.")
+    return
+  end
+
+  vim.ui.input({ prompt = "Search for: " }, function(search_term)
+    if not search_term or search_term == "" then
+      return
+    end
+
+    vim.ui.input({ prompt = "Replace with: " }, function(replace_term)
+      if not replace_term then
+        return
+      end
+
+      vim.cmd('redraw')
+      print("Searching in " .. git_root .. "...")
+
+      local search_escaped = vim.fn.shellescape(search_term)
+      local files = vim.fn.systemlist('grep -Frl ' .. search_escaped .. ' ' .. vim.fn.shellescape(git_root))
+
+      if vim.v.shell_error ~= 0 or #files == 0 then
+        print("No matches found")
+        return
+      end
+
+      local temp_search = vim.fn.tempname()
+      local temp_replace = vim.fn.tempname()
+      vim.fn.writefile({search_term}, temp_search, 'b')
+      vim.fn.writefile({replace_term}, temp_replace, 'b')
+
+      for i, file in ipairs(files) do
+        local perl_cmd = "perl -i -pe 'BEGIN{open S,q[" .. temp_search .. "];$/=undef;$s=<S>;open R,q[" .. temp_replace .. "];$r=<R>}s/\\Q$s\\E/$r/g' " .. vim.fn.shellescape(file)
+        vim.fn.system(perl_cmd)
+
+        if vim.v.shell_error ~= 0 then
+          vim.fn.delete(temp_search)
+          vim.fn.delete(temp_replace)
+          print("Error: Failed to replace in " .. file)
+          return
+        end
+      end
+
+      vim.fn.delete(temp_search)
+      vim.fn.delete(temp_replace)
+      print("Modified " .. #files .. " file(s)")
+      vim.cmd('checktime')
+    end)
+  end)
+end
+vim.api.nvim_create_user_command('Replace', replace_in_git_root, {})
 
 EOF
