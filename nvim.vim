@@ -2,11 +2,11 @@
 
 " Checkout commit
 autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
-autocmd FileType git nnoremap <buffer> ggc :call GitCheckoutNewRemoteFromBranchesView()<CR>
+autocmd FileType git nnoremap <buffer> grc :call GitCheckoutNewRemoteFromBranchesView()<CR>
 
 " Checkout commit
 autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
-autocmd FileType git nnoremap <buffer> ggc :call GitCheckoutNewRemoteFromBranchesView()<CR>
+autocmd FileType git nnoremap <buffer> grc :call GitCheckoutNewRemoteFromBranchesView()<CR>
 " - To see search count above 100 - :%s///gn
 
 " TODO
@@ -587,7 +587,7 @@ require'lspconfig'.ols.setup {
 
 require'lspconfig'.clangd.setup {
     capabilities = capabilities,
-    filetypes = { "c", "h", "cpp" }
+    filetypes = { "c", "h", "cpp", "m" }
 }
 
 require'lspconfig'.lua_ls.setup {
