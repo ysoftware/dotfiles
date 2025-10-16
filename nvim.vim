@@ -45,6 +45,12 @@ if has('mac')
     autocmd FileType swift abbrev si .store(in: &subscribers)
     autocmd FileType swift abbrev infii .frame(maxWidth: .infinity, alignment: .leading)
   augroup END
+
+  augroup PhpSnippets
+  autocmd!
+    autocmd FileType php abbrev fwr fwrite(STDOUT, var_export(, true));<Left><Left><Left><Left><Left><Left><Left><Left><Left>
+    autocmd FileType php abbrev stackTrace try { $a = null; string($a); } catch (Throwable $e) { fwrite(STDOUT, $e->getTraceAsString() ); }
+  augroup END
 endif
 
 call plug#begin('~/.local/share/nvim/plugged')

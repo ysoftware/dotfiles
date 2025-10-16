@@ -34,3 +34,6 @@ alias edit_monitors="nvim ~/Documents/GitHub/dotfiles/set-output.sh"
 alias mond="~/Documents/GitHub/dotfiles/set-output.sh set_workspace_desk"
 alias mons="~/Documents/GitHub/dotfiles/set-output.sh set_workspace_sofa"
 alias mona="~/Documents/GitHub/dotfiles/set-output.sh set_workspace_all"
+
+# jq setup
+export JQ_COLORS="0;31:0;39:0;39:0;34:0;32:0;90:0;90:0;39"
