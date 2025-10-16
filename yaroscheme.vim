@@ -52,7 +52,7 @@ else
     let s:text_brown = "#725011"
     let s:text_red = "#bf1c1c"
     let s:text_yellow = "#727211"
-    let s:text_gray = "#595959"
+    let s:text_gray = "#797979"
     let s:text_purple = "#9B2393"
 endif
 
