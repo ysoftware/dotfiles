@@ -35,18 +35,16 @@ if has('mac') " Xcode stuff
 endif
 call plug#end()
 
-" Tabs and shit
-filetype plugin indent on
-set tabstop=4
-set shiftwidth=4
-set tabstop=4
-set softtabstop=4
-set sw=4
-set expandtab
+let mapleader = " "
 
-" Code formatting
-autocmd FileType c,cpp,h setlocal commentstring=//\ %s
-autocmd FileType typescript,html,scss,css,javascript setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab
+" Multiline
+let g:VM_mouse_mappings = 1
+
+" Buffers
+command! Bufo silent! execute "%bd|e#|bd#"
+nnoremap <C-W>. :vertical res +10<CR>
+nnoremap <C-W>, :vertical res -10<CR>
+nnoremap <C-W>> :res +10<CR>
 
 " Auto fold imports
 command! FoldPhpImport silent! normal! zEG$/^use <CR>VGNzf/fake-search-query<CR>gg<C-l>
@@ -54,14 +52,9 @@ command! FoldTsImport silent! normal! zEG$/^import <CR>VGNzf/fake-search-query<C
 autocmd BufReadPost *.php FoldPhpImport
 autocmd BufReadPost *.ts,*.tsx FoldTsImport
 
-" Buffers
-command! Bufo silent! execute "%bd|e#|bd#"
-nnoremap <C-W>. :vertical res +10<CR>
-nnoremap <C-W>, :vertical res -10<CR>
-nnoremap <C-W>> :res +10<CR>
-nnoremap <C-W>< :res -10<CR>
-
-let mapleader = " "
+" Code formatting
+autocmd FileType c,cpp,h setlocal commentstring=//\ %s
+autocmd FileType typescript,html,scss,css,javascript setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab
 
 " Snippets
 augroup SwiftSnippets
@@ -78,6 +71,18 @@ augroup PhpSnippets
     autocmd FileType php abbrev fwr fwrite(STDOUT, var_export(, true));<Left><Left><Left><Left><Left><Left><Left><Left><Left>
     autocmd FileType php abbrev stackTrace catch (Throwable $e) { fwrite(STDOUT, " \n \n".$e->getMessage()."\n \n".$e->getTraceAsString()); }
 augroup END
+
+" Tabs and shit
+filetype plugin indent on
+set tabstop=4
+set shiftwidth=4
+set tabstop=4
+set softtabstop=4
+set sw=4
+set expandtab
+
+set noshowmode
+set termguicolors
 
 " Status line setup
 let g:bufferline_echo = 1
@@ -100,8 +105,6 @@ let g:bufferline_custom_pattern_indicator = [
 " Start page
 let g:startify_custom_header = ['   neovim']
 
-set noshowmode
-set termguicolors
 let g:lightline = { 'colorscheme': 'one', 
   \   'active': {
   \     'left': [[ 'mode', 'paste' ],
