@@ -11,7 +11,6 @@ autocmd FileType git nnoremap <buffer> grc :call GitCheckoutNewRemoteFromBranche
 
 " TODO
 " - Disable FUCKING STUPID word wrapping (repro: when typing a long comment, it will auto break at 100th)
-" - Replace in multiple files
 
 " Tabs and shit
 filetype plugin indent on
