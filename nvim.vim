@@ -1,16 +1,39 @@
 " Notes
-
-" Checkout commit
-autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
-autocmd FileType git nnoremap <buffer> grc :call GitCheckoutNewRemoteFromBranchesView()<CR>
-
-" Checkout commit
-autocmd FileType git nnoremap <buffer> gc :call GitCheckoutFromBranchesView()<CR>
-autocmd FileType git nnoremap <buffer> grc :call GitCheckoutNewRemoteFromBranchesView()<CR>
 " - To see search count above 100 - :%s///gn
-
 " TODO
 " - Disable FUCKING STUPID word wrapping (repro: when typing a long comment, it will auto break at 100th)
+
+" PLUGINS
+call plug#begin('~/.local/share/nvim/plugged')
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+Plug 'mg979/vim-visual-multi'
+Plug 'hrsh7th/nvim-cmp'
+Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'tpope/vim-fugitive' " Git
+Plug 'bkad/CamelCaseMotion' " Jump to camel case words
+Plug 'airblade/vim-gitgutter' " More Git
+Plug 'ysoftware/vim-bufferline' " Show all open buffers
+Plug 'kshenoy/vim-signature' " Show marks
+Plug 'itchyny/lightline.vim' " Status line
+Plug 'mhinz/vim-startify' " Startup screen
+Plug 'tpope/vim-commentary' " Comment lines of code
+
+Plug 'neovim/nvim-lspconfig' " Lsp
+Plug 'norcalli/nvim-colorizer.lua' " Hex Colors
+Plug 'preservim/nerdtree' | " File browser
+            \ Plug 'Xuyuanp/nerdtree-git-plugin' " Plugin with git status
+
+if has('mac') " Xcode stuff 
+    Plug 'wojciech-kulik/xcodebuild.nvim' " Xcode tools
+    Plug 'MunifTanjim/nui.nvim' " needed for xcodebuild
+    Plug 'nvim-telescope/telescope.nvim' " needed for xcodebuild
+    Plug 'nvim-lua/plenary.nvim' " Needed for telescope
+    Plug 'mfussenegger/nvim-lint'
+    Plug 'angular/vscode-ng-language-service' " Angular support
+    Plug 'keith/swift.vim' " Swift support
+endif
+call plug#end()
 
 " Tabs and shit
 filetype plugin indent on
@@ -25,7 +48,13 @@ set expandtab
 autocmd FileType c,cpp,h setlocal commentstring=//\ %s
 autocmd FileType typescript,html,scss,css,javascript setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab
 
-" buffers
+" Auto fold imports
+command! FoldPhpImport silent! normal! zEG$/^use <CR>VGNzf/fake-search-query<CR>gg<C-l>
+command! FoldTsImport silent! normal! zEG$/^import <CR>VGNzf/fake-search-query<CR>gg<C-l>
+autocmd BufReadPost *.php FoldPhpImport
+autocmd BufReadPost *.ts,*.tsx FoldTsImport
+
+" Buffers
 command! Bufo silent! execute "%bd|e#|bd#"
 nnoremap <C-W>. :vertical res +10<CR>
 nnoremap <C-W>, :vertical res -10<CR>
@@ -35,58 +64,20 @@ nnoremap <C-W>< :res -10<CR>
 let mapleader = " "
 
 " Snippets
-if has('mac')
-  augroup SwiftSnippets
+augroup SwiftSnippets
     autocmd!
     autocmd FileType swift abbrev wink .sink { [weak self] in<CR><CR>}<CR>.store(in: &subscribers)<Up><Up><Up><Left><Left><Left>
     autocmd FileType swift abbrev ws [weak self] in<Left><Left><Left>
     autocmd FileType swift abbrev gl guard let self else { return }
     autocmd FileType swift abbrev si .store(in: &subscribers)
     autocmd FileType swift abbrev infii .frame(maxWidth: .infinity, alignment: .leading)
-  augroup END
+augroup END
 
-  augroup PhpSnippets
-  autocmd!
+augroup PhpSnippets
+    autocmd!
     autocmd FileType php abbrev fwr fwrite(STDOUT, var_export(, true));<Left><Left><Left><Left><Left><Left><Left><Left><Left>
-    autocmd FileType php abbrev stackTrace try { $a = null; string($a); } catch (Throwable $e) { fwrite(STDOUT, $e->getTraceAsString() ); }
-  augroup END
-endif
-
-call plug#begin('~/.local/share/nvim/plugged')
-
-" Fuzzy finder
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
-
-if has('mac') " Xcode stuff 
-    Plug 'wojciech-kulik/xcodebuild.nvim' " Xcode tools
-    Plug 'MunifTanjim/nui.nvim' " needed for xcodebuild
-    Plug 'nvim-telescope/telescope.nvim' " needed for xcodebuild
-    Plug 'nvim-lua/plenary.nvim' " Needed for telescope
-    Plug 'mfussenegger/nvim-lint'
-    Plug 'angular/vscode-ng-language-service' " Angular support
-    Plug 'keith/swift.vim' " Swift support
-endif
-
-" Syntax highlighting
-Plug 'neovim/nvim-lspconfig' " Lsp
-Plug 'norcalli/nvim-colorizer.lua' " Hex Colors
-
-Plug 'preservim/nerdtree' | " File browser
-    \ Plug 'Xuyuanp/nerdtree-git-plugin' " Plugin with git status
-
-Plug 'mg979/vim-visual-multi'
-Plug 'hrsh7th/nvim-cmp'
-Plug 'hrsh7th/cmp-nvim-lsp'
-Plug 'tpope/vim-fugitive' " Git
-Plug 'bkad/CamelCaseMotion' " Jump to camel case words
-Plug 'airblade/vim-gitgutter' " More Git
-Plug 'ysoftware/vim-bufferline' " Show all open buffers
-Plug 'kshenoy/vim-signature' " Show marks
-Plug 'itchyny/lightline.vim' " Status line
-Plug 'mhinz/vim-startify' " Startup screen
-Plug 'tpope/vim-commentary' " Comment lines of code
-call plug#end()
+    autocmd FileType php abbrev stackTrace catch (Throwable $e) { fwrite(STDOUT, " \n \n".$e->getMessage()."\n \n".$e->getTraceAsString()); }
+augroup END
 
 " Status line setup
 let g:bufferline_echo = 1
