@@ -22,9 +22,9 @@ Plug 'tpope/vim-commentary' " Comment lines of code
 Plug 'neovim/nvim-lspconfig' " Lsp
 Plug 'norcalli/nvim-colorizer.lua' " Hex Colors
 Plug 'preservim/nerdtree' | " File browser
-            \ Plug 'Xuyuanp/nerdtree-git-plugin' " Plugin with git status
+    \ Plug 'Xuyuanp/nerdtree-git-plugin' " Plugin with git status
 
-if has('mac') " Xcode stuff 
+if has('mac') " Xcode stuff
     Plug 'wojciech-kulik/xcodebuild.nvim' " Xcode tools
     Plug 'MunifTanjim/nui.nvim' " needed for xcodebuild
     Plug 'nvim-telescope/telescope.nvim' " needed for xcodebuild
@@ -44,13 +44,12 @@ let g:VM_mouse_mappings = 1
 command! Bufo silent! execute "%bd|e#|bd#"
 nnoremap <C-W>. :vertical res +10<CR>
 nnoremap <C-W>, :vertical res -10<CR>
-nnoremap <C-W>> :res +10<CR>
+nnoremap <C-W>> :res +20<CR>
+nnoremap <C-W>< :res -20<CR>
 
 " Auto fold imports
 command! FoldPhpImport silent! normal! zEG$/^use <CR>VGNzf/fake-search-query<CR>gg<C-l>
 command! FoldTsImport silent! normal! zEG$/^import <CR>VGNzf/fake-search-query<CR>gg<C-l>
-autocmd BufReadPost *.php FoldPhpImport
-autocmd BufReadPost *.ts,*.tsx FoldTsImport
 
 " Code formatting
 autocmd FileType c,cpp,h setlocal commentstring=//\ %s
@@ -508,7 +507,7 @@ if ok and lint then
     lint.linters_by_ft = {
       javascript = { "eslint" },
       typescript = { "eslint" },
-      swift      = { "swiftlint" },
+      -- swift      = { "swiftlint" },
     }
     lint.linters.eslint = require("lint.util").wrap(lint.linters.eslint, function(diagnostic)
       if diagnostic.source and diagnostic.source:lower() == "eslint" then
