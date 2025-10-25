@@ -1,5 +1,3 @@
-" Notes
-" - To see search count above 100 - :%s///gn
 " TODO
 " - Disable FUCKING STUPID word wrapping (repro: when typing a long comment, it will auto break at 100th)
 
@@ -45,6 +43,7 @@ command! Bufo silent! execute "%bd|e#|bd#"
 nnoremap <C-W>. :vertical res +10<CR>
 nnoremap <C-W>, :vertical res -10<CR>
 nnoremap <C-W>> :res +10<CR>
+command! CountMatches execute "%s///gn"
 
 " Auto fold imports
 command! FoldPhpImport silent! normal! zEG$/^use <CR>VGNzf/fake-search-query<CR>gg<C-l>
