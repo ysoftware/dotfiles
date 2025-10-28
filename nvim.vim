@@ -42,7 +42,8 @@ let g:VM_mouse_mappings = 1
 command! Bufo silent! execute "%bd|e#|bd#"
 nnoremap <C-W>. :vertical res +10<CR>
 nnoremap <C-W>, :vertical res -10<CR>
-nnoremap <C-W>> :res +10<CR>
+nnoremap <C-W>> :res +20<CR>
+nnoremap <C-W>< :res -20<CR>
 command! CountMatches execute "%s///gn"
 
 " Auto fold imports
