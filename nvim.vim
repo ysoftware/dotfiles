@@ -751,18 +751,18 @@ vim.api.nvim_create_user_command('Branch', create_branch, {
 -- highlight mobile and desktop in fzf ----------
 if vim.loop.os_uname().sysname == "Darwin" then
   local timer = nil
-  
+
   local function apply_highlight()
     vim.cmd([[syntax region BufferLineType1 start=/[^\/]\+\/mobile\// end=/$/]])
     vim.cmd([[syntax region BufferLineType2 start=/[^\/]\+\/desktop\// end=/$/]])
   end
-  
+
   local function start_timer()
     if timer then
       timer:stop()
       timer:close()
     end
-  
+
     apply_highlight()
     timer = vim.loop.new_timer()
     timer:start(0, 1000, vim.schedule_wrap(function()
@@ -775,7 +775,7 @@ if vim.loop.os_uname().sysname == "Darwin" then
       apply_highlight()
     end))
   end
-  
+
   vim.api.nvim_create_augroup("FzfCustomHighlight", { clear = true })
   vim.api.nvim_create_autocmd("FileType", {
     group = "FzfCustomHighlight",
@@ -789,22 +789,22 @@ local function get_search_directory()
   local current_file = vim.fn.expand('%:p:h')
   local buftype = vim.bo.buftype
   local filetype = vim.bo.filetype
-  
+
   if buftype ~= '' or filetype == 'fugitive' or filetype == 'git' or current_file:match('^fugitive://') then
     current_file = vim.fn.getcwd()
   elseif current_file == '' or not vim.fn.isdirectory(current_file) then
     current_file = vim.fn.getcwd()
   end
-  
+
   local git_root = vim.fn.system('git -C ' .. vim.fn.shellescape(current_file) .. ' rev-parse --show-toplevel 2>/dev/null')
-  
+
   if vim.v.shell_error == 0 and git_root ~= '' then
     local clean_root = vim.fn.substitute(git_root, '\n', '', '')
     if vim.fn.isdirectory(clean_root) == 1 then
       return clean_root
     end
   end
-  
+
   if vim.fn.isdirectory(current_file) == 1 then
     return current_file
   else
@@ -958,5 +958,57 @@ local function replace_in_git_root()
   end)
 end
 vim.api.nvim_create_user_command('Replace', replace_in_git_root, {})
+
+-- Align selected lines by inserted query
+local function align_by_query(opts)
+  local start_line = opts.line1
+  local end_line = opts.line2
+
+  if start_line == 0 or end_line == 0 or start_line > end_line then
+    print("Error: Invalid visual selection")
+    return
+  end
+
+  if end_line - start_line < 1 then
+    print("Error: Must select at least 2 lines")
+    return
+  end
+
+  vim.ui.input({ prompt = "Enter alignment query: " }, function(query)
+    if not query or query == "" then
+      return
+    end
+
+    if #query > 200 then
+      print("Error: Query too long (max 200 chars)")
+      return
+    end
+
+    local lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
+    local positions = {}
+    local max_length = 0
+
+    for i, line in ipairs(lines) do
+      local pos = string.find(line, query, 1, true)
+      if not pos then
+        print("Error: Query not found in line " .. (start_line + i - 1))
+        return
+      end
+      local length = vim.fn.strwidth(string.sub(line, 1, pos - 1))
+      positions[i] = { pos = pos, length = length }
+      if length > max_length then
+        max_length = length
+      end
+    end
+
+    for i, info in pairs(positions) do
+      local spaces = string.rep(' ', max_length - info.length)
+      lines[i] = string.sub(lines[i], 1, info.pos - 1) .. spaces .. string.sub(lines[i], info.pos)
+    end
+
+    vim.api.nvim_buf_set_lines(0, start_line - 1, end_line, false, lines)
+  end)
+end
+vim.api.nvim_create_user_command('AlignByQuery', align_by_query, { range = true })
 
 EOF
