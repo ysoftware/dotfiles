@@ -45,6 +45,7 @@ nnoremap <C-W>, :vertical res -10<CR>
 nnoremap <C-W>> :res +20<CR>
 nnoremap <C-W>< :res -20<CR>
 command! CountMatches execute "%s///gn"
+command! W :w
 
 " Auto fold imports
 command! FoldPhpImport silent! normal! zEG$/^use <CR>VGNzf/fake-search-query<CR>gg<C-l>
