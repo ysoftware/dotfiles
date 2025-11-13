@@ -723,6 +723,8 @@ local function create_branch()
         "git push origin HEAD:" .. remote_branch,
         "git branch --set-upstream-to=origin/" .. remote_branch
       }
+
+      print("\n")
       for i, cmd in ipairs(commands) do
         print("Executing: " .. cmd)
         local result = vim.fn.system(cmd)
