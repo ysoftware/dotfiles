@@ -1,10 +1,10 @@
 # General bash settings
 export BASH_SILENCE_DEPRECATION_WARNING=1 # Hide "The default interactive shell is now ..." message
-export EDITOR="/opt/homebrew/bin/nvim" # For vimv
-export HOMEBREW_NO_AUTO_UPDATE=1 # Fucking homebrew
-
 unset POSIXLY_CORRECT # a setting for grep and other tools
 unset command_not_found_handle # Remove automatic download suggestion of the missing command
+
+export HOMEBREW_NO_AUTO_UPDATE=1 # Fucking homebrew
+export EDITOR="nvim" # For vimv
 
 # Reverse history
 export HISTSIZE=500000
