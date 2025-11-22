@@ -228,6 +228,16 @@ if has('mac')
         set background=light
         call SetCorrectBatThemeForFzf()
     endif
+elseif has('unix')
+    if system("which gsettings >/dev/null 2>&1 && echo 1 || echo 0") == "1\n"
+        if system("gsettings get org.gnome.desktop.interface color-scheme") =~# 'dark'
+            set background=dark
+        else
+            set background=light
+        endif
+    else
+        set background=dark
+    endif
 else
     set background=dark
     call SetCorrectBatThemeForFzf()
