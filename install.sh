@@ -51,3 +51,18 @@ if ! grep -Fsq "source $BASH_IN" "$BASHRC_OUT"; then
 else
     echo "${UP_TO_DATE_MSG}${BASHRC_OUT}"
 fi
+
+# symlink palette (on GNOME)
+PALETTE_IN="$DIR/ptyxis.palette"
+PALETTE_DIR="$HOME/.local/share/org.gnome.Ptyxis/palettes"
+PALETTE_OUT="$PALETTE_DIR/yaroscheme.palette"
+
+if [ -d "$HOME/.local/share/org.gnome.Ptyxis" ]; then
+    mkdir -p "$PALETTE_DIR"
+    if [ ! -f "$PALETTE_OUT" ]; then
+        ln -sf "$PALETTE_IN" "$PALETTE_OUT"
+        echo "$PALETTE_IN -> $PALETTE_OUT"
+    else
+        echo "${UP_TO_DATE_MSG}${PALETTE_OUT}"
+    fi
+fi
