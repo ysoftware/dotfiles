@@ -418,7 +418,16 @@ nnoremap <leader><C-f> :NERDTreeVCS<CR>
 nnoremap <C-f> :NERDTreeToggle<CR>
 
 " Prettify json (depends on installed jq)
-command! Prettify :%!jq .
+augroup PrettifyJson
+  autocmd!
+  autocmd FileType json command! -buffer Prettify %!jq --indent 2 -f %
+augroup END
+
+" Prettify html (depends on installed pup)
+augroup PrettifyHtml
+  autocmd!
+  autocmd FileType html,htmljinja,html.twig command! -buffer Prettify %!pup -i 2 -f % html
+augroup END
 
 " Move lines
 nnoremap <S-down> :m .+1<CR>==
