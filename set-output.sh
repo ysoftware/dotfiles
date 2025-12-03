@@ -2,7 +2,7 @@
 
 # call xrandr to see these variables or just guess them
 PRIMARY="DP-5"
-SECONDARY="HDMI-4"
+SECONDARY="HDMI-5"
 TV="HDMI-5"
 
 switch_audio_output() {
