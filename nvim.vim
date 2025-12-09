@@ -34,6 +34,7 @@ endif
 call plug#end()
 
 let mapleader = " "
+:set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
 
 " Multiline
 let g:VM_mouse_mappings = 1
@@ -507,7 +508,7 @@ endif
 
 colorscheme yaroscheme
 call yaroscheme#apply()
-set title 
+set title
 
 lua << EOF
 vim.deprecate = function() end
