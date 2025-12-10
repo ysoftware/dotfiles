@@ -724,8 +724,7 @@ function BreakArguments()
 end
 
 -- Function to create and setup a new git branch with different local and remote names
-local function create_branch()
-  -- Get ticket number
+vim.api.nvim_create_user_command('Branch', function()
   vim.ui.input({ prompt = "Enter ticket number (e.g., TEMOSO-22524): " }, function(ticket)
     if not ticket or ticket == "" then
       print("Branch creation cancelled - no ticket number provided")
@@ -765,11 +764,7 @@ local function create_branch()
       print("Branch setup complete!")
     end)
   end)
-end
-vim.api.nvim_create_user_command('Branch', create_branch, {
-  desc = 'Create a new git branch with different local and remote names'
-})
-
+end, { })
 
 -- highlight mobile and desktop in fzf ----------
 if vim.loop.os_uname().sysname == "Darwin" then
@@ -835,27 +830,30 @@ local function get_search_directory()
   end
 end
 
-local function files_search()
+vim.keymap.set('n', '<C-]>', function()
   local search_dir = get_search_directory()
   local cmd = 'Files ' .. search_dir
   vim.cmd('echo ":' .. cmd .. '"')
   vim.cmd(cmd)
-end
+end, { noremap = true, silent = true })
 
-local function ag_search()
+vim.keymap.set('n', '<C-p>', function()
   local search_dir = get_search_directory()
   local cmd = 'AgIn ' .. search_dir
   vim.cmd('echo ":' .. cmd .. '"')
   vim.cmd(cmd)
-end
+end, { noremap = true, silent = true })
 
-vim.keymap.set('n', '<C-]>', files_search, { noremap = true, silent = true })
-vim.keymap.set('n', '<leader><C-]>', function() vim.cmd('Files ~/Documents') end, { noremap = true, silent = true })
-vim.keymap.set('n', '<C-p>', ag_search, { noremap = true, silent = true })
-vim.keymap.set('n', '<leader><C-p>', function() vim.cmd('AgIn ~/Documents') end, { noremap = true, silent = true })
+vim.keymap.set('n', '<leader><C-]>', function()
+  vim.cmd('Files ~/Documents')
+end, { noremap = true, silent = true })
+
+vim.keymap.set('n', '<leader><C-p>', function()
+  vim.cmd('AgIn ~/Documents')
+end, { noremap = true, silent = true })
 
 -- Jump between mobile and desktop files of the same name
-local function web_jump()
+vim.api.nvim_create_user_command('WebJump', function()
   local current_file = vim.fn.expand('%:p')
   if current_file == '' then
     return
@@ -879,12 +877,9 @@ local function web_jump()
   else
     print("Target file does not exist: " .. search_pattern)
   end
-end
+end, {})
 
-vim.api.nvim_create_user_command('WebJump', web_jump, {
-  desc = 'Jump between mobile and desktop versions of Angular files'
-})
-
+-- Show git history of one file
 vim.api.nvim_create_user_command('GitFileHistory', function(command_opts)
   local target_file = (command_opts.args and command_opts.args ~= '' and vim.fn.expand(command_opts.args)) or vim.fn.expand('%:p')
   if not target_file or target_file == '' then
@@ -922,7 +917,7 @@ vim.api.nvim_create_user_command('GitFileHistory', function(command_opts)
 end, { nargs = '?', complete = 'file' })
 
 -- Search and replace in git root (checks for unstaged changes first)
-local function replace_in_git_root()
+vim.api.nvim_create_user_command('Replace', function()
   local git_root = vim.fn.system('git rev-parse --show-toplevel 2>/dev/null'):gsub('\n', '')
   if vim.v.shell_error ~= 0 or git_root == '' then
     print("Error: Not in a git repository")
@@ -979,11 +974,94 @@ local function replace_in_git_root()
       vim.cmd('checktime')
     end)
   end)
-end
-vim.api.nvim_create_user_command('Replace', replace_in_git_root, {})
+end, {})
+
+-- Open jira ticket from nvim
+vim.api.nvim_create_user_command('JiraOpen', function()
+  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+  local line = vim.api.nvim_get_current_line()
+  if line == '' then
+    return
+  end
+
+  local idx = col + 1
+  local len = #line
+  if idx > len then
+    idx = len
+  end
+
+  local ticket = nil
+
+  while idx >= 1 do
+    if line:sub(idx, idx) == 'T' then
+      local m = line:match("TEMOSO%-%d+", idx)
+      if m then
+        ticket = m
+        break
+      end
+    end
+    idx = idx - 1
+  end
+
+  if not ticket then
+    print("No TEMOSO ticket found on this line.")
+    return
+  end
+
+  local url = "https://c24-mobilfunk.atlassian.net/browse/" .. ticket
+
+  local sysname = vim.loop.os_uname().sysname
+  if sysname == "Darwin" then
+    vim.fn.jobstart({ "open", url }, { detach = true })
+  elseif sysname == "Windows_NT" then
+    vim.fn.jobstart({ "cmd", "/c", "start", "", url }, { detach = true })
+  else
+    vim.fn.jobstart({ "xdg-open", url }, { detach = true })
+  end
+end, {})
+
+-- Delete local branch
+vim.api.nvim_create_user_command('GitDelete', function()
+  if vim.bo.filetype ~= 'git' then
+    return
+  end
+
+  local line = vim.api.nvim_get_current_line()
+  if not line or line == '' then
+    return
+  end
+
+  -- currently checked out branch
+  if line:match("^%s*%*") then
+    print("Can not delete currently checked out branch.")
+    return
+  end
+
+  -- strip leading whitespace
+  line = line:gsub("^%s*", "")
+  local branch = line
+
+  if branch:match("^origin/") then
+    print("This command can only delete local branches")
+    return
+  end
+
+  local answer = vim.fn.input("Delete branch '" .. branch .. "'? [y/N]: ")
+  if answer ~= 'y' then
+    vim.cmd('echo ""')
+    return
+  end
+
+  local cmd = "git branch -D " .. vim.fn.shellescape(branch)
+  local result = vim.fn.system(cmd)
+
+  if vim.v.shell_error ~= 0 then
+    print(result)
+  end
+end, {})
 
 -- Align selected lines by inserted query
-local function align_by_query(opts)
+vim.api.nvim_create_user_command('AlignByQuery', function(opts)
   local start_line = opts.line1
   local end_line = opts.line2
 
@@ -1031,7 +1109,6 @@ local function align_by_query(opts)
 
     vim.api.nvim_buf_set_lines(0, start_line - 1, end_line, false, lines)
   end)
-end
-vim.api.nvim_create_user_command('AlignByQuery', align_by_query, { range = true })
+end, { range = true })
 
 EOF
