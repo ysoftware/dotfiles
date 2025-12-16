@@ -250,6 +250,7 @@ noremap <C-S-Left> :set background=dark<CR>:call SetCorrectBatThemeForFzf()<CR><
 autocmd OptionSet background call SetCorrectBatThemeForFzf() | call yaroscheme#apply()
 
 " Copy paste with system buffer
+set clipboard=unnamedplus " for NERDTree to copy path properly
 noremap p "+p
 noremap P "+P
 noremap y "+y
