@@ -340,6 +340,7 @@ autocmd FileType git nnoremap <buffer>         gc  :call GitCheckoutFromBranches
 autocmd FileType git nnoremap <buffer>         grc :call GitCheckoutNewRemoteFromBranchesView()<CR>
 
 autocmd FileType git nnoremap <buffer>         gd  :GitDelete<CR>
+autocmd FileType git nnoremap <buffer>         gj  :JiraOpen<CR>
 
 " Fetch, Pull, Merge, Log
 autocmd FileType git nnoremap <buffer> gm 0w"hy$   :exe 'Git merge ' . @h<CR>
@@ -458,7 +459,6 @@ nnoremap <leader><Down> :e ~/Documents/GitHub/Notes/Notes.txt<CR>
 
 if has('mac')
     nnoremap <C-S-down> :e ~/Documents/Check24/check24-worklog/worklog.txt<CR>
-
 elseif has('linux')
     nnoremap <C-S-down> :e ~/Documents/Text/os-todos.txt<CR>
 endif

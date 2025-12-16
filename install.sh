@@ -66,3 +66,18 @@ if [ -d "$HOME/.local/share/org.gnome.Ptyxis" ]; then
         echo "${UP_TO_DATE_MSG}${PALETTE_OUT}"
     fi
 fi
+
+# sym link git pre-commit hook
+PRECOMMIT_IN="$DIR/git-precommit-no-checkin.sh"
+PRECOMMIT_OUT="$HOME/.githooks/pre-commit"
+
+if [ ! -L "$PRECOMMIT_OUT" ] || [ "$(readlink "$PRECOMMIT_OUT")" != "$PRECOMMIT_IN" ]; then # TODO: this might be the better way to update symlinks, look into it
+    mkdir -p "$(dirname "$PRECOMMIT_OUT")"
+    ln -sf "$PRECOMMIT_IN" "$PRECOMMIT_OUT"
+    chmod +x "$PRECOMMIT_IN"
+    echo "$PRECOMMIT_IN -> $PRECOMMIT_OUT"
+else
+    chmod +x "$PRECOMMIT_IN"
+    echo "${UP_TO_DATE_MSG}${PRECOMMIT_OUT}"
+fi
+
