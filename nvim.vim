@@ -339,6 +339,8 @@ autocmd FileType git nnoremap <buffer>         grb :bd<CR> :Git branch -r<CR>
 autocmd FileType git nnoremap <buffer>         gc  :call GitCheckoutFromBranchesView()<CR>
 autocmd FileType git nnoremap <buffer>         grc :call GitCheckoutNewRemoteFromBranchesView()<CR>
 
+autocmd FileType git nnoremap <buffer>         gd  :GitDelete<CR>
+
 " Fetch, Pull, Merge, Log
 autocmd FileType git nnoremap <buffer> gm 0w"hy$   :exe 'Git merge ' . @h<CR>
 autocmd FileType git nnoremap <buffer>         gp  :Git pull<CR>
