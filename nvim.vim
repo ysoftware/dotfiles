@@ -17,6 +17,7 @@ Plug 'itchyny/lightline.vim' " Status line
 Plug 'mhinz/vim-startify' " Startup screen
 Plug 'tpope/vim-commentary' " Comment lines of code
 
+Plug 'rluba/jai.vim'
 Plug 'neovim/nvim-lspconfig' " Lsp
 Plug 'norcalli/nvim-colorizer.lua' " Hex Colors
 Plug 'preservim/nerdtree' | " File browser
