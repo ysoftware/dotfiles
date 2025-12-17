@@ -57,6 +57,11 @@ command! FoldTsImport silent! normal! zEG$/^import <CR>VGNzf/fake-search-query<C
 autocmd FileType c,cpp,h setlocal commentstring=//\ %s
 autocmd FileType typescript,html,scss,css,javascript setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab
 
+augroup twig_ft
+  au!
+  autocmd BufNewFile,BufRead *.html.twig   set syntax=html
+augroup END
+
 " Snippets
 augroup SwiftSnippets
     autocmd!
