@@ -255,7 +255,6 @@ noremap <C-S-Left> :set background=dark<CR>:call SetCorrectBatThemeForFzf()<CR><
 autocmd OptionSet background call SetCorrectBatThemeForFzf() | call yaroscheme#apply()
 
 " Copy paste with system buffer
-set clipboard=unnamedplus " for NERDTree to copy path properly
 noremap p "+p
 noremap P "+P
 noremap y "+y
@@ -270,7 +269,7 @@ set number
 set autowrite
 set wildignorecase
 set scroll=15
-set scrolloff=5
+set scrolloff=3
 
 " show invisible characters
 set listchars=tab:»-,trail:·,nbsp:␣,extends:>,precedes:< 
