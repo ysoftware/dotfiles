@@ -925,66 +925,6 @@ vim.api.nvim_create_user_command('GitFileHistory', function(command_opts)
   vim.api.nvim_set_current_buf(buf_handle)
 end, { nargs = '?', complete = 'file' })
 
--- Search and replace in git root (checks for unstaged changes first)
-vim.api.nvim_create_user_command('Replace', function()
-  local git_root = vim.fn.system('git rev-parse --show-toplevel 2>/dev/null'):gsub('\n', '')
-  if vim.v.shell_error ~= 0 or git_root == '' then
-    print("Error: Not in a git repository")
-    return
-  end
-
-  vim.fn.system('git diff --quiet 2>/dev/null')
-  if vim.v.shell_error ~= 0 then
-    print("Error: You have unstaged changes. For safety this is not allowed.")
-    return
-  end
-
-  vim.ui.input({ prompt = "Search for: " }, function(search_term)
-    if not search_term or search_term == "" then
-      return
-    end
-
-    vim.ui.input({ prompt = "Replace with: " }, function(replace_term)
-      if not replace_term then
-        return
-      end
-
-      vim.cmd('redraw')
-      print("Searching in " .. git_root .. "...")
-
-      local search_escaped = vim.fn.shellescape(search_term)
-      local files = vim.fn.systemlist('grep -Frl ' .. search_escaped .. ' ' .. vim.fn.shellescape(git_root))
-
-      if vim.v.shell_error ~= 0 or #files == 0 then
-        print("No matches found")
-        return
-      end
-
-      local temp_search = vim.fn.tempname()
-      local temp_replace = vim.fn.tempname()
-      vim.fn.writefile({search_term}, temp_search, 'b')
-      vim.fn.writefile({replace_term}, temp_replace, 'b')
-
-      for i, file in ipairs(files) do
-        local perl_cmd = "perl -i -pe 'BEGIN{open S,q[" .. temp_search .. "];$/=undef;$s=<S>;open R,q[" .. temp_replace .. "];$r=<R>}s/\\Q$s\\E/$r/g' " .. vim.fn.shellescape(file)
-        vim.fn.system(perl_cmd)
-
-        if vim.v.shell_error ~= 0 then
-          vim.fn.delete(temp_search)
-          vim.fn.delete(temp_replace)
-          print("Error: Failed to replace in " .. file)
-          return
-        end
-      end
-
-      vim.fn.delete(temp_search)
-      vim.fn.delete(temp_replace)
-      print("Modified " .. #files .. " file(s)")
-      vim.cmd('checktime')
-    end)
-  end)
-end, {})
-
 -- Open jira ticket from nvim
 vim.api.nvim_create_user_command('JiraOpen', function()
   local row, col = unpack(vim.api.nvim_win_get_cursor(0))
@@ -1055,18 +995,17 @@ vim.api.nvim_create_user_command('GitDelete', function()
     return
   end
 
-  local answer = vim.fn.input("Delete branch '" .. branch .. "'? [y/N]: ")
+  local answer = vim.fn.input("Delete branch '" .. branch .. "' in '" .. vim.fn["FugitiveWorkTree"]() .. "'? [y/N]: ")
+  vim.api.nvim_echo({{""}}, false, {})
+  vim.cmd("redraw")
+
   if answer ~= 'y' then
-    vim.cmd('echo ""')
+    vim.api.nvim_echo({{"Cancelled."}}, false, {})
+    vim.cmd("redraw")
     return
   end
 
-  local cmd = "git branch -D " .. vim.fn.shellescape(branch)
-  local result = vim.fn.system(cmd)
-
-  if vim.v.shell_error ~= 0 then
-    print(result)
-  end
+  vim.cmd("Git branch -D " .. vim.fn.fnameescape(branch))
 end, {})
 
 -- Align selected lines by inserted query
