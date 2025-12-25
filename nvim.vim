@@ -1,5 +1,6 @@
 " TODO
 " - Disable FUCKING STUPID word wrapping (repro: when typing a long comment, it will auto break at 100th)
+" - Make :Files respect .ignore
 
 " PLUGINS
 call plug#begin('~/.local/share/nvim/plugged')
