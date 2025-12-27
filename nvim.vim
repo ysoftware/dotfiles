@@ -259,6 +259,7 @@ noremap p "+p
 noremap P "+P
 noremap y "+y
 noremap Y "+Y
+set clipboard=
 
 syntax on
 set nocompatible
