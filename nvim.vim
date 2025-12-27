@@ -1068,4 +1068,67 @@ local function quickfix_from_command(command)
 end
 vim.keymap.set('n', '<leader>tr', function() quickfix_from_command('task -ls') end, { noremap = true, silent = true })
 
+-- Jump to task when cursor is over huid
+local function open_task_under_cursor()
+  local task_dir, pat = "tasks", "%d%d%d%d%d%d%d%d%-%d%d%d%d%d%d"
+  local line = vim.api.nvim_get_current_line()
+  local col = vim.api.nvim_win_get_cursor(0)[2] + 1 -- 1-based
+
+  local huid, s = nil, 1
+  while true do
+    local a, b = line:find(pat, s)
+    if not a then break end
+    if a <= col and col <= b then huid = line:sub(a, b); break end
+    s = b + 1
+  end
+  if not huid then return vim.notify("No HUID under cursor", vim.log.levels.WARN) end
+
+  local path = string.format("%s/%s/%s/task.md", vim.fn.getcwd(), task_dir, huid)
+  if vim.fn.filereadable(path) == 0 then
+    return vim.notify("Task file not found: " .. path, vim.log.levels.ERROR)
+  end
+
+  local old = vim.o.splitright
+  vim.o.splitright = true
+  vim.cmd("vsplit " .. vim.fn.fnameescape(path))
+  vim.o.splitright = old
+end
+vim.keymap.set("n", "<leader>tg", open_task_under_cursor, { desc = "" })
+
+-- convert todo into a task
+local function todo_to_task()
+  local line = vim.api.nvim_get_current_line()
+  local a, b, tag, desc = line:find("//%s*TODO%s*%(([^)]+)%)%s*:%s*(.+)")
+  if not a then a, b, desc = line:find("//%s*TODO%s*:%s*(.+)") end
+  if not a then return vim.notify("No TODO on this line", vim.log.levels.WARN) end
+
+  desc = desc:gsub("^%s+", ""):gsub("%s+$", "")
+  tag = tag and tag:lower() or ""
+  local huid = os.date("%d%m%Y-%H%M%S")
+
+  local dir = ("%s/tasks/%s"):format(vim.fn.getcwd(), huid)
+  local path = dir .. "/task.md"
+  if vim.fn.filereadable(path) == 1 then
+    return vim.notify("Refusing to overwrite: " .. path, vim.log.levels.ERROR)
+  end
+
+  vim.fn.mkdir(dir, "p")
+  local f, err = io.open(path, "w")
+  if not f then return vim.notify("Failed to write: " .. (err or path), vim.log.levels.ERROR) end
+  f:write(("# %s\n\n- STATUS: OPEN\n- PRIORITY: 20\n- TAGS:%s\n\n"):format(desc, tag ~= "" and (" " .. tag) or ""))
+  f:close()
+
+  vim.api.nvim_set_current_line(line:sub(1, a - 1) .. ("// TASK(" .. huid .. ")") .. line:sub(b + 1))
+end
+vim.keymap.set("n", "<leader>tn", todo_to_task, { desc = "" })
+
+-- Find references to task and populate qf
+local function task_find_from_current_buffer()
+  local path = vim.api.nvim_buf_get_name(0)
+  local huid = path:match("/tasks/(%d%d%d%d%d%d%d%d%-%d%d%d%d%d%d)/")
+  if not huid then return vim.notify("Not a /tasks/<huid>/ buffer", vim.log.levels.WARN) end
+  quickfix_from_command("task -find " .. huid)
+end
+vim.keymap.set("n", "<leader>tp", task_find_from_current_buffer, { desc = "task -find <huid> (quickfix)" })
+
 EOF
