@@ -1,5 +1,6 @@
 " TODO
 " - Disable FUCKING STUPID word wrapping (repro: when typing a long comment, it will auto break at 100th)
+" - Make :Files respect .ignore
 
 " PLUGINS
 call plug#begin('~/.local/share/nvim/plugged')
@@ -572,7 +573,7 @@ end
 local project_library_path = "~/Documents/Check24/angular/"
 local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
 local tsserver_lsp = require'lspconfig'.tsserver
-if tsserver_lsp then
+if tsserver_lsp and tsserver_lsp.setup then
     tsserver_lsp.setup {
         capabilities = capabilities,
         filetypes = { "typescript", "html", "scss", "css", "javascript", "htmlangular" },
@@ -1058,5 +1059,13 @@ vim.api.nvim_create_user_command('AlignByQuery', function(opts)
     vim.api.nvim_buf_set_lines(0, start_line - 1, end_line, false, lines)
   end)
 end, { range = true })
+
+-- Populate quickfix
+local function quickfix_from_command(command)
+    local output = vim.trim(vim.fn.system(command))
+    vim.fn.setqflist({}, 'r', { lines = vim.split(output, '\n', { plain = true }) })
+    vim.cmd('copen')
+end
+vim.keymap.set('n', '<leader>tr', function() quickfix_from_command('task -ls') end, { noremap = true, silent = true })
 
 EOF
