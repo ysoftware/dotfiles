@@ -1127,7 +1127,7 @@ local function task_find_from_current_buffer()
   local path = vim.api.nvim_buf_get_name(0)
   local huid = path:match("/tasks/(%d%d%d%d%d%d%d%d%-%d%d%d%d%d%d)/")
   if not huid then return vim.notify("Not a /tasks/<huid>/ buffer", vim.log.levels.WARN) end
-  quickfix_from_command("task -find " .. huid)
+  quickfix_from_command("replace " .. huid .. " -n -s")
 end
 vim.keymap.set("n", "<leader>tp", task_find_from_current_buffer, { desc = "task -find <huid> (quickfix)" })
 
