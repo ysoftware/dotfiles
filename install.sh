@@ -76,6 +76,7 @@ if [ ! -L "$PRECOMMIT_OUT" ] || [ "$(readlink "$PRECOMMIT_OUT")" != "$PRECOMMIT_
     ln -sf "$PRECOMMIT_IN" "$PRECOMMIT_OUT"
     chmod +x "$PRECOMMIT_IN"
     echo "$PRECOMMIT_IN -> $PRECOMMIT_OUT"
+    git config --global core.hooksPath ~/.githooks
 else
     chmod +x "$PRECOMMIT_IN"
     echo "${UP_TO_DATE_MSG}${PRECOMMIT_OUT}"
