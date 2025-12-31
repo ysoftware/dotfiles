@@ -1062,11 +1062,17 @@ end, { range = true })
 
 -- Populate quickfix
 local function quickfix_from_command(command)
+    -- print(command)
     local output = vim.trim(vim.fn.system(command))
     vim.fn.setqflist({}, 'r', { lines = vim.split(output, '\n', { plain = true }) })
     vim.cmd('copen')
 end
-vim.keymap.set('n', '<leader>tr', function() quickfix_from_command('task -ls') end, { noremap = true, silent = true })
+
+local function quickfix_from_command_enter() 
+    local command = vim.fn.input("Command for quickfix: ")
+    quickfix_from_command(command)
+end
+vim.keymap.set('n', '<leader>f', function() quickfix_from_command_enter() end, { noremap = true, silent = true })
 
 -- Jump to task when cursor is over huid
 local function open_task_under_cursor()
@@ -1093,7 +1099,6 @@ local function open_task_under_cursor()
   vim.cmd("vsplit " .. vim.fn.fnameescape(path))
   vim.o.splitright = old
 end
-vim.keymap.set("n", "<leader>tg", open_task_under_cursor, { desc = "" })
 
 -- convert todo into a task
 local function todo_to_task()
@@ -1119,8 +1124,12 @@ local function todo_to_task()
   f:close()
 
   vim.api.nvim_set_current_line(line:sub(1, a - 1) .. ("// TASK(" .. huid .. ")") .. line:sub(b + 1))
+
+  local old = vim.o.splitright
+  vim.o.splitright = true
+  vim.cmd("vsplit " .. vim.fn.fnameescape(path))
+  vim.o.splitright = old
 end
-vim.keymap.set("n", "<leader>tn", todo_to_task, { desc = "" })
 
 -- Find references to task and populate qf
 local function task_find_from_current_buffer()
@@ -1129,6 +1138,14 @@ local function task_find_from_current_buffer()
   if not huid then return vim.notify("Not a /tasks/<huid>/ buffer", vim.log.levels.WARN) end
   quickfix_from_command("replace " .. huid .. " -n -s")
 end
-vim.keymap.set("n", "<leader>tp", task_find_from_current_buffer, { desc = "task -find <huid> (quickfix)" })
+
+-- Task commands
+local function task_title_print_limit() return math.min(100, vim.api.nvim_win_get_width(0)-80) end
+vim.keymap.set("n", "<leader>tg", open_task_under_cursor)
+vim.keymap.set("n", "<leader>tp", task_find_from_current_buffer)
+vim.keymap.set("n", "<leader>tn", todo_to_task)
+vim.keymap.set('n', '<leader>tf', function() quickfix_from_command('task ls -t ' .. vim.fn.input("Tag for searching tasks: ") .. ' -f ' .. task_title_print_limit()) end, { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>tr', function() quickfix_from_command('task ls' .. ' -f ' .. task_title_print_limit()) end, { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>te', function() quickfix_from_command('task ls -c' .. ' -f ' .. task_title_print_limit()) end, { noremap = true, silent = true })
 
 EOF
