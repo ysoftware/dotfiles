@@ -1062,9 +1062,8 @@ end, { range = true })
 
 -- Populate quickfix
 local function quickfix_from_command(command)
-    -- print(command)
     local output = vim.trim(vim.fn.system(command))
-    vim.fn.setqflist({}, 'r', { lines = vim.split(output, '\n', { plain = true }) })
+    vim.fn.setqflist({}, 'r', { lines = vim.split(output, '\n', { plain = true }), efm = "%f:%l:%c %m" })
     vim.cmd('copen')
 end
 
