@@ -361,6 +361,7 @@ autocmd FileType fugitive nnoremap <buffer>    gl  :Git log -100<CR>
 autocmd FileType fugitive nnoremap <buffer> q <C-w>c
 autocmd FileType fugitiveblame nnoremap <buffer> <C-w>c
 autocmd FileType git nnoremap <buffer> q <C-w>c
+autocmd FileType qf nnoremap <buffer> q <C-w>c
 
 function! GitCheckoutFromBranchesView()
   normal! 0w"hy$
@@ -1102,13 +1103,18 @@ end
 -- convert todo into a task
 local function todo_to_task()
   local line = vim.api.nvim_get_current_line()
-  local a, b, tag, desc = line:find("//%s*TODO%s*%(([^)]+)%)%s*:%s*(.+)")
-  if not a then a, b, desc = line:find("//%s*TODO%s*:%s*(.+)") end
-  if not a then return vim.notify("No TODO on this line", vim.log.levels.WARN) end
-
-  desc = desc:gsub("^%s+", ""):gsub("%s+$", "")
-  tag = tag and tag:lower() or ""
   local huid = os.date("%d%m%Y-%H%M%S")
+
+  local title, tags, new_line = "", "", nil
+  do
+    local a, b, tag, desc = line:find("//%s*TODO%s*%(([^)]+)%)%s*:%s*(.+)")
+    if not a then a, b, desc = line:find("//%s*TODO%s*:%s*(.+)") end
+    if a then
+      title = desc:gsub("^%s+", ""):gsub("%s+$", "")
+      tags = tag and (" " .. tag:lower()) or ""
+      new_line = line:sub(1, a - 1) .. ("// TASK(" .. huid .. ")") .. line:sub(b + 1)
+    end
+  end
 
   local dir = ("%s/tasks/%s"):format(vim.fn.getcwd(), huid)
   local path = dir .. "/task.md"
@@ -1119,10 +1125,12 @@ local function todo_to_task()
   vim.fn.mkdir(dir, "p")
   local f, err = io.open(path, "w")
   if not f then return vim.notify("Failed to write: " .. (err or path), vim.log.levels.ERROR) end
-  f:write(("# %s\n\n- STATUS: OPEN\n- PRIORITY: 20\n- TAGS:%s\n\n"):format(desc, tag ~= "" and (" " .. tag) or ""))
+  f:write(("# %s\n\n- STATUS: OPEN\n- PRIORITY: 20\n- TAGS:%s\n\n"):format(title, tags))
   f:close()
 
-  vim.api.nvim_set_current_line(line:sub(1, a - 1) .. ("// TASK(" .. huid .. ")") .. line:sub(b + 1))
+  if new_line then
+    vim.api.nvim_set_current_line(new_line)
+  end
 
   local old = vim.o.splitright
   vim.o.splitright = true
