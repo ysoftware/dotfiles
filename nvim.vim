@@ -429,6 +429,7 @@ augroup END
 nnoremap <C-t> :NERDTreeFind<CR>
 nnoremap <leader><C-f> :NERDTreeVCS<CR>
 nnoremap <C-f> :NERDTreeToggle<CR>
+autocmd FileType nerdtree nnoremap <buffer> <leader>q <C-w>c
 
 " Prettify json (depends on installed jq)
 augroup PrettifyJson
