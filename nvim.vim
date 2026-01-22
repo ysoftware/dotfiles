@@ -617,7 +617,8 @@ require'lspconfig'.ols.setup {
 
 require'lspconfig'.clangd.setup {
     capabilities = capabilities,
-    filetypes = { "c", "h", "cpp", "m" }
+    filetypes = { "c", "h", "cpp", "m" },
+    cmd = { "clangd", "--clang-tidy=false" }
 }
 
 require'lspconfig'.lua_ls.setup {
