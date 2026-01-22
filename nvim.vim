@@ -634,12 +634,20 @@ require'lspconfig'.sourcekit.setup {
     end
 }
 
--- Setup float diagnostic windows behaviour
-vim.diagnostic.config({
-  float = {
-    close_events = { "CursorMoved", "CursorMovedI", "InsertEnter", "BufLeave", "WinLeave", "WinScrolled" },
-  },
-})
+do -- Setup float diagnostic windows behaviour
+  local orig = vim.lsp.util.open_floating_preview
+  function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
+    opts = opts or {}
+    opts.close_events = opts.close_events or {
+      "CursorMoved",
+      "CursorMovedI",
+      "InsertCharPre",
+      "WinLeave",
+      "WinScrolled",
+    }
+    return orig(contents, syntax, opts, ...)
+  end
+end
 
 -- Code completion
 local ELLIPSIS_CHAR = '…'
