@@ -634,6 +634,13 @@ require'lspconfig'.sourcekit.setup {
     end
 }
 
+-- Setup float diagnostic windows behaviour
+vim.diagnostic.config({
+  float = {
+    close_events = { "CursorMoved", "CursorMovedI", "InsertEnter", "BufLeave", "WinLeave", "WinScrolled" },
+  },
+})
+
 -- Code completion
 local ELLIPSIS_CHAR = '…'
 local MAX_LABEL_WIDTH = 80
