@@ -635,20 +635,24 @@ require'lspconfig'.sourcekit.setup {
     end
 }
 
-do -- Setup float diagnostic windows behaviour
-  local orig = vim.lsp.util.open_floating_preview
-  function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
-    opts = opts or {}
-    opts.close_events = opts.close_events or {
-      "CursorMoved",
-      "CursorMovedI",
-      "InsertCharPre",
-      "WinLeave",
-      "WinScrolled",
-    }
-    return orig(contents, syntax, opts, ...)
+-- Setup float diagnostic windows behaviour
+local function close_lsp_floats_if_not_in_float()
+  local curwin = vim.api.nvim_get_current_win()
+  if vim.api.nvim_win_get_config(curwin).relative ~= '' then
+    return
+  end
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    local ok, win = pcall(vim.api.nvim_buf_get_var, buf, 'lsp_floating_preview')
+    if ok and type(win) == 'number' and vim.api.nvim_win_is_valid(win) and win ~= curwin then
+      pcall(vim.api.nvim_win_close, win, true)
+    end
   end
 end
+vim.api.nvim_create_augroup('CloseLspFloats', { clear = true })
+vim.api.nvim_create_autocmd({ 'WinEnter', 'WinScrolled' }, {
+  group = 'CloseLspFloats',
+  callback = close_lsp_floats_if_not_in_float,
+})
 
 -- Code completion
 local ELLIPSIS_CHAR = '…'
