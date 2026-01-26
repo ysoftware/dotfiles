@@ -1124,7 +1124,7 @@ end
 -- convert todo into a task
 local function todo_to_task()
   local line = vim.api.nvim_get_current_line()
-  local huid = os.date("%d%m%Y-%H%M%S")
+  local huid = os.date("%Y%m%d-%H%M%S")
 
   local title, tags, new_line = "", "", nil
   do
