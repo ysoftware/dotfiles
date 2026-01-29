@@ -1173,7 +1173,14 @@ vim.keymap.set("n", "<leader>tg", open_task_under_cursor)
 vim.keymap.set("n", "<leader>tp", task_find_from_current_buffer)
 vim.keymap.set("n", "<leader>tn", todo_to_task)
 vim.keymap.set('n', '<leader>tf', function() quickfix_from_command('task ls -t ' .. vim.fn.input("Tag for searching tasks: ") .. ' -f ' .. task_title_print_limit()) end, { noremap = true, silent = true })
-vim.keymap.set('n', '<leader>tr', function() quickfix_from_command('task ls' .. ' -f ' .. task_title_print_limit()) end, { noremap = true, silent = true })
-vim.keymap.set('n', '<leader>te', function() quickfix_from_command('task ls -c' .. ' -f ' .. task_title_print_limit()) end, { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>tr', function()
+  quickfix_from_command('task ls' .. ' -f ' .. task_title_print_limit())
+  vim.cmd('copen ' .. math.floor(vim.api.nvim_list_uis()[1].height * 0.6))
+end, { noremap = true, silent = true })
+
+vim.keymap.set('n', '<leader>te', function()
+  quickfix_from_command('task ls -c' .. ' -f ' .. task_title_print_limit())
+  vim.cmd('copen ' .. math.floor(vim.api.nvim_list_uis()[1].height * 0.6))
+end, { noremap = true, silent = true })
 
 EOF
