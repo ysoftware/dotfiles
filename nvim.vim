@@ -763,6 +763,14 @@ end
 
 -- Function to create and setup a new git branch with different local and remote names
 vim.api.nvim_create_user_command('Branch', function()
+  local current_branch = vim.fn.system("git rev-parse --abbrev-ref HEAD"):gsub("%s+", "")
+  if current_branch ~= "master" then
+    local choice = vim.fn.confirm("You are on '" .. current_branch .. "', not master. Continue?", "&Yes\n&No", 2)
+    if choice ~= 1 then
+      print("Branch creation cancelled")
+      return
+    end
+  end
   vim.ui.input({ prompt = "Enter ticket number (e.g., TEMOSO-22524): " }, function(ticket)
     if not ticket or ticket == "" then
       print("Branch creation cancelled - no ticket number provided")
