@@ -2,6 +2,8 @@
 " - Disable FUCKING STUPID word wrapping (repro: when typing a long comment, it will auto break at 100th)
 " - Make :Files respect .ignore
 
+" TODO: add .gitconfig to dotfiles
+
 " PLUGINS
 call plug#begin('~/.local/share/nvim/plugged')
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
