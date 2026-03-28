@@ -179,8 +179,15 @@ execute 'highlight BufferLineType4ActiveModified    gui=bold guibg=' . s:bg_sele
 execute 'highlight BufferLineType4                           guibg=' . s:bg_almost_invisible . ' guifg=' . s:text_purple
 execute 'highlight BufferLineType4Modified gui=bold guibg=' . s:bg_almost_invisible . ' guifg=' . s:text_purple
 
-" Markdown
 execute 'highlight Title                  gui=bold guifg=' . s:text_normal
+
+" Markdown
+execute 'highlight markdownH1             gui=bold guifg=' . s:text_yellow
+execute 'highlight markdownH2             gui=bold guifg=' . s:text_normal
+execute 'highlight markdownH3                      guifg=' . s:text_normal
+execute 'highlight markdownH4                      guifg=' . s:text_normal
+execute 'highlight markdownLinkText                guifg=' . s:text_yellow
+
 execute 'highlight markdownCodeBlock               guibg=' . s:bg_almost_invisible . '  guifg=' . s:text_normal
 
 highlight link @lsp.type.macro.cpp Macro
