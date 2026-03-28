@@ -1,4 +1,4 @@
-hi clear
+highlight clear
 if exists("syntax_on")
     syntax reset
 endif
@@ -162,31 +162,35 @@ execute 'highlight BufferLineModified gui=bold guibg='   . s:bg_almost_invisible
 execute 'highlight BufferLineType1Active                     guibg='   . s:bg_select . '           guifg=' . s:text_blue
 execute 'highlight BufferLineType1ActiveModified    gui=bold guibg='   . s:bg_select . '           guifg=' . s:text_blue
 execute 'highlight BufferLineType1                           guibg='   . s:bg_almost_invisible . ' guifg=' . s:text_blue
-execute 'highlight BufferLineType1Modified gui=bold gui=bold guibg='   . s:bg_almost_invisible . ' guifg=' . s:text_blue
+execute 'highlight BufferLineType1Modified gui=bold guibg='   . s:bg_almost_invisible . ' guifg=' . s:text_blue
 
 execute 'highlight BufferLineType2Active                     guibg=' . s:bg_select . '           guifg=' . s:text_red
 execute 'highlight BufferLineType2ActiveModified    gui=bold guibg=' . s:bg_select . '           guifg=' . s:text_red
 execute 'highlight BufferLineType2                           guibg=' . s:bg_almost_invisible . ' guifg=' . s:text_red
-execute 'highlight BufferLineType2Modified gui=bold gui=bold guibg=' . s:bg_almost_invisible . ' guifg=' . s:text_red
+execute 'highlight BufferLineType2Modified gui=bold guibg=' . s:bg_almost_invisible . ' guifg=' . s:text_red
 
 execute 'highlight BufferLineType3Active                     guibg='   . s:bg_select . '           guifg=' . s:text_green
 execute 'highlight BufferLineType3ActiveModified    gui=bold guibg='   . s:bg_select . '           guifg=' . s:text_green
 execute 'highlight BufferLineType3                           guibg='   . s:bg_almost_invisible . ' guifg=' . s:text_green
-execute 'highlight BufferLineType3Modified gui=bold gui=bold guibg='   . s:bg_almost_invisible . ' guifg=' . s:text_green
+execute 'highlight BufferLineType3Modified gui=bold guibg='   . s:bg_almost_invisible . ' guifg=' . s:text_green
 
 execute 'highlight BufferLineType4Active                     guibg=' . s:bg_select . '           guifg=' . s:text_purple
 execute 'highlight BufferLineType4ActiveModified    gui=bold guibg=' . s:bg_select . '           guifg=' . s:text_purple
 execute 'highlight BufferLineType4                           guibg=' . s:bg_almost_invisible . ' guifg=' . s:text_purple
-execute 'highlight BufferLineType4Modified gui=bold gui=bold guibg=' . s:bg_almost_invisible . ' guifg=' . s:text_purple
+execute 'highlight BufferLineType4Modified gui=bold guibg=' . s:bg_almost_invisible . ' guifg=' . s:text_purple
 
-hi link @lsp.type.macro.cpp Macro
+" Markdown
+execute 'highlight Title                  gui=bold guifg=' . s:text_normal
+execute 'highlight markdownCodeBlock               guibg=' . s:bg_almost_invisible . '  guifg=' . s:text_normal
 
-hi link LspDiagnosticsDefaultError DiagnosticError
-hi link LspDiagnosticsDefaultWarning DiagnosticWarn
-hi link LspDiagnosticsDefaultInformation DiagnosticInfo
-hi link LspDiagnosticsDefaultHint DiagnosticHint
-hi link LspDiagnosticsUnderlineError DiagnosticUnderlineError
-hi link LspDiagnosticsUnderlineWarning DiagnosticUnderlineWarn
-hi link LspDiagnosticsUnderlineInformation DiagnosticUnderlineInfo
-hi link LspDiagnosticsUnderlineHint DiagnosticUnderlineHint
+highlight link @lsp.type.macro.cpp Macro
+
+highlight link LspDiagnosticsDefaultError DiagnosticError
+highlight link LspDiagnosticsDefaultWarning DiagnosticWarn
+highlight link LspDiagnosticsDefaultInformation DiagnosticInfo
+highlight link LspDiagnosticsDefaultHint DiagnosticHint
+highlight link LspDiagnosticsUnderlineError DiagnosticUnderlineError
+highlight link LspDiagnosticsUnderlineWarning DiagnosticUnderlineWarn
+highlight link LspDiagnosticsUnderlineInformation DiagnosticUnderlineInfo
+highlight link LspDiagnosticsUnderlineHint DiagnosticUnderlineHint
 endfunction
