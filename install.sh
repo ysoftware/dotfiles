@@ -82,3 +82,14 @@ else
     echo "${UP_TO_DATE_MSG}${PRECOMMIT_OUT}"
 fi
 
+# sym link gdb init
+GDBINIT_IN="$DIR/gdbinit"
+GDBINIT_OUT="$HOME/.config/gdb/gdbinit"
+if [ ! -f "$GDBINIT_OUT" ]; then
+    mkdir -p "$(dirname "$GDBINIT_OUT")"
+    ln -sf "$GDBINIT_IN" "$GDBINIT_OUT"
+    echo "$GDBINIT_IN -> $GDBINIT_OUT"
+else
+    echo "${UP_TO_DATE_MSG}${GDBINIT_OUT}"
+fi
+
