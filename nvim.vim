@@ -412,7 +412,7 @@ let NERDTreeShowHidden=1
 let NERDTreeCustomOpenArgs={'file':{'keepopen': '0'}}
 let g:NERDTreeWinSize=60
 
-set wildignore+=*.pyc,*.o,*.obj,*.svn,*.swp,*.hg,*.DS_Store,*.min.*
+set wildignore+=*.pyc,*.svn,*.swp,*.hg,*.DS_Store
 let NERDTreeRespectWildIgnore=1
 
 let g:NERDTreeGitStatusIndicatorMapCustom = {
