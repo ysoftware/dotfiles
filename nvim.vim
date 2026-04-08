@@ -412,7 +412,7 @@ let NERDTreeShowHidden=1
 let NERDTreeCustomOpenArgs={'file':{'keepopen': '0'}}
 let g:NERDTreeWinSize=60
 
-set wildignore+=*.pyc,*.o,*.obj,*.svn,*.swp,*.hg,*.DS_Store,*.min.*
+set wildignore+=*.pyc,*.svn,*.swp,*.hg,*.DS_Store
 let NERDTreeRespectWildIgnore=1
 
 let g:NERDTreeGitStatusIndicatorMapCustom = {
@@ -1192,16 +1192,19 @@ vim.keymap.set("n", "<leader>tn", todo_to_task)
 vim.keymap.set('n', '<leader>tf', function()
   quickfix_from_command('task ls -t ' .. vim.fn.input("Tag for searching tasks: ") .. ' -f ' .. task_title_print_limit())
   vim.cmd('copen ' .. math.floor(vim.api.nvim_list_uis()[1].height * 0.4))
+  vim.api.nvim_feedkeys('f|;ll', 'n', false)
 end, { noremap = true, silent = true })
 
 vim.keymap.set('n', '<leader>tr', function()
   quickfix_from_command('task ls' .. ' -f ' .. task_title_print_limit())
   vim.cmd('copen ' .. math.floor(vim.api.nvim_list_uis()[1].height * 0.6))
+  vim.api.nvim_feedkeys('f|;ll', 'n', false)
 end, { noremap = true, silent = true })
 
 vim.keymap.set('n', '<leader>te', function()
   quickfix_from_command('task ls -c' .. ' -f ' .. task_title_print_limit())
   vim.cmd('copen ' .. math.floor(vim.api.nvim_list_uis()[1].height * 0.6))
+  vim.api.nvim_feedkeys('f|;ll', 'n', false)
 end, { noremap = true, silent = true })
 
 EOF
