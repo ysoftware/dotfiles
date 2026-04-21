@@ -567,14 +567,18 @@ end
 local phpactor_lsp = require'lspconfig'.phpactor
 if phpactor_lsp then
     phpactor_lsp.setup {
+        autostart = true,
         capabilities = capabilities,
-        cmd = { "/Users/iaroslav.erokhin/.composer/vendor/bin/phpactor", "language-server" },
+        cmd = { "phpactor", "language-server" },
         root_dir = function()
             return "/Users/iaroslav.erokhin/Documents/Check24/core-api/"
         end,
         init_options = {
             ["language_server_phpstan.enabled"] = false,
             ["language_server_psalm.enabled"] = false,
+        },
+        handlers = {
+            ["window/showMessage"] = function() end,
         },
     }
 end
