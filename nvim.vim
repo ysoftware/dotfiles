@@ -1133,41 +1133,54 @@ vim.api.nvim_create_user_command('AlignByQuery', function(opts)
     return
   end
 
-  if end_line - start_line < 1 then
-    print("Error: Must select at least 2 lines")
-    return
-  end
-
-  vim.ui.input({ prompt = "Enter alignment query: " }, function(query)
+  vim.ui.input({ prompt = "Query to align by: " }, function(query)
     if not query or query == "" then
       return
     end
 
     if #query > 200 then
-      print("Error: Query too long (max 200 chars)")
+      print(" -> Error: Query too long (max 200 chars)")
       return
     end
 
     local lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
     local positions = {}
     local max_length = 0
+    local non_empty_count = 0
 
     for i, line in ipairs(lines) do
-      local pos = string.find(line, query, 1, true)
-      if not pos then
-        print("Error: Query not found in line " .. (start_line + i - 1))
-        return
-      end
-      local length = vim.fn.strwidth(string.sub(line, 1, pos - 1))
-      positions[i] = { pos = pos, length = length }
-      if length > max_length then
-        max_length = length
+      if not line:match("^%s*$") then
+        non_empty_count = non_empty_count + 1
+        local pos = string.find(line, query, 1, true)
+
+        if not pos then
+          print(" -> Error: Query not found in line " .. (start_line + i - 1))
+          return
+        end
+
+        local before = string.sub(line, 1, pos - 1):gsub("(%S)%s+$", "%1")
+        local after = string.sub(line, pos)
+        local length = vim.fn.strwidth(before)
+        positions[i] = { before = before, after = after, length = length }
+
+        if length > max_length then
+          max_length = length
+        end
       end
     end
 
-    for i, info in pairs(positions) do
-      local spaces = string.rep(' ', max_length - info.length)
-      lines[i] = string.sub(lines[i], 1, info.pos - 1) .. spaces .. string.sub(lines[i], info.pos)
+    if non_empty_count < 2 then
+      print(" -> Error: Must select at least 2 non-empty lines")
+      return
+    end
+
+    for i, _ in ipairs(lines) do
+      local info = positions[i]
+      if info then
+        local extra_space = query == " " and 0 or 1
+        local spaces = string.rep(" ", max_length - info.length + extra_space)
+        lines[i] = info.before .. spaces .. info.after
+      end
     end
 
     vim.api.nvim_buf_set_lines(0, start_line - 1, end_line, false, lines)
