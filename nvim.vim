@@ -363,7 +363,7 @@ autocmd FileType git nnoremap <buffer>         gp  :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer>    gp  :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer>    gP  :Git push<CR>
 autocmd FileType fugitive nnoremap <buffer>    grp :Git fetch<CR>
-autocmd FileType fugitive nnoremap <buffer>    gl  :Git log -100<CR>
+autocmd FileType fugitive nnoremap <buffer>    gl  :Git log -100 --decorate<CR>
 
 " q to quit some buffers
 autocmd FileType fugitive nnoremap <buffer> q <C-w>c
