@@ -818,6 +818,78 @@ vim.api.nvim_create_user_command('Branch', function()
   end)
 end, { })
 
+-- Function to pull a remote branch while specifying a custom name for the local branch
+vim.api.nvim_create_user_command('BranchRemote', function()
+  local function git(args)
+    local result = vim.fn.system(vim.list_extend({ "git" }, args))
+    return result, vim.v.shell_error
+  end
+
+  local status, status_error = git({ "status", "--porcelain" })
+  if status_error ~= 0 then
+    print("Error checking git status")
+    print("Error output: " .. status)
+    return
+  end
+
+  if status ~= "" then
+    print("Branch checkout cancelled - working tree is not clean")
+    print(status)
+    return
+  end
+
+  vim.ui.input({ prompt = "Enter remote branch name (e.g., TEMOSO-22524): " }, function(remote_branch)
+    if not remote_branch or remote_branch == "" then
+      print("Branch checkout cancelled - no remote branch provided")
+      return
+    end
+
+    vim.ui.input({ prompt = "Enter local branch name: ", default = remote_branch }, function(local_branch)
+      if not local_branch or local_branch == "" then
+        print("Branch checkout cancelled - no local branch provided")
+        return
+      end
+
+      local _, branch_exists = git({ "show-ref", "--verify", "--quiet", "refs/heads/" .. local_branch })
+      if branch_exists == 0 then
+        print("Branch checkout cancelled - local branch already exists: " .. local_branch)
+        return
+      end
+
+      local commands = {
+        {
+          label = "Fetched remote branch",
+          args = { "fetch", "origin", "+refs/heads/" .. remote_branch .. ":refs/remotes/origin/" .. remote_branch }
+        },
+        {
+          label = "Checked out local branch: " .. local_branch,
+          args = { "checkout", "-b", local_branch, "origin/" .. remote_branch }
+        },
+        {
+          label = "Upstream tracking set to origin/" .. remote_branch,
+          args = { "branch", "--set-upstream-to=origin/" .. remote_branch, local_branch }
+        }
+      }
+
+      print("\n")
+      for _, command in ipairs(commands) do
+        print("Executing: git " .. table.concat(command.args, " "))
+        local result, error = git(command.args)
+
+        if error ~= 0 then
+          print("Error executing command: git " .. table.concat(command.args, " "))
+          print("Error output: " .. result)
+          return
+        end
+
+        print(command.label)
+      end
+
+      print("Remote branch checkout complete!")
+    end)
+  end)
+end, { })
+
 -- highlight mobile and desktop in fzf ----------
 if vim.loop.os_uname().sysname == "Darwin" then
   local timer = nil
