@@ -363,7 +363,7 @@ autocmd FileType git nnoremap <buffer>         gp  :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer>    gp  :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer>    gP  :Git push<CR>
 autocmd FileType fugitive nnoremap <buffer>    grp :Git fetch<CR>
-autocmd FileType fugitive nnoremap <buffer>    gl  :Git log -100<CR>
+autocmd FileType fugitive nnoremap <buffer>    gl  :Git log -100 --decorate<CR>
 
 " q to quit some buffers
 autocmd FileType fugitive nnoremap <buffer> q <C-w>c
@@ -583,14 +583,18 @@ end
 local phpactor_lsp = require'lspconfig'.phpactor
 if phpactor_lsp then
     phpactor_lsp.setup {
+        autostart = true,
         capabilities = capabilities,
-        cmd = { "/Users/iaroslav.erokhin/.composer/vendor/bin/phpactor", "language-server" },
+        cmd = { "phpactor", "language-server" },
         root_dir = function()
             return "/Users/iaroslav.erokhin/Documents/Check24/core-api/"
         end,
         init_options = {
             ["language_server_phpstan.enabled"] = false,
             ["language_server_psalm.enabled"] = false,
+        },
+        handlers = {
+            ["window/showMessage"] = function() end,
         },
     }
 end
@@ -826,6 +830,78 @@ vim.api.nvim_create_user_command('Branch', function()
         end
       end
       print("Branch setup complete!")
+    end)
+  end)
+end, { })
+
+-- Function to pull a remote branch while specifying a custom name for the local branch
+vim.api.nvim_create_user_command('BranchRemote', function()
+  local function git(args)
+    local result = vim.fn.system(vim.list_extend({ "git" }, args))
+    return result, vim.v.shell_error
+  end
+
+  local status, status_error = git({ "status", "--porcelain" })
+  if status_error ~= 0 then
+    print("Error checking git status")
+    print("Error output: " .. status)
+    return
+  end
+
+  if status ~= "" then
+    print("Branch checkout cancelled - working tree is not clean")
+    print(status)
+    return
+  end
+
+  vim.ui.input({ prompt = "Enter remote branch name (e.g., TEMOSO-22524): " }, function(remote_branch)
+    if not remote_branch or remote_branch == "" then
+      print("Branch checkout cancelled - no remote branch provided")
+      return
+    end
+
+    vim.ui.input({ prompt = "Enter local branch name: ", default = remote_branch }, function(local_branch)
+      if not local_branch or local_branch == "" then
+        print("Branch checkout cancelled - no local branch provided")
+        return
+      end
+
+      local _, branch_exists = git({ "show-ref", "--verify", "--quiet", "refs/heads/" .. local_branch })
+      if branch_exists == 0 then
+        print("Branch checkout cancelled - local branch already exists: " .. local_branch)
+        return
+      end
+
+      local commands = {
+        {
+          label = "Fetched remote branch",
+          args = { "fetch", "origin", "+refs/heads/" .. remote_branch .. ":refs/remotes/origin/" .. remote_branch }
+        },
+        {
+          label = "Checked out local branch: " .. local_branch,
+          args = { "checkout", "-b", local_branch, "origin/" .. remote_branch }
+        },
+        {
+          label = "Upstream tracking set to origin/" .. remote_branch,
+          args = { "branch", "--set-upstream-to=origin/" .. remote_branch, local_branch }
+        }
+      }
+
+      print("\n")
+      for _, command in ipairs(commands) do
+        print("Executing: git " .. table.concat(command.args, " "))
+        local result, error = git(command.args)
+
+        if error ~= 0 then
+          print("Error executing command: git " .. table.concat(command.args, " "))
+          print("Error output: " .. result)
+          return
+        end
+
+        print(command.label)
+      end
+
+      print("Remote branch checkout complete!")
     end)
   end)
 end, { })
