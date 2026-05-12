@@ -1,5 +1,8 @@
 " TODO
 " - Disable FUCKING STUPID word wrapping (repro: when typing a long comment, it will auto break at 100th)
+" - Make :Files respect .ignore
+
+" TODO: add .gitconfig to dotfiles
 
 " PLUGINS
 call plug#begin('~/.local/share/nvim/plugged')
@@ -17,6 +20,7 @@ Plug 'itchyny/lightline.vim' " Status line
 Plug 'mhinz/vim-startify' " Startup screen
 Plug 'tpope/vim-commentary' " Comment lines of code
 
+Plug 'rluba/jai.vim'
 Plug 'neovim/nvim-lspconfig' " Lsp
 Plug 'norcalli/nvim-colorizer.lua' " Hex Colors
 Plug 'preservim/nerdtree' | " File browser
@@ -34,6 +38,7 @@ endif
 call plug#end()
 
 let mapleader = " "
+:set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
 
 " Multiline
 let g:VM_mouse_mappings = 1
@@ -55,6 +60,11 @@ command! FoldTsImport silent! normal! zEG$/^import <CR>VGNzf/fake-search-query<C
 autocmd FileType c,cpp,h setlocal commentstring=//\ %s
 autocmd FileType typescript,html,scss,css,javascript setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab
 
+augroup twig_ft
+  au!
+  autocmd BufNewFile,BufRead *.html.twig   set syntax=html
+augroup END
+
 " Snippets
 augroup SwiftSnippets
     autocmd!
@@ -69,6 +79,12 @@ augroup PhpSnippets
     autocmd!
     autocmd FileType php abbrev fwr fwrite(STDOUT, var_export(, true));<Left><Left><Left><Left><Left><Left><Left><Left><Left>
     autocmd FileType php abbrev stackTrace catch (Throwable $e) { fwrite(STDOUT, " \n \n".$e->getMessage()."\n \n".$e->getTraceAsString()); }
+augroup END
+
+augroup AllSnippets
+    autocmd!
+    autocmd FileType * abbrev noch // nocheckin
+    autocmd FileType typescript,javascript abbrev cons console.info(); // nocheckin<Left><Left><Left><Left><Left><Left><Left><Left><Left><Left><Left><Left><Left><Left>
 augroup END
 
 " Tabs and shit
@@ -252,6 +268,7 @@ noremap p "+p
 noremap P "+P
 noremap y "+y
 noremap Y "+Y
+set clipboard=
 
 syntax on
 set nocompatible
@@ -262,7 +279,7 @@ set number
 set autowrite
 set wildignorecase
 set scroll=15
-set scrolloff=5
+set scrolloff=3
 
 " show invisible characters
 set listchars=tab:»-,trail:·,nbsp:␣,extends:>,precedes:< 
@@ -337,18 +354,22 @@ autocmd FileType git nnoremap <buffer>         grb :bd<CR> :Git branch -r<CR>
 autocmd FileType git nnoremap <buffer>         gc  :call GitCheckoutFromBranchesView()<CR>
 autocmd FileType git nnoremap <buffer>         grc :call GitCheckoutNewRemoteFromBranchesView()<CR>
 
+autocmd FileType git nnoremap <buffer>         gd  :GitDelete<CR>
+autocmd FileType git nnoremap <buffer>         gj  :JiraOpen<CR>
+
 " Fetch, Pull, Merge, Log
-autocmd FileType git nnoremap <buffer> gm 0w"hy$   :exe 'Git merge ' . @h<CR>
+autocmd FileType git nnoremap <buffer>         gm  0w"hy$   :exe 'Git merge ' . @h<CR>
 autocmd FileType git nnoremap <buffer>         gp  :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer>    gp  :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer>    gP  :Git push<CR>
 autocmd FileType fugitive nnoremap <buffer>    grp :Git fetch<CR>
-autocmd FileType fugitive nnoremap <buffer>    gl  :Git log -100<CR>
+autocmd FileType fugitive nnoremap <buffer>    gl  :Git log -100 --decorate<CR>
 
 " q to quit some buffers
 autocmd FileType fugitive nnoremap <buffer> q <C-w>c
 autocmd FileType fugitiveblame nnoremap <buffer> <C-w>c
 autocmd FileType git nnoremap <buffer> q <C-w>c
+autocmd FileType qf nnoremap <buffer> q <C-w>c
 
 function! GitCheckoutFromBranchesView()
   normal! 0w"hy$
@@ -391,7 +412,7 @@ let NERDTreeShowHidden=1
 let NERDTreeCustomOpenArgs={'file':{'keepopen': '0'}}
 let g:NERDTreeWinSize=60
 
-set wildignore+=*.pyc,*.o,*.obj,*.svn,*.swp,*.hg,*.DS_Store,*.min.*
+set wildignore+=*.pyc,*.svn,*.swp,*.hg,*.DS_Store
 let NERDTreeRespectWildIgnore=1
 
 let g:NERDTreeGitStatusIndicatorMapCustom = {
@@ -416,6 +437,23 @@ augroup END
 nnoremap <C-t> :NERDTreeFind<CR>
 nnoremap <leader><C-f> :NERDTreeVCS<CR>
 nnoremap <C-f> :NERDTreeToggle<CR>
+autocmd FileType nerdtree nnoremap <buffer> <leader>q <C-w>c
+
+" fix nerdtree copy path
+lua << EOF
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "nerdtree",
+    once = true,
+    callback = function()
+        vim.cmd([[
+function! NERDTreeCopyPath()
+    let @+ = g:NERDTreeFileNode.GetSelected().path.str()
+    call nerdtree#echo('Copied path to clipboard')
+endfunction
+]])
+    end,
+})
+EOF
 
 " Prettify json (depends on installed jq)
 augroup PrettifyJson
@@ -454,7 +492,6 @@ nnoremap <leader><Down> :e ~/Documents/GitHub/Notes/Notes.txt<CR>
 
 if has('mac')
     nnoremap <C-S-down> :e ~/Documents/Check24/check24-worklog/worklog.txt<CR>
-
 elseif has('linux')
     nnoremap <C-S-down> :e ~/Documents/Text/os-todos.txt<CR>
 endif
@@ -507,7 +544,7 @@ endif
 
 colorscheme yaroscheme
 call yaroscheme#apply()
-set title 
+set title
 
 lua << EOF
 vim.deprecate = function() end
@@ -546,14 +583,18 @@ end
 local phpactor_lsp = require'lspconfig'.phpactor
 if phpactor_lsp then
     phpactor_lsp.setup {
+        autostart = true,
         capabilities = capabilities,
-        cmd = { "/Users/iaroslav.erokhin/.composer/vendor/bin/phpactor", "language-server" },
+        cmd = { "phpactor", "language-server" },
         root_dir = function()
             return "/Users/iaroslav.erokhin/Documents/Check24/core-api/"
         end,
         init_options = {
             ["language_server_phpstan.enabled"] = false,
             ["language_server_psalm.enabled"] = false,
+        },
+        handlers = {
+            ["window/showMessage"] = function() end,
         },
     }
 end
@@ -562,7 +603,7 @@ end
 local project_library_path = "~/Documents/Check24/angular/"
 local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
 local tsserver_lsp = require'lspconfig'.tsserver
-if tsserver_lsp then
+if tsserver_lsp and tsserver_lsp.setup then
     tsserver_lsp.setup {
         capabilities = capabilities,
         filetypes = { "typescript", "html", "scss", "css", "javascript", "htmlangular" },
@@ -604,7 +645,8 @@ require'lspconfig'.ols.setup {
 
 require'lspconfig'.clangd.setup {
     capabilities = capabilities,
-    filetypes = { "c", "h", "cpp", "m" }
+    filetypes = { "c", "h", "cpp", "m" },
+    cmd = { "clangd", "--clang-tidy=false" }
 }
 
 require'lspconfig'.lua_ls.setup {
@@ -620,6 +662,25 @@ require'lspconfig'.sourcekit.setup {
         return "/Users/iaroslav.erokhin/Documents/Check24/ios-pod-mobile-sim"
     end
 }
+
+-- Setup float diagnostic windows behaviour
+local function close_lsp_floats_if_not_in_float()
+  local curwin = vim.api.nvim_get_current_win()
+  if vim.api.nvim_win_get_config(curwin).relative ~= '' then
+    return
+  end
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    local ok, win = pcall(vim.api.nvim_buf_get_var, buf, 'lsp_floating_preview')
+    if ok and type(win) == 'number' and vim.api.nvim_win_is_valid(win) and win ~= curwin then
+      pcall(vim.api.nvim_win_close, win, true)
+    end
+  end
+end
+vim.api.nvim_create_augroup('CloseLspFloats', { clear = true })
+vim.api.nvim_create_autocmd({ 'WinEnter', 'WinScrolled' }, {
+  group = 'CloseLspFloats',
+  callback = close_lsp_floats_if_not_in_float,
+})
 
 -- Code completion
 local ELLIPSIS_CHAR = '…'
@@ -723,8 +784,15 @@ function BreakArguments()
 end
 
 -- Function to create and setup a new git branch with different local and remote names
-local function create_branch()
-  -- Get ticket number
+vim.api.nvim_create_user_command('Branch', function()
+  local current_branch = vim.fn.system("git rev-parse --abbrev-ref HEAD"):gsub("%s+", "")
+  if current_branch ~= "master" then
+    local choice = vim.fn.confirm("You are on '" .. current_branch .. "', not master. Continue?", "&Yes\n&No", 2)
+    if choice ~= 1 then
+      print("Branch creation cancelled")
+      return
+    end
+  end
   vim.ui.input({ prompt = "Enter ticket number (e.g., TEMOSO-22524): " }, function(ticket)
     if not ticket or ticket == "" then
       print("Branch creation cancelled - no ticket number provided")
@@ -764,11 +832,79 @@ local function create_branch()
       print("Branch setup complete!")
     end)
   end)
-end
-vim.api.nvim_create_user_command('Branch', create_branch, {
-  desc = 'Create a new git branch with different local and remote names'
-})
+end, { })
 
+-- Function to pull a remote branch while specifying a custom name for the local branch
+vim.api.nvim_create_user_command('BranchRemote', function()
+  local function git(args)
+    local result = vim.fn.system(vim.list_extend({ "git" }, args))
+    return result, vim.v.shell_error
+  end
+
+  local status, status_error = git({ "status", "--porcelain" })
+  if status_error ~= 0 then
+    print("Error checking git status")
+    print("Error output: " .. status)
+    return
+  end
+
+  if status ~= "" then
+    print("Branch checkout cancelled - working tree is not clean")
+    print(status)
+    return
+  end
+
+  vim.ui.input({ prompt = "Enter remote branch name (e.g., TEMOSO-22524): " }, function(remote_branch)
+    if not remote_branch or remote_branch == "" then
+      print("Branch checkout cancelled - no remote branch provided")
+      return
+    end
+
+    vim.ui.input({ prompt = "Enter local branch name: ", default = remote_branch }, function(local_branch)
+      if not local_branch or local_branch == "" then
+        print("Branch checkout cancelled - no local branch provided")
+        return
+      end
+
+      local _, branch_exists = git({ "show-ref", "--verify", "--quiet", "refs/heads/" .. local_branch })
+      if branch_exists == 0 then
+        print("Branch checkout cancelled - local branch already exists: " .. local_branch)
+        return
+      end
+
+      local commands = {
+        {
+          label = "Fetched remote branch",
+          args = { "fetch", "origin", "+refs/heads/" .. remote_branch .. ":refs/remotes/origin/" .. remote_branch }
+        },
+        {
+          label = "Checked out local branch: " .. local_branch,
+          args = { "checkout", "-b", local_branch, "origin/" .. remote_branch }
+        },
+        {
+          label = "Upstream tracking set to origin/" .. remote_branch,
+          args = { "branch", "--set-upstream-to=origin/" .. remote_branch, local_branch }
+        }
+      }
+
+      print("\n")
+      for _, command in ipairs(commands) do
+        print("Executing: git " .. table.concat(command.args, " "))
+        local result, error = git(command.args)
+
+        if error ~= 0 then
+          print("Error executing command: git " .. table.concat(command.args, " "))
+          print("Error output: " .. result)
+          return
+        end
+
+        print(command.label)
+      end
+
+      print("Remote branch checkout complete!")
+    end)
+  end)
+end, { })
 
 -- highlight mobile and desktop in fzf ----------
 if vim.loop.os_uname().sysname == "Darwin" then
@@ -834,27 +970,30 @@ local function get_search_directory()
   end
 end
 
-local function files_search()
+vim.keymap.set('n', '<C-]>', function()
   local search_dir = get_search_directory()
   local cmd = 'Files ' .. search_dir
   vim.cmd('echo ":' .. cmd .. '"')
   vim.cmd(cmd)
-end
+end, { noremap = true, silent = true })
 
-local function ag_search()
+vim.keymap.set('n', '<C-p>', function()
   local search_dir = get_search_directory()
   local cmd = 'AgIn ' .. search_dir
   vim.cmd('echo ":' .. cmd .. '"')
   vim.cmd(cmd)
-end
+end, { noremap = true, silent = true })
 
-vim.keymap.set('n', '<C-]>', files_search, { noremap = true, silent = true })
-vim.keymap.set('n', '<leader><C-]>', function() vim.cmd('Files ~/Documents') end, { noremap = true, silent = true })
-vim.keymap.set('n', '<C-p>', ag_search, { noremap = true, silent = true })
-vim.keymap.set('n', '<leader><C-p>', function() vim.cmd('AgIn ~/Documents') end, { noremap = true, silent = true })
+vim.keymap.set('n', '<leader><C-]>', function()
+  vim.cmd('Files ~/Documents')
+end, { noremap = true, silent = true })
+
+vim.keymap.set('n', '<leader><C-p>', function()
+  vim.cmd('AgIn ~/Documents')
+end, { noremap = true, silent = true })
 
 -- Jump between mobile and desktop files of the same name
-local function web_jump()
+vim.api.nvim_create_user_command('WebJump', function()
   local current_file = vim.fn.expand('%:p')
   if current_file == '' then
     return
@@ -878,12 +1017,9 @@ local function web_jump()
   else
     print("Target file does not exist: " .. search_pattern)
   end
-end
+end, {})
 
-vim.api.nvim_create_user_command('WebJump', web_jump, {
-  desc = 'Jump between mobile and desktop versions of Angular files'
-})
-
+-- Show git history of one file
 vim.api.nvim_create_user_command('GitFileHistory', function(command_opts)
   local target_file = (command_opts.args and command_opts.args ~= '' and vim.fn.expand(command_opts.args)) or vim.fn.expand('%:p')
   if not target_file or target_file == '' then
@@ -920,69 +1056,91 @@ vim.api.nvim_create_user_command('GitFileHistory', function(command_opts)
   vim.api.nvim_set_current_buf(buf_handle)
 end, { nargs = '?', complete = 'file' })
 
--- Search and replace in git root (checks for unstaged changes first)
-local function replace_in_git_root()
-  local git_root = vim.fn.system('git rev-parse --show-toplevel 2>/dev/null'):gsub('\n', '')
-  if vim.v.shell_error ~= 0 or git_root == '' then
-    print("Error: Not in a git repository")
+-- Open jira ticket from nvim
+vim.api.nvim_create_user_command('JiraOpen', function()
+  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+  local line = vim.api.nvim_get_current_line()
+  if line == '' then
     return
   end
 
-  vim.fn.system('git diff --quiet 2>/dev/null')
-  if vim.v.shell_error ~= 0 then
-    print("Error: You have unstaged changes. For safety this is not allowed.")
-    return
+  local idx = col + 1
+  local len = #line
+  if idx > len then
+    idx = len
   end
 
-  vim.ui.input({ prompt = "Search for: " }, function(search_term)
-    if not search_term or search_term == "" then
-      return
+  local ticket = nil
+
+  while idx >= 1 do
+    if line:sub(idx, idx) == 'T' then
+      local m = line:match("TEMOSO%-%d+", idx)
+      if m then
+        ticket = m
+        break
+      end
     end
+    idx = idx - 1
+  end
 
-    vim.ui.input({ prompt = "Replace with: " }, function(replace_term)
-      if not replace_term then
-        return
-      end
+  if not ticket then
+    print("No TEMOSO ticket found on this line.")
+    return
+  end
 
-      vim.cmd('redraw')
-      print("Searching in " .. git_root .. "...")
+  local url = "https://c24-mobilfunk.atlassian.net/browse/" .. ticket
 
-      local search_escaped = vim.fn.shellescape(search_term)
-      local files = vim.fn.systemlist('grep -Frl ' .. search_escaped .. ' ' .. vim.fn.shellescape(git_root))
+  local sysname = vim.loop.os_uname().sysname
+  if sysname == "Darwin" then
+    vim.fn.jobstart({ "open", url }, { detach = true })
+  elseif sysname == "Windows_NT" then
+    vim.fn.jobstart({ "cmd", "/c", "start", "", url }, { detach = true })
+  else
+    vim.fn.jobstart({ "xdg-open", url }, { detach = true })
+  end
+end, {})
 
-      if vim.v.shell_error ~= 0 or #files == 0 then
-        print("No matches found")
-        return
-      end
+-- Delete local branch
+vim.api.nvim_create_user_command('GitDelete', function()
+  if vim.bo.filetype ~= 'git' then
+    return
+  end
 
-      local temp_search = vim.fn.tempname()
-      local temp_replace = vim.fn.tempname()
-      vim.fn.writefile({search_term}, temp_search, 'b')
-      vim.fn.writefile({replace_term}, temp_replace, 'b')
+  local line = vim.api.nvim_get_current_line()
+  if not line or line == '' then
+    return
+  end
 
-      for i, file in ipairs(files) do
-        local perl_cmd = "perl -i -pe 'BEGIN{open S,q[" .. temp_search .. "];$/=undef;$s=<S>;open R,q[" .. temp_replace .. "];$r=<R>}s/\\Q$s\\E/$r/g' " .. vim.fn.shellescape(file)
-        vim.fn.system(perl_cmd)
+  -- currently checked out branch
+  if line:match("^%s*%*") then
+    print("Can not delete currently checked out branch.")
+    return
+  end
 
-        if vim.v.shell_error ~= 0 then
-          vim.fn.delete(temp_search)
-          vim.fn.delete(temp_replace)
-          print("Error: Failed to replace in " .. file)
-          return
-        end
-      end
+  -- strip leading whitespace
+  line = line:gsub("^%s*", "")
+  local branch = line
 
-      vim.fn.delete(temp_search)
-      vim.fn.delete(temp_replace)
-      print("Modified " .. #files .. " file(s)")
-      vim.cmd('checktime')
-    end)
-  end)
-end
-vim.api.nvim_create_user_command('Replace', replace_in_git_root, {})
+  if branch:match("^origin/") then
+    print("This command can only delete local branches")
+    return
+  end
+
+  local answer = vim.fn.input("Delete branch '" .. branch .. "' in '" .. vim.fn["FugitiveWorkTree"]() .. "'? [y/N]: ")
+  vim.api.nvim_echo({{""}}, false, {})
+  vim.cmd("redraw")
+
+  if answer ~= 'y' then
+    vim.api.nvim_echo({{"Cancelled."}}, false, {})
+    vim.cmd("redraw")
+    return
+  end
+
+  vim.cmd("Git branch -D " .. vim.fn.fnameescape(branch))
+end, {})
 
 -- Align selected lines by inserted query
-local function align_by_query(opts)
+vim.api.nvim_create_user_command('AlignByQuery', function(opts)
   local start_line = opts.line1
   local end_line = opts.line2
 
@@ -991,46 +1149,167 @@ local function align_by_query(opts)
     return
   end
 
-  if end_line - start_line < 1 then
-    print("Error: Must select at least 2 lines")
-    return
-  end
-
-  vim.ui.input({ prompt = "Enter alignment query: " }, function(query)
+  vim.ui.input({ prompt = "Query to align by: " }, function(query)
     if not query or query == "" then
       return
     end
 
     if #query > 200 then
-      print("Error: Query too long (max 200 chars)")
+      print(" -> Error: Query too long (max 200 chars)")
       return
     end
 
     local lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
     local positions = {}
     local max_length = 0
+    local non_empty_count = 0
 
     for i, line in ipairs(lines) do
-      local pos = string.find(line, query, 1, true)
-      if not pos then
-        print("Error: Query not found in line " .. (start_line + i - 1))
-        return
-      end
-      local length = vim.fn.strwidth(string.sub(line, 1, pos - 1))
-      positions[i] = { pos = pos, length = length }
-      if length > max_length then
-        max_length = length
+      if not line:match("^%s*$") then
+        non_empty_count = non_empty_count + 1
+        local pos = string.find(line, query, 1, true)
+
+        if not pos then
+          print(" -> Error: Query not found in line " .. (start_line + i - 1))
+          return
+        end
+
+        local before = string.sub(line, 1, pos - 1):gsub("(%S)%s+$", "%1")
+        local after = string.sub(line, pos)
+        local length = vim.fn.strwidth(before)
+        positions[i] = { before = before, after = after, length = length }
+
+        if length > max_length then
+          max_length = length
+        end
       end
     end
 
-    for i, info in pairs(positions) do
-      local spaces = string.rep(' ', max_length - info.length)
-      lines[i] = string.sub(lines[i], 1, info.pos - 1) .. spaces .. string.sub(lines[i], info.pos)
+    if non_empty_count < 2 then
+      print(" -> Error: Must select at least 2 non-empty lines")
+      return
+    end
+
+    for i, _ in ipairs(lines) do
+      local info = positions[i]
+      if info then
+        local extra_space = query == " " and 0 or 1
+        local spaces = string.rep(" ", max_length - info.length + extra_space)
+        lines[i] = info.before .. spaces .. info.after
+      end
     end
 
     vim.api.nvim_buf_set_lines(0, start_line - 1, end_line, false, lines)
   end)
+end, { range = true })
+
+-- Populate quickfix
+local function quickfix_from_command(command)
+    local output = vim.trim(vim.fn.system(command))
+    vim.fn.setqflist({}, 'r', { lines = vim.split(output, '\n', { plain = true }), efm = "%f:%l:%c %m" })
+    vim.cmd('copen')
 end
-vim.api.nvim_create_user_command('AlignByQuery', align_by_query, { range = true })
+
+local function quickfix_from_command_enter() 
+    local command = vim.fn.input("Command for quickfix: ")
+    quickfix_from_command(command)
+end
+vim.keymap.set('n', '<leader>f', function() quickfix_from_command_enter() end, { noremap = true, silent = true })
+
+-- Jump to task when cursor is over huid
+local function open_task_under_cursor()
+  local task_dir, pat = "tasks", "%d%d%d%d%d%d%d%d%-%d%d%d%d%d%d"
+  local line = vim.api.nvim_get_current_line()
+  local col = vim.api.nvim_win_get_cursor(0)[2] + 1 -- 1-based
+
+  local huid, s = nil, 1
+  while true do
+    local a, b = line:find(pat, s)
+    if not a then break end
+    if a <= col and col <= b then huid = line:sub(a, b); break end
+    s = b + 1
+  end
+  if not huid then return vim.notify("No HUID under cursor", vim.log.levels.WARN) end
+
+  local path = string.format("%s/%s/%s/task.md", vim.fn.getcwd(), task_dir, huid)
+  if vim.fn.filereadable(path) == 0 then
+    return vim.notify("Task file not found: " .. path, vim.log.levels.ERROR)
+  end
+
+  local old = vim.o.splitright
+  vim.o.splitright = true
+  vim.cmd("vsplit " .. vim.fn.fnameescape(path))
+  vim.o.splitright = old
+end
+
+-- convert todo into a task
+local function todo_to_task()
+  local line = vim.api.nvim_get_current_line()
+  local huid = os.date("%Y%m%d-%H%M%S")
+
+  local title, tags, new_line = "", "", nil
+  do
+    local a, b, tag, desc = line:find("//%s*TODO%s*%(([^)]+)%)%s*:%s*(.+)")
+    if not a then a, b, desc = line:find("//%s*TODO%s*:%s*(.+)") end
+    if a then
+      title = desc:gsub("^%s+", ""):gsub("%s+$", "")
+      tags = tag and (" " .. tag:lower()) or ""
+      new_line = line:sub(1, a - 1) .. ("// TASK(" .. huid .. ")") .. line:sub(b + 1)
+    end
+  end
+
+  local dir = ("%s/tasks/%s"):format(vim.fn.getcwd(), huid)
+  local path = dir .. "/task.md"
+  if vim.fn.filereadable(path) == 1 then
+    return vim.notify("Refusing to overwrite: " .. path, vim.log.levels.ERROR)
+  end
+
+  vim.fn.mkdir(dir, "p")
+  local f, err = io.open(path, "w")
+  if not f then return vim.notify("Failed to write: " .. (err or path), vim.log.levels.ERROR) end
+  f:write(("# %s\n\n- STATUS: OPEN\n- PRIORITY: 20\n- TAGS:%s\n\n"):format(title, tags))
+  f:close()
+
+  if new_line then
+    vim.api.nvim_set_current_line(new_line)
+  end
+
+  local old = vim.o.splitright
+  vim.o.splitright = true
+  vim.cmd("vsplit " .. vim.fn.fnameescape(path))
+  vim.o.splitright = old
+end
+
+-- Find references to task and populate qf
+local function task_find_from_current_buffer()
+  local path = vim.api.nvim_buf_get_name(0)
+  local huid = path:match("/tasks/(%d%d%d%d%d%d%d%d%-%d%d%d%d%d%d)/")
+  if not huid then return vim.notify("Not a /tasks/<huid>/ buffer", vim.log.levels.WARN) end
+  quickfix_from_command("replace " .. huid .. " -n -s")
+end
+
+-- Task commands
+local function task_title_print_limit() return math.min(100, vim.api.nvim_win_get_width(0)-80) end
+vim.keymap.set("n", "<leader>tg", open_task_under_cursor)
+vim.keymap.set("n", "<leader>tp", task_find_from_current_buffer)
+vim.keymap.set("n", "<leader>tn", todo_to_task)
+
+vim.keymap.set('n', '<leader>tf', function()
+  quickfix_from_command('task ls -t ' .. vim.fn.input("Tag for searching tasks: ") .. ' -f ' .. task_title_print_limit())
+  vim.cmd('copen ' .. math.floor(vim.api.nvim_list_uis()[1].height * 0.4))
+  vim.api.nvim_feedkeys('f|;ll', 'n', false)
+end, { noremap = true, silent = true })
+
+vim.keymap.set('n', '<leader>tr', function()
+  quickfix_from_command('task ls' .. ' -f ' .. task_title_print_limit())
+  vim.cmd('copen ' .. math.floor(vim.api.nvim_list_uis()[1].height * 0.6))
+  vim.api.nvim_feedkeys('f|;ll', 'n', false)
+end, { noremap = true, silent = true })
+
+vim.keymap.set('n', '<leader>te', function()
+  quickfix_from_command('task ls -c' .. ' -f ' .. task_title_print_limit())
+  vim.cmd('copen ' .. math.floor(vim.api.nvim_list_uis()[1].height * 0.6))
+  vim.api.nvim_feedkeys('f|;ll', 'n', false)
+end, { noremap = true, silent = true })
 
 EOF
