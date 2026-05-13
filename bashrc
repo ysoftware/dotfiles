@@ -1,3 +1,6 @@
+# Disable stty for non-interactive sessions; this fixes scp (copy file via ssh)
+[[ $- != *i* ]] && return
+
 # General bash settings
 export BASH_SILENCE_DEPRECATION_WARNING=1 # Hide "The default interactive shell is now ..." message
 unset POSIXLY_CORRECT # a setting for grep and other tools

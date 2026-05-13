@@ -357,7 +357,7 @@ autocmd FileType git nnoremap <buffer>         gd  :GitDelete<CR>
 autocmd FileType git nnoremap <buffer>         gj  :JiraOpen<CR>
 
 " Fetch, Pull, Merge, Log
-autocmd FileType git nnoremap <buffer> gm 0w"hy$   :exe 'Git merge ' . @h<CR>
+autocmd FileType git nnoremap <buffer>         gm  0w"hy$   :exe 'Git merge ' . @h<CR>
 autocmd FileType git nnoremap <buffer>         gp  :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer>    gp  :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer>    gP  :Git push<CR>
@@ -437,6 +437,22 @@ nnoremap <C-t> :NERDTreeFind<CR>
 nnoremap <leader><C-f> :NERDTreeVCS<CR>
 nnoremap <C-f> :NERDTreeToggle<CR>
 autocmd FileType nerdtree nnoremap <buffer> <leader>q <C-w>c
+
+" fix nerdtree copy path
+lua << EOF
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "nerdtree",
+    once = true,
+    callback = function()
+        vim.cmd([[
+function! NERDTreeCopyPath()
+    let @+ = g:NERDTreeFileNode.GetSelected().path.str()
+    call nerdtree#echo('Copied path to clipboard')
+endfunction
+]])
+    end,
+})
+EOF
 
 " Prettify json (depends on installed jq)
 augroup PrettifyJson
