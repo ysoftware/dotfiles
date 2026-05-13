@@ -83,7 +83,6 @@ augroup END
 
 augroup AllSnippets
     autocmd!
-    autocmd FileType * abbrev noch // nocheckin
     autocmd FileType typescript,javascript abbrev cons console.info(); // nocheckin<Left><Left><Left><Left><Left><Left><Left><Left><Left><Left><Left><Left><Left><Left>
 augroup END
 
@@ -532,7 +531,14 @@ set title
 
 lua << EOF
 vim.deprecate = function() end
+
 require'colorizer'.setup()
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'diff',
+  callback = function()
+    require'colorizer'.detach_from_buffer(0)
+  end,
+})
 
 vim.keymap.set('n', '<leader><C-d>', function() vim.cmd('tab split | lua vim.lsp.buf.definition()') end, { noremap = true, silent = true })
 
@@ -1029,7 +1035,7 @@ vim.api.nvim_create_user_command('GitFileHistory', function(command_opts)
     relpath = target_file
   end
 
-  local git_cmd = { 'git', '-C', git_root, 'log', '--follow', '-p', '-n', '50', '--', relpath }
+  local git_cmd = { 'git', '-C', git_root, 'log', '--follow', '-p', '-n', '100', '--', relpath }
 
   local output_lines = vim.fn.systemlist(git_cmd)
   local buf_handle = vim.api.nvim_create_buf(false, true)
