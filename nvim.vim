@@ -536,9 +536,6 @@ if has('mac')
     command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/' 
     command! Set :XcodebuildPicker
     command! Lg :XcodebuildOpenLog
-
-    autocmd FileType gitcommit command! Ticket execute 'keeppatterns normal! /TEMOSO<CR>veee"qygg"qpI[<Esc>A] '
-    autocmd FileType gitcommit nnoremap T :Ticket<CR>A
 else
 endif
 
@@ -1311,5 +1308,24 @@ vim.keymap.set('n', '<leader>te', function()
   vim.cmd('copen ' .. math.floor(vim.api.nvim_list_uis()[1].height * 0.6))
   vim.api.nvim_feedkeys('f|;ll', 'n', false)
 end, { noremap = true, silent = true })
+
+-- Check if work repo
+local function is_work_repo()
+    local root = vim.fn.systemlist("git rev-parse --show-toplevel")[1] or ""
+    return root:find(vim.fn.expand("~/Documents/Work/"), 1, true) == 1
+end
+
+-- Ticket number insert in the git commit
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "gitcommit",
+    callback = function()
+        if is_work_repo() then
+            vim.cmd([[command! Ticket execute 'keeppatterns normal! /TEMOSO<CR>veee"qygg"qpI[<Esc>A]']])
+        else
+            vim.cmd([[command! Ticket execute 'keeppatterns normal! gg0pI[<Esc>A]']])
+        end
+        vim.keymap.set("n", "T", "<Cmd>Ticket<CR>A", { buffer = true })
+    end,
+})
 
 EOF
