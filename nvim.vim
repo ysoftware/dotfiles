@@ -545,6 +545,8 @@ set title
 lua << EOF
 vim.deprecate = function() end
 
+pcall(function() require("vim._core.ui2").enable({ enable = true }) end)
+
 require'colorizer'.setup()
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'diff',
@@ -1318,7 +1320,7 @@ end, { noremap = true, silent = true })
 -- Check if work repo
 local function is_work_repo()
     local root = vim.fn.systemlist("git rev-parse --show-toplevel")[1] or ""
-    return root:find(vim.fn.expand("~/Documents/Work/"), 1, true) == 1
+    return root:find(vim.fn.expand("~/Documents/Check24/"), 1, true) == 1
 end
 
 -- Ticket number insert in the git commit
@@ -1326,7 +1328,7 @@ vim.api.nvim_create_autocmd("FileType", {
     pattern = "gitcommit",
     callback = function()
         if is_work_repo() then
-            vim.cmd([[command! Ticket execute 'keeppatterns normal! /TEMOSO<CR>veee"qygg"qpI[<Esc>A]']])
+            vim.cmd([[command! Ticket execute 'keeppatterns normal! /TEMOSO<CR>veee"qygg"qpI[<Esc>A] ']])
         else
             vim.cmd([[command! Ticket execute 'keeppatterns normal! gg0pI[<Esc>A]']])
         end
