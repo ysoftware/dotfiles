@@ -545,8 +545,6 @@ set title
 lua << EOF
 vim.deprecate = function() end
 
-pcall(function() require("vim._core.ui2").enable({ enable = true }) end)
-
 require'colorizer'.setup()
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'diff',
