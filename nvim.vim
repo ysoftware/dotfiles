@@ -1328,7 +1328,7 @@ vim.api.nvim_create_autocmd("FileType", {
         if is_work_repo() then
             vim.cmd([[command! Ticket execute 'keeppatterns normal! /TEMOSO<CR>veee"qygg"qpI[<Esc>A]']])
         else
-            vim.cmd([[command! Ticket execute 'keeppatterns normal! gg0pI[<Esc>A]']])
+            vim.cmd([[command! Ticket execute 'keeppatterns normal! gg0"+Pa] <Esc>I[<Esc>A']])
         end
         vim.keymap.set("n", "T", "<Cmd>Ticket<CR>A", { buffer = true })
     end,
