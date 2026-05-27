@@ -26,6 +26,7 @@ fi
 # Aliases
 alias cl=clear && printf '\e[3J' && stty sane
 alias ls="LC_COLLATE=C ls -lah"
+alias vim=nvim
 
 # Custom apps
 alias note="nvim ~/Documents/GitHub/Notes/Notes.md"
