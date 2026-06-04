@@ -554,6 +554,29 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
+if vim.g.neovide then -- ->
+    vim.g.neovide_pixel_geometry = "RGBH"
+    vim.g.neovide_refresh_rate = 144
+    vim.g.neovide_text_gamma = 0.85
+
+    vim.g.neovide_cursor_antialiasing = true
+    vim.g.neovide_cursor_trail_size = 0.2
+    vim.g.neovide_cursor_animation_length = 0.020
+
+    vim.g.neovide_position_animation_length = 0
+
+    for _, group in ipairs(vim.fn.getcompletion("", "highlight")) do
+      local hl = vim.api.nvim_get_hl(0, { name = group })
+      if hl.bold then
+        hl.bold = false
+        vim.api.nvim_set_hl(0, group, hl)
+      end
+    end
+end
+
+-- stop insert mode of terminal
+vim.keymap.set('t', '<C-q>', [[<C-\><C-n>]])
+
 vim.keymap.set('n', '<leader><C-d>', function() vim.cmd('tab split | lua vim.lsp.buf.definition()') end, { noremap = true, silent = true })
 
 local ok, xcodebuild = pcall(require, 'xcodebuild')
