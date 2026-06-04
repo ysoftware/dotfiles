@@ -1321,27 +1321,26 @@ vim.keymap.set("n", "<leader>tp", task_find_from_current_buffer)
 vim.keymap.set("n", "<leader>tn", todo_to_task)
 
 vim.keymap.set('n', '<leader>tf', function()
-  quickfix_from_command('task ls -t ' .. vim.fn.input("Tag for searching tasks: ") .. ' -f ' .. task_title_print_limit())
   vim.cmd('copen ' .. math.floor(vim.api.nvim_list_uis()[1].height * 0.4))
+  quickfix_from_command('task ls -t ' .. vim.fn.input("Tag for searching tasks: ") .. ' -f ' .. task_title_print_limit())
   vim.api.nvim_feedkeys('f|;ll', 'n', false)
 end, { noremap = true, silent = true })
 
 vim.keymap.set('n', '<leader>tr', function()
-  quickfix_from_command('task ls' .. ' -f ' .. task_title_print_limit())
   vim.cmd('copen ' .. math.floor(vim.api.nvim_list_uis()[1].height * 0.6))
+  quickfix_from_command('task ls' .. ' -f ' .. task_title_print_limit())
   vim.api.nvim_feedkeys('f|;ll', 'n', false)
 end, { noremap = true, silent = true })
 
 vim.keymap.set('n', '<leader>te', function()
-  quickfix_from_command('task ls -c' .. ' -f ' .. task_title_print_limit())
   vim.cmd('copen ' .. math.floor(vim.api.nvim_list_uis()[1].height * 0.6))
+  quickfix_from_command('task ls -c' .. ' -f ' .. task_title_print_limit())
   vim.api.nvim_feedkeys('f|;ll', 'n', false)
 end, { noremap = true, silent = true })
 
 -- Check if work repo
 local function is_work_repo()
-    local root = vim.fn.systemlist("git rev-parse --show-toplevel")[1] or ""
-    return root:find(vim.fn.expand("~/Documents/Check24/"), 1, true) == 1
+    return vim.fn.expand("%:p"):find("/Documents/Check24/", 1, true) ~= nil
 end
 
 -- Ticket number insert in the git commit
