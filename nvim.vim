@@ -1253,11 +1253,12 @@ local function quickfix_from_command(command)
     vim.cmd('copen')
 end
 
-local function quickfix_from_command_enter() 
-    local command = vim.fn.input("Command for quickfix: ")
-    quickfix_from_command(command)
-end
-vim.keymap.set('n', '<leader>f', function() quickfix_from_command_enter() end, { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>f', function()
+    local ok, command = pcall(vim.fn.input, "Command for quickfix: ")
+    if ok and command ~= "" then
+        quickfix_from_command(command)
+    end
+end, { noremap = true, silent = true })
 
 -- Jump to task when cursor is over huid
 local function open_task_under_cursor()
