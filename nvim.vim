@@ -513,22 +513,6 @@ if has('mac')
 else
 endif
 
-" Vim LSP
-nnoremap <leader>l :ccl<CR>
-nnoremap <leader>e :lua vim.diagnostic.setqflist({ severity = vim.diagnostic.severity.ERROR })<CR> :copen<CR>
-nnoremap <leader>E :lua vim.diagnostic.setqflist()<CR> :copen<CR>
-nnoremap <leader>h :lua vim.lsp.buf.hover()<CR>
-nnoremap [g :lua goto_error_then_hint(vim.diagnostic.goto_prev)<CR>
-nnoremap ]g :lua goto_error_then_hint(vim.diagnostic.goto_next)<CR>
-nnoremap <leader>o :lua vim.diagnostic.open_float()<CR>
-nnoremap <leader>d :lua vim.lsp.buf.definition()<CR>
-nnoremap <leader>D :lua vim.lsp.buf.references()<CR>
-nnoremap <leader>M :lua BreakArguments()<CR>
-nnoremap <leader><C-A> :InlayHintsToggle<CR>
-
-command! Mess execute "put =execute('messages')"
-nnoremap Q :lua vim.lsp.buf.code_action()<CR>
-
 if has('mac')
     nnoremap <leader>r :w<CR> :Simo<CR> :XcodebuildBuildRun<CR>
     nnoremap <leader>Q :XcodebuildCodeActions<CR>
@@ -553,6 +537,52 @@ vim.api.nvim_create_autocmd('FileType', {
     require'colorizer'.detach_from_buffer(0)
   end,
 })
+
+-- LSP
+
+vim.keymap.set('n', '<leader>l', '<cmd>ccl<CR>', { silent = true })
+
+vim.keymap.set('n', '<leader>e', function()
+  vim.diagnostic.setqflist({ severity = vim.diagnostic.severity.ERROR })
+  vim.cmd('copen')
+end, { silent = true })
+
+vim.keymap.set('n', '<leader>E', function()
+  vim.diagnostic.setqflist()
+  vim.cmd('copen')
+end, { silent = true })
+
+vim.keymap.set('n', '<leader>h', vim.lsp.buf.hover, { silent = true })
+vim.keymap.set('n', '[g', function() goto_error_then_hint(vim.diagnostic.goto_prev) end, { silent = true })
+vim.keymap.set('n', ']g', function() goto_error_then_hint(vim.diagnostic.goto_next) end, { silent = true })
+vim.keymap.set('n', '<leader>o', vim.diagnostic.open_float, { silent = true })
+vim.keymap.set('n', '<leader>d', vim.lsp.buf.definition, { silent = true })
+vim.keymap.set('n', '<leader>D', vim.lsp.buf.references, { silent = true })
+vim.keymap.set('n', '<leader>M', function() BreakArguments() end, { silent = true })
+vim.keymap.set('n', '<leader><C-A>', '<cmd>InlayHintsToggle<CR>', { silent = true })
+
+-- remap go to definition for markdown
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'markdown',
+  callback = function()
+    vim.keymap.set('n', '<leader>d', function()
+      local line = vim.api.nvim_get_current_line()
+      local col = vim.fn.col('.')
+
+      for start_col, target, end_col in line:gmatch('()%[[^%]]+%]%(([^%)]+)%)()') do
+        if col >= start_col and col <= end_col then
+          vim.cmd('edit ' .. vim.fn.fnameescape(vim.fn.expand('%:p:h') .. '/' .. target))
+          return
+        end
+      end
+    end, { buffer = true, silent = true })
+  end,
+})
+
+vim.api.nvim_create_user_command('Mess', "put =execute('messages')", {})
+vim.keymap.set('n', 'Q', vim.lsp.buf.code_action, { silent = true })
+
+-- neovide
 
 if vim.g.neovide then -- ->
     vim.g.neovide_pixel_geometry = "RGBH"
