@@ -285,7 +285,7 @@ set listchars=tab:»-,trail:·,nbsp:␣,extends:>,precedes:<
 set list
 
 " Search&Replace in the file
-vnoremap ts "hy:%s/\V<C-R>=escape(@h, '\/')<CR>//gcI<Left><Left><Left><Left>
+vnoremap ts "hy:%s/\V<C-R>=escape(@h, '\/')<CR>//cI<Left><Left><Left><Left>
 
 " Navigation
 nnoremap n nzz
