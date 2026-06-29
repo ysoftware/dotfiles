@@ -262,24 +262,6 @@ noremap <C-S-Right> :set background=light<CR>:call SetCorrectBatThemeForFzf()<CR
 noremap <C-S-Left> :set background=dark<CR>:call SetCorrectBatThemeForFzf()<CR><C-l>
 autocmd OptionSet background call SetCorrectBatThemeForFzf() | call yaroscheme#apply()
 
-" Copy paste with system buffer
-noremap p "+p
-noremap P "+P
-noremap y "+y
-noremap Y "+Y
-set clipboard=
-
-syntax on
-set nocompatible
-set path+=**
-set ruler
-set rnu
-set number
-set autowrite
-set wildignorecase
-set scroll=15
-set scrolloff=3
-
 " show invisible characters
 set listchars=tab:»-,trail:·,nbsp:␣,extends:>,precedes:< 
 set list
@@ -537,6 +519,27 @@ vim.api.nvim_create_autocmd('FileType', {
     require'colorizer'.detach_from_buffer(0)
   end,
 })
+
+-- copy paste with system buffer
+vim.keymap.set('', 'p', '"+p')
+vim.keymap.set('', 'P', '"+P')
+vim.keymap.set('', 'y', '"+y')
+vim.keymap.set('', 'Y', '"+Y')
+vim.opt.clipboard = ''
+
+-- basic settings
+vim.cmd('syntax on')
+vim.opt.path:append('**')
+vim.opt.ruler = true
+vim.opt.relativenumber = true
+vim.opt.number = true
+vim.opt.autowrite = true
+vim.opt.wildignorecase = true
+vim.opt.scroll = 15
+vim.opt.scrolloff = 3
+
+-- this might not be needed in nvim, but I added it for some reason
+vim.cmd('set nocompatible')
 
 -- LSP
 
