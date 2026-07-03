@@ -361,8 +361,9 @@ autocmd FileType git nnoremap <buffer>         gm  0w"hy$   :exe 'Git merge ' . 
 autocmd FileType git nnoremap <buffer>         gp  :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer>    gp  :Git pull<CR>
 autocmd FileType fugitive nnoremap <buffer>    gP  :Git push<CR>
+autocmd FileType fugitive nnoremap <buffer>    gFP  :Git push --force
 autocmd FileType fugitive nnoremap <buffer>    grp :Git fetch<CR>
-autocmd FileType fugitive nnoremap <buffer>    gl  :Git log -100 --decorate<CR>
+autocmd FileType fugitive nnoremap <buffer>    gl  :Git log -500 --decorate<CR>
 autocmd FileType fugitive nnoremap <buffer>    cn  :Git commit --no-verify<CR>
 
 " q to quit some buffers
@@ -1367,6 +1368,12 @@ local function task_title_print_limit() return math.min(100, vim.api.nvim_win_ge
 vim.keymap.set("n", "<leader>tg", open_task_under_cursor)
 vim.keymap.set("n", "<leader>tp", task_find_from_current_buffer)
 vim.keymap.set("n", "<leader>tn", todo_to_task)
+
+vim.keymap.set('n', '<leader>tl', function()
+  local path = vim.api.nvim_buf_get_name(0)
+  local huid = path:match("/tasks/(%d%d%d%d%d%d%d%d%-%d%d%d%d%d%d)/")
+  vim.cmd("Git log --all --grep='" .. huid .."'")
+end, { noremap = true, silent = true})
 
 vim.keymap.set('n', '<leader>tf', function()
   vim.cmd('copen ' .. math.floor(vim.api.nvim_list_uis()[1].height * 0.4))
