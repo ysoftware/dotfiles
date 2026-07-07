@@ -6,8 +6,6 @@
 
 " PLUGINS
 call plug#begin('~/.local/share/nvim/plugged')
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
 Plug 'mg979/vim-visual-multi'
 Plug 'hrsh7th/nvim-cmp'
 Plug 'hrsh7th/cmp-nvim-lsp'
@@ -26,11 +24,13 @@ Plug 'norcalli/nvim-colorizer.lua' " Hex Colors
 Plug 'preservim/nerdtree' | " File browser
     \ Plug 'Xuyuanp/nerdtree-git-plugin' " Plugin with git status
 
+Plug 'nvim-lua/plenary.nvim' " Needed for telescope
+Plug 'nvim-telescope/telescope.nvim' " needed for search
+Plug 'nvim-telescope/telescope-live-grep-args.nvim' " additional tool for search
+
 if has('mac') " Xcode stuff
     Plug 'wojciech-kulik/xcodebuild.nvim' " Xcode tools
     Plug 'MunifTanjim/nui.nvim' " needed for xcodebuild
-    Plug 'nvim-telescope/telescope.nvim' " needed for xcodebuild
-    Plug 'nvim-lua/plenary.nvim' " Needed for telescope
     Plug 'mfussenegger/nvim-lint'
     Plug 'angular/vscode-ng-language-service' " Angular support
     Plug 'keith/swift.vim' " Swift support
@@ -123,49 +123,11 @@ if has('mac')
     au BufWritePost * lua require('lint').try_lint()
 endif
 
-" Setup fzf
-let $FZF_DEFAULT_OPTS = '--bind ?:toggle-preview --bind ctrl-j:down --bind ctrl-k:up --bind ctrl-d:half-page-down --bind ctrl-u:half-page-up --bind ctrl-a:select-all'
-let g:fzf_layout = { 'window': { 'width': 1.0, 'height': 1.0 } }
-
-let g:fzf_history_dir = '~/.local/share/fzf-history'
-if has('nvim')
-  set shada=!,'1000,<5000,s200,h
-else
-  set viminfo='1000,<5000,s200,h
-endif
-autocmd BufWritePost * silent! execute(has('nvim') ? 'shada' : 'wviminfo')
-
 function! s:build_quickfix_list(lines)
     call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
     copen
     cc
 endfunction
-let g:fzf_action = {
-  \ 'ctrl-q': function('s:build_quickfix_list'),
-  \ 'ctrl-t': 'tab split',
-  \ 'ctrl-x': 'split',
-  \ 'ctrl-v': 'vsplit' }
-
-let g:fzf_colors = {
-  \ 'fg':         ['fg', 'Normal'],
-  \ 'bg':         ['bg', 'Normal'],
-  \ 'preview-fg': ['fg', 'Normal'],
-  \ 'preview-bg': ['bg', 'Normal'],
-  \ 'hl':         ['fg', 'Comment'],
-  \ 'fg+':        ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-  \ 'bg+':        ['bg', 'CursorLine', 'CursorColumn'],
-  \ 'hl+':        ['fg', 'Statement'],
-  \ 'gutter':     ['bg', 'ColorColumn'],
-  \ 'info':       ['fg', 'PreProc'],
-  \ 'border':     ['fg', 'Ignore'],
-  \ 'prompt':     ['fg', 'Conditional'],
-  \ 'pointer':    ['fg', 'Exception'],
-  \ 'marker':     ['fg', 'Keyword'],
-  \ 'spinner':    ['fg', 'Label'],
-  \ 'header':     ['fg', 'Comment'] }
-
-" History setup
-nnoremap <C-h> :History<CR>
 
 " Setup Plugin Manager
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
@@ -173,43 +135,6 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
   silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
-
-" Vim theme
-function! SetCorrectBatThemeForFzf()
-    if &background == "dark"
-        let $BAT_THEME = 'OneHalfDark'
-    else
-        let $BAT_THEME = 'GitHub'
-    endif
-endfunction
-
-if has('mac')
-    set colorcolumn=140
-    if system('defaults read -g AppleInterfaceStyle') == "Dark\n"
-        set background=dark
-        call SetCorrectBatThemeForFzf()
-    else
-        set background=light
-        call SetCorrectBatThemeForFzf()
-    endif
-elseif has('unix')
-    if system("which gsettings >/dev/null 2>&1 && echo 1 || echo 0") == "1\n"
-        if system("gsettings get org.gnome.desktop.interface color-scheme") =~# 'dark'
-            set background=dark
-        else
-            set background=light
-        endif
-    else
-        set background=dark
-    endif
-else
-    set background=dark
-    call SetCorrectBatThemeForFzf()
-endif
-
-noremap <C-S-Right> :set background=light<CR>:call SetCorrectBatThemeForFzf()<CR><C-l>
-noremap <C-S-Left> :set background=dark<CR>:call SetCorrectBatThemeForFzf()<CR><C-l>
-autocmd OptionSet background call SetCorrectBatThemeForFzf() | call yaroscheme#apply()
 
 " Nerd tree
 let NERDTreeShowHidden=1
@@ -349,37 +274,64 @@ local function get_search_directory()
   end
 end
 
--- Fzf
-local function fzf_files(dir, bang)
-  local opts = vim.fn['fzf#vim#with_preview']({
-    options = { '--reverse', '-i', '--info=inline', '--keep-right', '--preview=bat -p --color always {}' }
-  }, 'down:30%')
-  vim.fn['fzf#vim#files'](dir, opts, bang and 1 or 0)
+-- New search for files / in files
+
+local telescope = require('telescope')
+local telescope_config = require('telescope.config')
+local actions = require('telescope.actions')
+local action_set = require('telescope.actions.set')
+local action_state = require('telescope.actions.state')
+
+telescope.load_extension('live_grep_args')
+local lga = require('telescope').extensions.live_grep_args
+
+local function scroll_results(direction)
+  return function(prompt_bufnr)
+    local status = require('telescope.state').get_status(prompt_bufnr)
+    local height = vim.api.nvim_win_get_height(status.results_win)
+    action_set.shift_selection(prompt_bufnr, direction * math.floor(height / 2))
+  end
 end
 
-local function fzf_ag(dir, query, bang)
-  local opts = vim.fn['fzf#vim#with_preview']({
-    options = { '--reverse', '-i', '--info=inline', '--exact', '--keep-right', '--preview=bat -p --color always {}' }
-  }, 'down:70%')
-  opts['dir'] = vim.fn.expand(dir)
-  vim.fn['fzf#vim#ag'](query or '', opts, bang and 1 or 0)
+if vim.loop.os_uname().sysname == 'Darwin' then
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = 'TelescopeResults',
+    callback = function()
+      vim.cmd([[syntax region BufferLineType1 start=/[^\/]\+\/mobile\// end=/$/]])
+      vim.cmd([[syntax region BufferLineType2 start=/[^\/]\+\/desktop\// end=/$/]])
+    end,
+  })
 end
 
--- Files setup
-vim.api.nvim_create_user_command('Files', function(opts)
-  fzf_files(opts.args, opts.bang)
-end, { bang = true, nargs = '+', complete = 'dir' })
+telescope.setup({
+  defaults = {
+    layout_config = { horizontal = { width = 0.99, height = 0.99, prompt_position = 'top', preview_width = 0.35, }},
+    layout_strategy = 'horizontal', scroll_strategy = 'limit', sorting_strategy = 'ascending',
+    mappings = {
+        i = {
+          ['<Esc>'] = actions.close, ['<C-j>'] = actions.move_selection_next, ['<C-k>'] = actions.move_selection_previous,
+          ['<C-a>'] = actions.select_all, ['<C-o>'] = actions.send_selected_to_qflist + actions.open_qflist, ['<C-b>'] = actions.toggle_selection,
+          ['<C-d>'] = scroll_results(1), ['<C-u>'] = scroll_results(-1),
+          ['<C-e>'] = actions.preview_scrolling_down, ['<C-y>'] = actions.preview_scrolling_up,
+          ['<C-]>'] = actions.cycle_history_next, ['<C-p>'] = actions.cycle_history_prev,
+          ['<C-h>'] = actions.results_scrolling_left, ['<C-l>'] = actions.results_scrolling_right,
+        },
+    },
+    preview = { hide_on_startup = false },
+    vimgrep_arguments = { 'rg', '--color=never', '--no-heading', '--with-filename', '--line-number', '--column', '--smart-case' },
+    history = { path = vim.fn.stdpath('data') .. '/telescope_history', limit = 100, },
+  },
+  pickers = { find_files = { find_command = { 'rg', '--files', '--smart-case' }}},
+})
 
--- AgIn setup
-vim.api.nvim_create_user_command('AgIn', function(opts)
-  local args = vim.split(opts.args, '%s+', { trimempty = true })
-  fzf_ag(args[1], table.concat(args, ' ', 2), opts.bang)
-end, { bang = true, nargs = '+', complete = 'dir' })
+-- vim.opt.laststatus = 3 TODO: this needs to be enabled only for some windows (telescope search)
 
-vim.keymap.set('n', '<C-]>', function() local search_dir = get_search_directory() vim.cmd('echo ":Files ' .. search_dir .. '"') fzf_files(search_dir, false) end, { noremap = true, silent = true })
-vim.keymap.set('n', '<C-p>', function() local search_dir = get_search_directory() vim.cmd('echo ":AgIn ' .. search_dir .. '"') fzf_ag(search_dir, '', false) end, { noremap = true, silent = true })
-vim.keymap.set('n', '<leader><C-]>', function() vim.cmd('Files ~/Documents') end, { noremap = true, silent = true })
-vim.keymap.set('n', '<leader><C-p>', function() vim.cmd('AgIn ~/Documents') end, { noremap = true, silent = true })
+local builtin = require('telescope.builtin')
+
+vim.keymap.set('n', '<C-]>', function() builtin.find_files({ cwd = get_search_directory() }) end, { noremap = true, silent = true })
+vim.keymap.set('n', '<leader><C-]>', function() builtin.find_files({ cwd = '~/Documents' }) end, { noremap = true, silent = true })
+vim.keymap.set('n', '<C-p>', function() lga.live_grep_args({ cwd = get_search_directory() }) end, { noremap = true, silent = true })
+vim.keymap.set('n', '<leader><C-p>', function() lga.live_grep_args({ cwd = '~/Documents' }) end, { noremap = true, silent = true })
 
 -- Navigation
 vim.keymap.set('n', 'n', 'nzz')
@@ -1002,42 +954,6 @@ vim.api.nvim_create_user_command('BranchRemote', function()
     end)
   end)
 end, { })
-
--- highlight mobile and desktop in fzf ----------
-if vim.loop.os_uname().sysname == "Darwin" then
-  local timer = nil
-
-  local function apply_highlight()
-    vim.cmd([[syntax region BufferLineType1 start=/[^\/]\+\/mobile\// end=/$/]])
-    vim.cmd([[syntax region BufferLineType2 start=/[^\/]\+\/desktop\// end=/$/]])
-  end
-
-  local function start_timer()
-    if timer then
-      timer:stop()
-      timer:close()
-    end
-
-    apply_highlight()
-    timer = vim.loop.new_timer()
-    timer:start(0, 1000, vim.schedule_wrap(function()
-      if vim.bo.filetype ~= "fzf" then
-        timer:stop()
-        timer:close()
-        timer = nil
-        return
-      end
-      apply_highlight()
-    end))
-  end
-
-  vim.api.nvim_create_augroup("FzfCustomHighlight", { clear = true })
-  vim.api.nvim_create_autocmd("FileType", {
-    group = "FzfCustomHighlight",
-    pattern = "fzf",
-    callback = start_timer,
-  })
-end
 
 -- Jump between mobile and desktop files of the same name
 vim.api.nvim_create_user_command('WebJump', function()
