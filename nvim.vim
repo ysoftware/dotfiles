@@ -27,6 +27,8 @@ Plug 'preservim/nerdtree' | " File browser
 Plug 'nvim-lua/plenary.nvim' " Needed for telescope
 Plug 'nvim-telescope/telescope.nvim' " needed for search
 Plug 'nvim-telescope/telescope-live-grep-args.nvim' " additional tool for search
+" telescope with better sorting
+Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 
 if has('mac') " Xcode stuff
     Plug 'wojciech-kulik/xcodebuild.nvim' " Xcode tools
@@ -285,6 +287,8 @@ local action_state = require('telescope.actions.state')
 telescope.load_extension('live_grep_args')
 local lga = require('telescope').extensions.live_grep_args
 
+telescope.load_extension('fzf')
+
 local function scroll_results(direction)
   return function(prompt_bufnr)
     local status = require('telescope.state').get_status(prompt_bufnr)
@@ -293,20 +297,35 @@ local function scroll_results(direction)
   end
 end
 
-if vim.loop.os_uname().sysname == 'Darwin' then
-  vim.api.nvim_create_autocmd('FileType', {
-    pattern = 'TelescopeResults',
-    callback = function()
-      vim.cmd([[syntax region BufferLineType1 start=/[^\/]\+\/mobile\// end=/$/]])
-      vim.cmd([[syntax region BufferLineType2 start=/[^\/]\+\/desktop\// end=/$/]])
-    end,
-  })
+-- highlight mobile/desktop
+local function highlight_entry(entry_maker, patterns)
+  return function(entry)
+    local made = entry_maker(entry)
+    if not made then return nil end
+    local original_display = made.display
+    made.display = function(e)
+      local str, highlights = original_display(e)
+      highlights = highlights or {}
+      for _, p in ipairs(patterns) do
+        if e.value and e.value:match(p.pattern) then
+          table.insert(highlights, { { 0, #str }, p.hl_group })
+          break
+        end
+      end
+      return str, highlights
+    end
+    return made
+  end
 end
+local entry_patterns = {
+  { pattern = '/mobile/',  hl_group = 'BufferLineType1' },
+  { pattern = '/desktop/', hl_group = 'BufferLineType2' },
+}
 
 telescope.setup({
   defaults = {
-    layout_config = { horizontal = { width = 0.99, height = 0.99, prompt_position = 'top', preview_width = 0.35, }},
-    layout_strategy = 'horizontal', scroll_strategy = 'limit', sorting_strategy = 'ascending',
+    layout_strategy = 'vertical', layout_config = { vertical = { width = 0.99, height = 0.99, prompt_position = 'top', preview_height = 0.15, }},
+    scroll_strategy = 'limit', sorting_strategy = 'ascending',
     mappings = {
         i = {
           ['<Esc>'] = actions.close, ['<C-j>'] = actions.move_selection_next, ['<C-k>'] = actions.move_selection_previous,
@@ -321,7 +340,12 @@ telescope.setup({
     vimgrep_arguments = { 'rg', '--color=never', '--no-heading', '--with-filename', '--line-number', '--column', '--smart-case' },
     history = { path = vim.fn.stdpath('data') .. '/telescope_history', limit = 100, },
   },
-  pickers = { find_files = { find_command = { 'rg', '--files', '--smart-case' }}},
+  pickers = {
+    find_files = {
+      find_command = { 'rg', '--files', '--smart-case' },
+      entry_maker = highlight_entry(require('telescope.make_entry').gen_from_file(), entry_patterns),
+    },
+  },
 })
 
 -- vim.opt.laststatus = 3 TODO: this needs to be enabled only for some windows (telescope search)
@@ -330,8 +354,26 @@ local builtin = require('telescope.builtin')
 
 vim.keymap.set('n', '<C-]>', function() builtin.find_files({ cwd = get_search_directory() }) end, { noremap = true, silent = true })
 vim.keymap.set('n', '<leader><C-]>', function() builtin.find_files({ cwd = '~/Documents' }) end, { noremap = true, silent = true })
-vim.keymap.set('n', '<C-p>', function() lga.live_grep_args({ cwd = get_search_directory() }) end, { noremap = true, silent = true })
-vim.keymap.set('n', '<leader><C-p>', function() lga.live_grep_args({ cwd = '~/Documents' }) end, { noremap = true, silent = true })
+
+vim.keymap.set('n', '<C-p>', function()
+  lga.live_grep_args({
+    cwd = get_search_directory(),
+    entry_maker = highlight_entry(
+      require('telescope.make_entry').gen_from_vimgrep(),
+      entry_patterns
+    ),
+  })
+end, { noremap = true, silent = true })
+
+vim.keymap.set('n', '<leader><C-p>', function()
+  lga.live_grep_args({
+    cwd = '~/Documents',
+    entry_maker = highlight_entry(
+      require('telescope.make_entry').gen_from_vimgrep(),
+      entry_patterns
+    ),
+  })
+end, { noremap = true, silent = true })
 
 -- Navigation
 vim.keymap.set('n', 'n', 'nzz')
