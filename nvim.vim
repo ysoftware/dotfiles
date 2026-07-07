@@ -167,45 +167,6 @@ let g:fzf_colors = {
 " History setup
 nnoremap <C-h> :History<CR>
 
-" Files setup
-command! -bang -nargs=+ -complete=dir Files
-    \ call fzf#vim#files(<q-args>,
-    \     fzf#vim#with_preview(
-    \         {
-    \             'options': [
-    \                 '--reverse', '-i', '--info=inline',
-    \                 '--keep-right', '--preview="bat -p --color always {}"'
-    \             ]
-    \         },
-    \         'down:30%'
-    \     ),
-    \ <bang>0)
-
-" AgIn setup
-function! s:ag_in(bang, ...)
-    call fzf#vim#ag(join(a:000[1:], ' '),
-        \     fzf#vim#with_preview(
-        \         {
-        \             'dir': expand(a:1),
-        \             'options': [
-        \                 '--reverse', '-i', '--info=inline', '--exact',
-        \                 '--keep-right', '--preview="bat -p --color always {}"'
-        \             ]
-        \         },
-        \         'down:70%'
-        \     ),
-        \ a:bang)
-endfunction
-command! -bang -nargs=+ -complete=dir AgIn call s:ag_in(<bang>0, <f-args>)
-
-if has('mac')
-    nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents ' . @h<CR>
-    nnoremap <leader>P "hyiw:exe 'AgIn ~/Documents ^.*(actor\|enum\|func\|var\|let\|class\|struct\|protocol\|case)(\s+)'.@h<CR>
-elseif has('linux')
-    nnoremap <leader>p "hyiw:exe 'AgIn ~/Documents ' . @h<CR>
-    nnoremap <leader>P "hyiw:exe 'AgIn ~/Documents ^.*(fun\|fn\|void\|int\|struct\|enum)(\s+)'.@h<CR>
-endif
-
 " Setup Plugin Manager
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
 if empty(glob(data_dir . '/autoload/plug.vim'))
@@ -359,6 +320,66 @@ vim.opt.list = true
 
 -- Search&Replace in the file
 vim.keymap.set('v', 'ts', '"hy:%s/\\V<C-R>=escape(@h, \'\\/\')<CR>//cI<Left><Left><Left><Left>')
+
+-- Smart directory search: git root -> current dir -> ~/Documents fallback with special buffer handling
+local function get_search_directory()
+  local current_file = vim.fn.expand('%:p:h')
+  local buftype = vim.bo.buftype
+  local filetype = vim.bo.filetype
+
+  if buftype ~= '' or filetype == 'fugitive' or filetype == 'git' or current_file:match('^fugitive://') then
+    current_file = vim.fn.getcwd()
+  elseif current_file == '' or not vim.fn.isdirectory(current_file) then
+    current_file = vim.fn.getcwd()
+  end
+
+  local git_root = vim.fn.system('git -C ' .. vim.fn.shellescape(current_file) .. ' rev-parse --show-toplevel 2>/dev/null')
+
+  if vim.v.shell_error == 0 and git_root ~= '' then
+    local clean_root = vim.fn.substitute(git_root, '\n', '', '')
+    if vim.fn.isdirectory(clean_root) == 1 then
+      return clean_root
+    end
+  end
+
+  if vim.fn.isdirectory(current_file) == 1 then
+    return current_file
+  else
+    return vim.fn.expand('~/Documents')
+  end
+end
+
+-- Fzf
+local function fzf_files(dir, bang)
+  local opts = vim.fn['fzf#vim#with_preview']({
+    options = { '--reverse', '-i', '--info=inline', '--keep-right', '--preview=bat -p --color always {}' }
+  }, 'down:30%')
+  vim.fn['fzf#vim#files'](dir, opts, bang and 1 or 0)
+end
+
+local function fzf_ag(dir, query, bang)
+  local opts = vim.fn['fzf#vim#with_preview']({
+    options = { '--reverse', '-i', '--info=inline', '--exact', '--keep-right', '--preview=bat -p --color always {}' }
+  }, 'down:70%')
+  opts['dir'] = vim.fn.expand(dir)
+  vim.fn['fzf#vim#ag'](query or '', opts, bang and 1 or 0)
+end
+
+-- Files setup
+vim.api.nvim_create_user_command('Files', function(opts)
+  fzf_files(opts.args, opts.bang)
+end, { bang = true, nargs = '+', complete = 'dir' })
+
+-- AgIn setup
+vim.api.nvim_create_user_command('AgIn', function(opts)
+  local args = vim.split(opts.args, '%s+', { trimempty = true })
+  fzf_ag(args[1], table.concat(args, ' ', 2), opts.bang)
+end, { bang = true, nargs = '+', complete = 'dir' })
+
+vim.keymap.set('n', '<C-]>', function() local search_dir = get_search_directory() vim.cmd('echo ":Files ' .. search_dir .. '"') fzf_files(search_dir, false) end, { noremap = true, silent = true })
+vim.keymap.set('n', '<C-p>', function() local search_dir = get_search_directory() vim.cmd('echo ":AgIn ' .. search_dir .. '"') fzf_ag(search_dir, '', false) end, { noremap = true, silent = true })
+vim.keymap.set('n', '<leader><C-]>', function() vim.cmd('Files ~/Documents') end, { noremap = true, silent = true })
+vim.keymap.set('n', '<leader><C-p>', function() vim.cmd('AgIn ~/Documents') end, { noremap = true, silent = true })
 
 -- Navigation
 vim.keymap.set('n', 'n', 'nzz')
@@ -1017,56 +1038,6 @@ if vim.loop.os_uname().sysname == "Darwin" then
     callback = start_timer,
   })
 end
-
--- Smart directory search: git root -> current dir -> ~/Documents fallback with special buffer handling
-local function get_search_directory()
-  local current_file = vim.fn.expand('%:p:h')
-  local buftype = vim.bo.buftype
-  local filetype = vim.bo.filetype
-
-  if buftype ~= '' or filetype == 'fugitive' or filetype == 'git' or current_file:match('^fugitive://') then
-    current_file = vim.fn.getcwd()
-  elseif current_file == '' or not vim.fn.isdirectory(current_file) then
-    current_file = vim.fn.getcwd()
-  end
-
-  local git_root = vim.fn.system('git -C ' .. vim.fn.shellescape(current_file) .. ' rev-parse --show-toplevel 2>/dev/null')
-
-  if vim.v.shell_error == 0 and git_root ~= '' then
-    local clean_root = vim.fn.substitute(git_root, '\n', '', '')
-    if vim.fn.isdirectory(clean_root) == 1 then
-      return clean_root
-    end
-  end
-
-  if vim.fn.isdirectory(current_file) == 1 then
-    return current_file
-  else
-    return vim.fn.expand('~/Documents')
-  end
-end
-
-vim.keymap.set('n', '<C-]>', function()
-  local search_dir = get_search_directory()
-  local cmd = 'Files ' .. search_dir
-  vim.cmd('echo ":' .. cmd .. '"')
-  vim.cmd(cmd)
-end, { noremap = true, silent = true })
-
-vim.keymap.set('n', '<C-p>', function()
-  local search_dir = get_search_directory()
-  local cmd = 'AgIn ' .. search_dir
-  vim.cmd('echo ":' .. cmd .. '"')
-  vim.cmd(cmd)
-end, { noremap = true, silent = true })
-
-vim.keymap.set('n', '<leader><C-]>', function()
-  vim.cmd('Files ~/Documents')
-end, { noremap = true, silent = true })
-
-vim.keymap.set('n', '<leader><C-p>', function()
-  vim.cmd('AgIn ~/Documents')
-end, { noremap = true, silent = true })
 
 -- Jump between mobile and desktop files of the same name
 vim.api.nvim_create_user_command('WebJump', function()
