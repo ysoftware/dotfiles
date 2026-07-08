@@ -4,40 +4,6 @@
 
 " TODO: add .gitconfig to dotfiles
 
-" PLUGINS
-call plug#begin('~/.local/share/nvim/plugged')
-Plug 'mg979/vim-visual-multi'
-Plug 'hrsh7th/nvim-cmp'
-Plug 'hrsh7th/cmp-nvim-lsp'
-Plug 'tpope/vim-fugitive' " Git
-Plug 'bkad/CamelCaseMotion' " Jump to camel case words
-Plug 'airblade/vim-gitgutter' " More Git
-Plug 'ysoftware/vim-bufferline' " Show all open buffers
-Plug 'kshenoy/vim-signature' " Show marks
-Plug 'mhinz/vim-startify' " Startup screen
-Plug 'tpope/vim-commentary' " Comment lines of code
-
-Plug 'rluba/jai.vim'
-Plug 'neovim/nvim-lspconfig' " Lsp
-Plug 'norcalli/nvim-colorizer.lua' " Hex Colors
-Plug 'preservim/nerdtree' | " File browser
-    \ Plug 'Xuyuanp/nerdtree-git-plugin' " Plugin with git status
-
-Plug 'nvim-lua/plenary.nvim' " Needed for telescope
-Plug 'nvim-telescope/telescope.nvim' " needed for search
-Plug 'nvim-telescope/telescope-live-grep-args.nvim' " additional tool for search
-" telescope with better sorting
-Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
-
-if has('mac') " Xcode stuff
-    Plug 'wojciech-kulik/xcodebuild.nvim' " Xcode tools
-    Plug 'MunifTanjim/nui.nvim' " needed for xcodebuild
-    Plug 'mfussenegger/nvim-lint'
-    Plug 'angular/vscode-ng-language-service' " Angular support
-    Plug 'keith/swift.vim' " Swift support
-endif
-call plug#end()
-
 let mapleader = " "
 :set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
 
@@ -224,10 +190,46 @@ set title
 lua << EOF
 vim.deprecate = function() end
 
-vim.pack.add({
-    'https://github.com/nvim-tree/nvim-web-devicons',
-    'https://github.com/nvim-lualine/lualine.nvim'
+vim.api.nvim_create_autocmd('PackChanged', {
+  callback = function(ev)
+    local name, kind = ev.data.spec.name, ev.data.kind
+    if name == 'telescope-fzf-native.nvim' and (kind == 'install' or kind == 'update') then
+      vim.system({ 'make' }, { cwd = ev.data.path })
+    end
+  end,
 })
+
+vim.pack.add({
+  'https://github.com/hrsh7th/nvim-cmp',                             -- Completion
+  'https://github.com/hrsh7th/cmp-nvim-lsp',                         -- Completion + LSP
+  'https://github.com/nvim-lualine/lualine.nvim',                    -- Status line
+  'https://github.com/mg979/vim-visual-multi',                       -- Multi cursor
+  'https://github.com/tpope/vim-fugitive',                           -- Git
+  'https://github.com/bkad/CamelCaseMotion',                         -- Jump to camel case words
+  'https://github.com/airblade/vim-gitgutter',                       -- More Git
+  'https://github.com/ysoftware/vim-bufferline',                     -- Show all open buffers
+  'https://github.com/kshenoy/vim-signature',                        -- Show marks
+  'https://github.com/mhinz/vim-startify',                           -- Startup screen
+  'https://github.com/tpope/vim-commentary',                         -- Comment lines of code
+  'https://github.com/rluba/jai.vim',                                -- Jai support
+  'https://github.com/neovim/nvim-lspconfig',                        -- Lsp
+  'https://github.com/norcalli/nvim-colorizer.lua',                  -- Hex Colors
+  'https://github.com/preservim/nerdtree',                           -- File browser
+  'https://github.com/nvim-lua/plenary.nvim',                        -- Needed for telescope
+  'https://github.com/nvim-telescope/telescope.nvim',                -- needed for search
+  'https://github.com/nvim-telescope/telescope-live-grep-args.nvim', -- additional tool for search
+  'https://github.com/nvim-telescope/telescope-fzf-native.nvim',     -- telescope with better sorting
+})
+
+if vim.fn.has('mac') == 1 then
+  vim.pack.add({
+    'https://github.com/wojciech-kulik/xcodebuild.nvim',     -- Xcode tools
+    'https://github.com/MunifTanjim/nui.nvim',               -- needed for xcodebuild
+    'https://github.com/mfussenegger/nvim-lint',             -- Linter for web
+    'https://github.com/angular/vscode-ng-language-service', -- Angular support
+    'https://github.com/keith/swift.vim',                    -- Swift support
+  })
+end
 
 do -- colorizer plugin
   require'colorizer'.setup()
