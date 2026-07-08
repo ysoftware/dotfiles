@@ -1,6 +1,5 @@
 " TODO
 " - Disable FUCKING STUPID word wrapping (repro: when typing a long comment, it will auto break at 100th)
-" - Make :Files respect .ignore
 
 " TODO: add .gitconfig to dotfiles
 
@@ -190,6 +189,7 @@ set title
 lua << EOF
 vim.deprecate = function() end
 
+-- run scripts after installing packages
 vim.api.nvim_create_autocmd('PackChanged', {
   callback = function(ev)
     local name, kind = ev.data.spec.name, ev.data.kind
@@ -242,6 +242,7 @@ do -- status line plugin
       theme = 'auto',
       disabled_filetypes = { statusline = { 'TelescopePrompt' }}, icons_enabled = false,
       section_separators = { left = '', right = '' }, component_separators = { left = '', right = '' },
+      always_show_tabline = false,
     },
     sections = {
       lualine_a = { 'mode' },
@@ -251,21 +252,126 @@ do -- status line plugin
       lualine_y = { 'location' },
       lualine_z = {},
     },
+    tabline = {
+      lualine_a = {
+        { 'tabs',
+          tab_max_length = 50, mode = 1, use_mode_colors = false,
+          tabs_color = { active = 'LualineActiveTab', inactive = 'LualineInactiveTab' },
+          color = { fg = 'Normal', bg = 'Normal' },
+        },
+      },
+    },
   }
 end
 
 do -- basic settings ------------------------------------------------
+  vim.cmd('syntax on')
+  vim.opt.path:append('**')
+  vim.opt.ruler = true
+  vim.opt.relativenumber = true
+  vim.opt.number = true
+  vim.opt.autowrite = true
+  vim.opt.wildignorecase = true
+  vim.opt.scroll = 15
+  vim.opt.scrolloff = 3
 
   -- show invisible characters
   vim.opt.listchars = { tab = '»-', trail = '·', nbsp = '␣', extends = '>', precedes = '<' }
   vim.opt.list = true
 
-end -- basic settings -----------------------------------------------
+  -- Tabs and shit
+  vim.cmd('filetype plugin indent on')
+  vim.opt.tabstop = 4
+  vim.opt.shiftwidth = 4
+  vim.opt.softtabstop = 4
+  vim.opt.expandtab = true
+  vim.opt.showmode = false
 
-do -- basic mapping
+end -- basic settings
+
+do -- basic mapping -------------------------------------------------
 
   -- Search&Replace in the file
   vim.keymap.set('v', 'ts', '"hy:%s/\\V<C-R>=escape(@h, \'\\/\')<CR>//cI<Left><Left><Left><Left>')
+
+  -- Navigation
+  vim.keymap.set('n', 'n', 'nzz')
+  vim.keymap.set('n', 'N', 'Nzz')
+  vim.opt.switchbuf:append('useopen')
+  
+  -- camel case navigation
+  vim.keymap.set('', ',w', '<Plug>CamelCaseMotion_w', { silent = true, remap = true })
+  vim.keymap.set('', ',b', '<Plug>CamelCaseMotion_b', { silent = true, remap = true })
+  vim.keymap.set('', ',e', '<Plug>CamelCaseMotion_e', { silent = true, remap = true })
+  vim.keymap.set('', ',ge', '<Plug>CamelCaseMotion_ge', { silent = true, remap = true })
+
+  -- Funny command to quit insert mode without escape
+  vim.keymap.set('i', 'jk', '<Esc>:cd %:p:h<CR>', { remap = true })
+
+  -- Tab lines
+  vim.keymap.set('v', '<', '<gv')
+  vim.keymap.set('v', '>', '>gv')
+
+  -- copy paste with system buffer
+  vim.keymap.set('', 'p', '"+p')
+  vim.keymap.set('', 'P', '"+P')
+  vim.keymap.set('', 'y', '"+y')
+  vim.keymap.set('', 'Y', '"+Y')
+  vim.opt.clipboard = ''
+
+  -- Move lines
+  vim.keymap.set('n', '<S-down>', ':m .+1<CR>==')
+  vim.keymap.set('n', '<S-up>', ':m .-2<CR>==')
+  vim.keymap.set('i', '<S-down>', '<Esc>:m .+1<CR>==gi')
+  vim.keymap.set('i', '<S-up>', '<Esc>:m .-2<CR>==gi')
+  vim.keymap.set('v', '<S-down>', ":m '>+1<CR>gv=gv")
+  vim.keymap.set('v', '<S-up>', ":m '<-2<CR>gv=gv")
+
+  -- Switch letters/words places (put cursor on the left one)
+  vim.keymap.set('n', '<leader>xl', '"qx"qph')
+  vim.keymap.set('n', '<leader>xw', 'viw"qdxea <Esc>"qpbb')
+  vim.keymap.set('n', '<leader>xe', 'viw"qywwPlve"qdbbbviwpb')
+
+  -- Tabs
+  vim.keymap.set('n', 'tg', 'gT')
+  vim.keymap.set('n', "<leader>'", ':tabnew<CR>')
+  vim.keymap.set('n', '<leader>q', ':bp<CR>:bd #<CR>')
+  vim.keymap.set('n', '<leader>w', '<C-w>c')
+
+  -- Brackets around selection
+  vim.keymap.set('x', '<leader>[', '<Esc>a]<Esc>gv`<<Esc>i[<Esc>')
+  vim.keymap.set('x', '<leader>(', '<Esc>a)<Esc>gv`<<Esc>i(<Esc>')
+  vim.keymap.set('x', '<leader>{', '<Esc>a}<Esc>gv`<<Esc>i{<Esc>')
+
+  -- Jump to next empty line
+  vim.keymap.set('', '}', function() vim.fn.search('^\\s*$\\|\\%$', 'W') end)
+  vim.keymap.set('', '{', function() vim.fn.search('^\\s*$\\|\\%^', 'Wb') end)
+
+  -- Jump to next git change
+  vim.keymap.set('n', ']h', '<Plug>(GitGutterNextHunk)zz')
+  vim.keymap.set('n', '[h', '<Plug>(GitGutterPrevHunk)zz')
+
+  -- Uppercase / lowercase one letter
+  vim.keymap.set('n', '<leader>u', 'vu')
+  vim.keymap.set('n', '<leader>U', 'vU')
+  vim.keymap.set('n', '<leader>g', ':vertical:G<CR>')
+
+  -- LSP
+  vim.keymap.set('n', '<leader>l', '<cmd>ccl<CR>', { silent = true })
+  vim.keymap.set('n', '<leader>e', function() vim.diagnostic.setqflist({ severity = vim.diagnostic.severity.ERROR }) vim.cmd('copen') end, { silent = true })
+  vim.keymap.set('n', '<leader>E', function() vim.diagnostic.setqflist() vim.cmd('copen') end, { silent = true })
+  vim.keymap.set('n', '<leader>h', vim.lsp.buf.hover, { silent = true })
+  vim.keymap.set('n', '[g', function() goto_error_then_hint(vim.diagnostic.goto_prev) end, { silent = true })
+  vim.keymap.set('n', ']g', function() goto_error_then_hint(vim.diagnostic.goto_next) end, { silent = true })
+  vim.keymap.set('n', '<leader>o', vim.diagnostic.open_float, { silent = true })
+  vim.keymap.set('n', '<leader>d', vim.lsp.buf.definition, { silent = true })
+  vim.keymap.set('n', '<leader>D', vim.lsp.buf.references, { silent = true })
+  vim.keymap.set('n', '<leader>M', function() BreakArguments() end, { silent = true })
+  vim.keymap.set('n', '<leader><C-A>', '<cmd>InlayHintsToggle<CR>', { silent = true })
+  vim.keymap.set('n', '<leader><C-d>', function() vim.cmd('tab split | lua vim.lsp.buf.definition()') end, { noremap = true, silent = true })
+
+  -- stop insert mode of terminal
+  vim.keymap.set('t', '<C-q>', [[<C-\><C-n>]])
 
 end -- basic mapping
 
@@ -289,7 +395,7 @@ do -- search for files / in files -----------------------------------
     local current_file = vim.fn.expand('%:p:h')
     local buftype = vim.bo.buftype
     local filetype = vim.bo.filetype
-  
+
     if buftype ~= '' or filetype == 'fugitive' or filetype == 'git' or current_file:match('^fugitive://') then
       current_file = vim.fn.getcwd()
     elseif current_file == '' or not vim.fn.isdirectory(current_file) then
@@ -304,7 +410,7 @@ do -- search for files / in files -----------------------------------
         return clean_root
       end
     end
-  
+
     if vim.fn.isdirectory(current_file) == 1 then
       return current_file
     else
@@ -408,195 +514,93 @@ do -- search for files / in files -----------------------------------
   end, { noremap = true, silent = true })
 end -- telescope file search
 
--- Navigation
-vim.keymap.set('n', 'n', 'nzz')
-vim.keymap.set('n', 'N', 'Nzz')
-vim.opt.switchbuf:append('useopen')
-
--- camel case navigation
-vim.keymap.set('', ',w', '<Plug>CamelCaseMotion_w', { silent = true, remap = true })
-vim.keymap.set('', ',b', '<Plug>CamelCaseMotion_b', { silent = true, remap = true })
-vim.keymap.set('', ',e', '<Plug>CamelCaseMotion_e', { silent = true, remap = true })
-vim.keymap.set('', ',ge', '<Plug>CamelCaseMotion_ge', { silent = true, remap = true })
-
-function SwitchToBuffer(n)
-  local buffers = vim.fn.getbufinfo({ buflisted = 1 })
-  if n <= #buffers then
-    vim.cmd('buffer ' .. buffers[n].bufnr)
+do -- switch buffer by number ---------------------------------------
+  function SwitchToBuffer(n)
+    local buffers = vim.fn.getbufinfo({ buflisted = 1 })
+    if n <= #buffers then
+      vim.cmd('buffer ' .. buffers[n].bufnr)
+    end
   end
+  vim.keymap.set('n', '<leader>1', ':lua SwitchToBuffer(1)<CR>', { silent = true })
+  vim.keymap.set('n', '<leader>2', ':lua SwitchToBuffer(2)<CR>', { silent = true })
+  vim.keymap.set('n', '<leader>3', ':lua SwitchToBuffer(3)<CR>', { silent = true })
+  vim.keymap.set('n', '<leader>4', ':lua SwitchToBuffer(4)<CR>', { silent = true })
+  vim.keymap.set('n', '<leader>5', ':lua SwitchToBuffer(5)<CR>', { silent = true })
+  vim.keymap.set('n', '<leader>6', ':lua SwitchToBuffer(6)<CR>', { silent = true })
+  vim.keymap.set('n', '<leader>7', ':lua SwitchToBuffer(7)<CR>', { silent = true })
+  vim.keymap.set('n', '<leader>8', ':lua SwitchToBuffer(8)<CR>', { silent = true })
+  vim.keymap.set('n', '<leader>9', ':lua SwitchToBuffer(9)<CR>', { silent = true })
+  vim.keymap.set('n', '<leader>0', ':lua SwitchToBuffer(10)<CR>', { silent = true })
+  vim.keymap.set('n', '<leader>-', ':lua SwitchToBuffer(11)<CR>', { silent = true })
+end -- switch buffer by number
+
+do -- Highlight merge conflicted blocks -----------------------------
+  local merge_conflict_group = vim.api.nvim_create_augroup('MergeConflictHighlight', { clear = true })
+  local function setup_merge_conflict_highlight()
+    vim.cmd([[syn region ConflictMarkerOurs start=/^<<<<<<< .*$/ end=/^\ze\(=======$\||||||||\)/]])
+    vim.cmd([[syn region ConflictMarkerSeparator start=/^||||||| .*$/ end=/^\ze=======$/]])
+    vim.cmd([[syn region ConflictMarkerTheirs start=/^\(=======$\||||||| |\)/ end=/^>>>>>>> .*$/]])
+  end
+  vim.api.nvim_create_autocmd({ 'BufReadPost', 'BufNewFile' }, {
+    group = merge_conflict_group,
+    pattern = '*',
+    callback = setup_merge_conflict_highlight,
+  })
 end
 
-vim.keymap.set('n', '<leader>1', ':lua SwitchToBuffer(1)<CR>', { silent = true })
-vim.keymap.set('n', '<leader>2', ':lua SwitchToBuffer(2)<CR>', { silent = true })
-vim.keymap.set('n', '<leader>3', ':lua SwitchToBuffer(3)<CR>', { silent = true })
-vim.keymap.set('n', '<leader>4', ':lua SwitchToBuffer(4)<CR>', { silent = true })
-vim.keymap.set('n', '<leader>5', ':lua SwitchToBuffer(5)<CR>', { silent = true })
-vim.keymap.set('n', '<leader>6', ':lua SwitchToBuffer(6)<CR>', { silent = true })
-vim.keymap.set('n', '<leader>7', ':lua SwitchToBuffer(7)<CR>', { silent = true })
-vim.keymap.set('n', '<leader>8', ':lua SwitchToBuffer(8)<CR>', { silent = true })
-vim.keymap.set('n', '<leader>9', ':lua SwitchToBuffer(9)<CR>', { silent = true })
-vim.keymap.set('n', '<leader>0', ':lua SwitchToBuffer(10)<CR>', { silent = true })
-vim.keymap.set('n', '<leader>-', ':lua SwitchToBuffer(11)<CR>', { silent = true })
+do -- Git commands / mapping ----------------------------------------
+  vim.api.nvim_create_user_command('Diff', 'GitGutterDiff', {})
 
-function GitCheckoutFromBranchesView()
-  vim.cmd('normal! 0w"hy$')
-  local branch = vim.fn.getreg('h')
-  vim.cmd('Git checkout ' .. branch)
-  vim.cmd('bd')
-  vim.cmd('Git branch')
-  vim.cmd('redraw!')
-end
+  function GitCheckoutFromBranchesView()
+    vim.cmd('normal! 0w"hy$')
+    local branch = vim.fn.getreg('h')
+    vim.cmd('Git checkout ' .. branch)
+    vim.cmd('bd')
+    vim.cmd('Git branch')
+    vim.cmd('redraw!')
+  end
 
-function GitCheckoutNewRemoteFromBranchesView()
-  vim.cmd('normal! 0www"hy$')
-  local branch = vim.fn.getreg('h')
-  vim.cmd('Git checkout -b ' .. branch .. ' origin/' .. branch)
-  vim.cmd('bd')
-  vim.cmd('Git branch')
-  vim.cmd('redraw!')
-end
+  function GitCheckoutNewRemoteFromBranchesView()
+    vim.cmd('normal! 0www"hy$')
+    local branch = vim.fn.getreg('h')
+    vim.cmd('Git checkout -b ' .. branch .. ' origin/' .. branch)
+    vim.cmd('bd')
+    vim.cmd('Git branch')
+    vim.cmd('redraw!')
+  end
 
--- Highlight merge conflicted blocks
-local merge_conflict_group = vim.api.nvim_create_augroup('MergeConflictHighlight', { clear = true })
+  -- Show list of branches / remote branches (if inside git file, then close it first)
+  vim.keymap.set('n', 'gb', ':Git branch<CR>')
+  vim.keymap.set('n', 'grb', ':Git branch -r<CR>')
 
-local function setup_merge_conflict_highlight()
-  vim.cmd([[syn region ConflictMarkerOurs start=/^<<<<<<< .*$/ end=/^\ze\(=======$\||||||||\)/]])
-  vim.cmd([[syn region ConflictMarkerSeparator start=/^||||||| .*$/ end=/^\ze=======$/]])
-  vim.cmd([[syn region ConflictMarkerTheirs start=/^\(=======$\||||||| |\)/ end=/^>>>>>>> .*$/]])
-end
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'gb', ':bd<CR>:Git branch<CR>', { buffer = a.buf }) end })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'grb', ':bd<CR>:Git branch -r<CR>', { buffer = a.buf }) end })
 
-vim.api.nvim_create_autocmd({ 'BufReadPost', 'BufNewFile' }, {
-  group = merge_conflict_group,
-  pattern = '*',
-  callback = setup_merge_conflict_highlight,
-})
+  -- Checkout commit
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'gc', ':lua GitCheckoutFromBranchesView()<CR>', { buffer = a.buf }) end })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'grc', ':lua GitCheckoutNewRemoteFromBranchesView()<CR>', { buffer = a.buf }) end })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'gd', ':GitDelete<CR>', { buffer = a.buf }) end })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'gj', ':JiraOpen<CR>', { buffer = a.buf }) end })
 
--- Funny command to quit insert mode without escape
-vim.keymap.set('i', 'jk', '<Esc>:cd %:p:h<CR>', { remap = true })
+  -- Fetch, Pull, Merge, Log
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'gm', '0w"hy$:exe \'Git merge \' . @h<CR>', { buffer = a.buf }) end })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'gp', ':Git pull<CR>', { buffer = a.buf }) end })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'gp', ':Git pull<CR>', { buffer = a.buf }) end })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'gP', ':Git push<CR>', { buffer = a.buf }) end })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'gFP', ':Git push --force', { buffer = a.buf }) end })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'grp', ':Git fetch<CR>', { buffer = a.buf }) end })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'gl', ':Git log -500 --decorate<CR>', { buffer = a.buf }) end })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'cn', ':Git commit --no-verify<CR>', { buffer = a.buf }) end })
 
--- Tab lines
-vim.keymap.set('v', '<', '<gv')
-vim.keymap.set('v', '>', '>gv')
-
--- Tabs and shit
-vim.cmd('filetype plugin indent on')
-vim.opt.tabstop = 4
-vim.opt.shiftwidth = 4
-vim.opt.softtabstop = 4
-vim.opt.expandtab = true
-vim.opt.showmode = false
-
--- copy paste with system buffer
-vim.keymap.set('', 'p', '"+p')
-vim.keymap.set('', 'P', '"+P')
-vim.keymap.set('', 'y', '"+y')
-vim.keymap.set('', 'Y', '"+Y')
-vim.opt.clipboard = ''
-
--- Move lines
-vim.keymap.set('n', '<S-down>', ':m .+1<CR>==')
-vim.keymap.set('n', '<S-up>', ':m .-2<CR>==')
-vim.keymap.set('i', '<S-down>', '<Esc>:m .+1<CR>==gi')
-vim.keymap.set('i', '<S-up>', '<Esc>:m .-2<CR>==gi')
-vim.keymap.set('v', '<S-down>', ":m '>+1<CR>gv=gv")
-vim.keymap.set('v', '<S-up>', ":m '<-2<CR>gv=gv")
-
--- Switch letters/words places (put cursor on the left one)
-vim.keymap.set('n', '<leader>xl', '"qx"qph')
-vim.keymap.set('n', '<leader>xw', 'viw"qdxea <Esc>"qpbb')
-vim.keymap.set('n', '<leader>xe', 'viw"qywwPlve"qdbbbviwpb')
-
--- Tabs
-vim.keymap.set('n', 'tg', 'gT')
-vim.keymap.set('n', "<leader>'", ':tabnew<CR>')
-vim.keymap.set('n', '<leader>q', ':bp<CR>:bd #<CR>')
-vim.keymap.set('n', '<leader>w', '<C-w>c')
-
--- Brackets around selection
-vim.keymap.set('x', '<leader>[', '<Esc>a]<Esc>gv`<<Esc>i[<Esc>')
-vim.keymap.set('x', '<leader>(', '<Esc>a)<Esc>gv`<<Esc>i(<Esc>')
-vim.keymap.set('x', '<leader>{', '<Esc>a}<Esc>gv`<<Esc>i{<Esc>')
-
--- Jump to next empty line
-vim.keymap.set('', '}', function() vim.fn.search('^\\s*$\\|\\%$', 'W') end)
-vim.keymap.set('', '{', function() vim.fn.search('^\\s*$\\|\\%^', 'Wb') end)
-
--- Jump to next git change
-vim.keymap.set('n', ']h', '<Plug>(GitGutterNextHunk)zz')
-vim.keymap.set('n', '[h', '<Plug>(GitGutterPrevHunk)zz')
-
--- Uppercase / lowercase one letter
-vim.keymap.set('n', '<leader>u', 'vu')
-vim.keymap.set('n', '<leader>U', 'vU')
-vim.keymap.set('n', '<leader>g', ':vertical:G<CR>')
-
-vim.api.nvim_create_user_command('Diff', 'GitGutterDiff', {})
-
--- Show list of branches / remote branches (if inside git file, then close it first)
-vim.keymap.set('n', 'gb', ':Git branch<CR>')
-vim.keymap.set('n', 'grb', ':Git branch -r<CR>')
-
-vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'gb', ':bd<CR>:Git branch<CR>', { buffer = a.buf }) end })
-vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'grb', ':bd<CR>:Git branch -r<CR>', { buffer = a.buf }) end })
-
--- Checkout commit
-vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'gc', ':lua GitCheckoutFromBranchesView()<CR>', { buffer = a.buf }) end })
-vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'grc', ':lua GitCheckoutNewRemoteFromBranchesView()<CR>', { buffer = a.buf }) end })
-vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'gd', ':GitDelete<CR>', { buffer = a.buf }) end })
-vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'gj', ':JiraOpen<CR>', { buffer = a.buf }) end })
-
--- Fetch, Pull, Merge, Log
-vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'gm', '0w"hy$:exe \'Git merge \' . @h<CR>', { buffer = a.buf }) end })
-vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'gp', ':Git pull<CR>', { buffer = a.buf }) end })
-vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'gp', ':Git pull<CR>', { buffer = a.buf }) end })
-vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'gP', ':Git push<CR>', { buffer = a.buf }) end })
-vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'gFP', ':Git push --force', { buffer = a.buf }) end })
-vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'grp', ':Git fetch<CR>', { buffer = a.buf }) end })
-vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'gl', ':Git log -500 --decorate<CR>', { buffer = a.buf }) end })
-vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'cn', ':Git commit --no-verify<CR>', { buffer = a.buf }) end })
-
--- q to quit some buffers
-vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'q', '<C-w>c', { buffer = a.buf }) end })
-vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitiveblame', callback = function(a) vim.keymap.set('n', 'q', '<C-w>c', { buffer = a.buf }) end })
-vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'q', '<C-w>c', { buffer = a.buf }) end })
-vim.api.nvim_create_autocmd('FileType', { pattern = 'qf', callback = function(a) vim.keymap.set('n', 'q', '<C-w>c', { buffer = a.buf }) end })
-
--- basic settings
-vim.cmd('syntax on')
-vim.opt.path:append('**')
-vim.opt.ruler = true
-vim.opt.relativenumber = true
-vim.opt.number = true
-vim.opt.autowrite = true
-vim.opt.wildignorecase = true
-vim.opt.scroll = 15
-vim.opt.scrolloff = 3
+  -- q to quit some buffers
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'q', '<C-w>c', { buffer = a.buf }) end })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitiveblame', callback = function(a) vim.keymap.set('n', 'q', '<C-w>c', { buffer = a.buf }) end })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'q', '<C-w>c', { buffer = a.buf }) end })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'qf', callback = function(a) vim.keymap.set('n', 'q', '<C-w>c', { buffer = a.buf }) end })
+end -- Git commands / mapping
 
 -- this might not be needed in nvim, but I added it for some reason
 vim.cmd('set nocompatible')
-
--- LSP
-
-vim.keymap.set('n', '<leader>l', '<cmd>ccl<CR>', { silent = true })
-
-vim.keymap.set('n', '<leader>e', function()
-  vim.diagnostic.setqflist({ severity = vim.diagnostic.severity.ERROR })
-  vim.cmd('copen')
-end, { silent = true })
-
-vim.keymap.set('n', '<leader>E', function()
-  vim.diagnostic.setqflist()
-  vim.cmd('copen')
-end, { silent = true })
-
-vim.keymap.set('n', '<leader>h', vim.lsp.buf.hover, { silent = true })
-vim.keymap.set('n', '[g', function() goto_error_then_hint(vim.diagnostic.goto_prev) end, { silent = true })
-vim.keymap.set('n', ']g', function() goto_error_then_hint(vim.diagnostic.goto_next) end, { silent = true })
-vim.keymap.set('n', '<leader>o', vim.diagnostic.open_float, { silent = true })
-vim.keymap.set('n', '<leader>d', vim.lsp.buf.definition, { silent = true })
-vim.keymap.set('n', '<leader>D', vim.lsp.buf.references, { silent = true })
-vim.keymap.set('n', '<leader>M', function() BreakArguments() end, { silent = true })
-vim.keymap.set('n', '<leader><C-A>', '<cmd>InlayHintsToggle<CR>', { silent = true })
 
 -- remap go to definition for markdown
 vim.api.nvim_create_autocmd('FileType', {
@@ -605,7 +609,6 @@ vim.api.nvim_create_autocmd('FileType', {
     vim.keymap.set('n', '<leader>d', function()
       local line = vim.api.nvim_get_current_line()
       local col = vim.fn.col('.')
-
       for start_col, target, end_col in line:gmatch('()%[[^%]]+%]%(([^%)]+)%)()') do
         if col >= start_col and col <= end_col then
           vim.cmd('edit ' .. vim.fn.fnameescape(vim.fn.expand('%:p:h') .. '/' .. target))
@@ -670,11 +673,6 @@ if vim.g.neovide then -- ->
       end
     end
 end
-
--- stop insert mode of terminal
-vim.keymap.set('t', '<C-q>', [[<C-\><C-n>]])
-
-vim.keymap.set('n', '<leader><C-d>', function() vim.cmd('tab split | lua vim.lsp.buf.definition()') end, { noremap = true, silent = true })
 
 local ok, xcodebuild = pcall(require, 'xcodebuild')
 if ok and xcodebuild then

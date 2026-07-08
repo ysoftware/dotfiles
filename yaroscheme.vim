@@ -102,6 +102,10 @@ call s:setbgfg("EndOfBuffer", s:bg_default, s:text_normal)
 
 call s:setfg("ErrorMsg", s:text_red)
 
+call s:setbgfg("MsgArea", s:bg_almost_invisible, s:text_normal)
+call s:setbgfg("MoreMsg", s:bg_almost_invisible, s:text_normal)
+call s:setbgfg("Question", s:bg_almost_invisible, s:text_blue)
+
 call s:setbgfg("QuickFixLine", s:bg_highlight, s:text_normal)
 
 call s:setbgfg("Visual", s:bg_select, s:text_normal)
@@ -154,8 +158,9 @@ call s:setbgfg("CursorLine", s:bg_select, s:text_normal)
 " Lualine colors
 call s:setbgfg("StatusLine", s:bg_default, s:text_normal) 
 call s:setbgfg("StatusLineNC", s:bg_default, s:text_normal) 
+call s:setbgfg("LualineActiveTab", s:bg_highlight, s:text_normal) 
+call s:setbgfg("LualineInactiveTab", s:bg_default, s:text_normal) 
 
-" Bufferline colors
 execute 'highlight BufferLineActive                    guibg='   . s:bg_select . ' guifg=' . s:text_normal
 execute 'highlight BufferLineActiveModified   gui=bold guibg='   . s:bg_select . ' guifg=' . s:text_normal
 
