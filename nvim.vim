@@ -284,11 +284,6 @@ local actions = require('telescope.actions')
 local action_set = require('telescope.actions.set')
 local action_state = require('telescope.actions.state')
 
-telescope.load_extension('live_grep_args')
-local lga = require('telescope').extensions.live_grep_args
-
-telescope.load_extension('fzf')
-
 local function scroll_results(direction)
   return function(prompt_bufnr)
     local status = require('telescope.state').get_status(prompt_bufnr)
@@ -322,6 +317,7 @@ local entry_patterns = {
   { pattern = '/desktop/', hl_group = 'BufferLineType2' },
 }
 
+local lga_actions = require("telescope-live-grep-args.actions")
 telescope.setup({
   defaults = {
     layout_strategy = 'vertical', layout_config = { vertical = { width = 0.99, height = 0.99, prompt_position = 'top', preview_height = 0.15, }},
@@ -339,6 +335,8 @@ telescope.setup({
     preview = { hide_on_startup = false },
     vimgrep_arguments = { 'rg', '--color=never', '--no-heading', '--with-filename', '--line-number', '--column', '--smart-case' },
     history = { path = vim.fn.stdpath('data') .. '/telescope_history', limit = 100, },
+    generic_sorter = require('telescope').extensions.fzf.native_fzf_sorter,
+    file_sorter    = require('telescope').extensions.fzf.native_fzf_sorter,
   },
   pickers = {
     find_files = {
@@ -346,7 +344,21 @@ telescope.setup({
       entry_maker = highlight_entry(require('telescope.make_entry').gen_from_file(), entry_patterns),
     },
   },
+  extensions = {
+    live_grep_args = {
+      auto_quoting = true,
+      mappings = {
+        i = {
+          ["<C-q>"] = lga_actions.quote_prompt(),
+          ["<C-f>"] = actions.to_fuzzy_refine,
+        },
+      },
+    },
+  }
 })
+
+telescope.load_extension('fzf')
+telescope.load_extension('live_grep_args')
 
 -- vim.opt.laststatus = 3 TODO: this needs to be enabled only for some windows (telescope search)
 
@@ -355,6 +367,7 @@ local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<C-]>', function() builtin.find_files({ cwd = get_search_directory() }) end, { noremap = true, silent = true })
 vim.keymap.set('n', '<leader><C-]>', function() builtin.find_files({ cwd = '~/Documents' }) end, { noremap = true, silent = true })
 
+local lga = require('telescope').extensions.live_grep_args
 vim.keymap.set('n', '<C-p>', function()
   lga.live_grep_args({
     cwd = get_search_directory(),
