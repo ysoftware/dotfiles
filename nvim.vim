@@ -14,7 +14,6 @@ Plug 'bkad/CamelCaseMotion' " Jump to camel case words
 Plug 'airblade/vim-gitgutter' " More Git
 Plug 'ysoftware/vim-bufferline' " Show all open buffers
 Plug 'kshenoy/vim-signature' " Show marks
-Plug 'itchyny/lightline.vim' " Status line
 Plug 'mhinz/vim-startify' " Startup screen
 Plug 'tpope/vim-commentary' " Comment lines of code
 
@@ -109,18 +108,6 @@ let g:bufferline_custom_pattern_indicator = [
 " Start page
 let g:startify_custom_header = ['   neovim']
 
-let g:lightline = { 'colorscheme': 'one', 
-  \   'active': {
-  \     'left': [[ 'mode', 'paste' ],
-  \              [ 'gitbranch', 'readonly', 'filename', 'modified' ]],
-  \     'right': [[ 'lineinfo' ],
-  \              [ 'fileencoding', 'filetype', 'charvaluehex' ]]
-  \   },
-  \   'component_function': {
-  \     'gitbranch': 'FugitiveHead'
-  \   },
-  \ }
-
 if has('mac')
     au BufWritePost * lua require('lint').try_lint()
 endif
@@ -198,6 +185,10 @@ elseif has('linux')
     nnoremap <C-S-down> :e ~/Documents/Text/os-todos.txt<CR>
 endif
 
+noremap <C-S-Right> :set background=light<CR><CR><C-l>
+noremap <C-S-Left> :set background=dark<CR><C-l>
+autocmd OptionSet background call yaroscheme#apply()
+
 set ic " case insensitive search
 set gdefault
 let g:searchindex_line_limit=2000000
@@ -233,160 +224,187 @@ set title
 lua << EOF
 vim.deprecate = function() end
 
-require'colorizer'.setup()
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'diff',
-  callback = function()
-    require'colorizer'.detach_from_buffer(0)
-  end,
+vim.pack.add({
+    'https://github.com/nvim-tree/nvim-web-devicons',
+    'https://github.com/nvim-lualine/lualine.nvim'
 })
 
--- show invisible characters
-vim.opt.listchars = { tab = '»-', trail = '·', nbsp = '␣', extends = '>', precedes = '<' }
-vim.opt.list = true
-
--- Search&Replace in the file
-vim.keymap.set('v', 'ts', '"hy:%s/\\V<C-R>=escape(@h, \'\\/\')<CR>//cI<Left><Left><Left><Left>')
-
--- Smart directory search: git root -> current dir -> ~/Documents fallback with special buffer handling
-local function get_search_directory()
-  local current_file = vim.fn.expand('%:p:h')
-  local buftype = vim.bo.buftype
-  local filetype = vim.bo.filetype
-
-  if buftype ~= '' or filetype == 'fugitive' or filetype == 'git' or current_file:match('^fugitive://') then
-    current_file = vim.fn.getcwd()
-  elseif current_file == '' or not vim.fn.isdirectory(current_file) then
-    current_file = vim.fn.getcwd()
-  end
-
-  local git_root = vim.fn.system('git -C ' .. vim.fn.shellescape(current_file) .. ' rev-parse --show-toplevel 2>/dev/null')
-
-  if vim.v.shell_error == 0 and git_root ~= '' then
-    local clean_root = vim.fn.substitute(git_root, '\n', '', '')
-    if vim.fn.isdirectory(clean_root) == 1 then
-      return clean_root
-    end
-  end
-
-  if vim.fn.isdirectory(current_file) == 1 then
-    return current_file
-  else
-    return vim.fn.expand('~/Documents')
-  end
+do -- colorizer plugin
+  require'colorizer'.setup()
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'diff', callback = function() require'colorizer'.detach_from_buffer(0) end, })
 end
 
--- New search for files / in files
-
-local telescope = require('telescope')
-local telescope_config = require('telescope.config')
-local actions = require('telescope.actions')
-local action_set = require('telescope.actions.set')
-local action_state = require('telescope.actions.state')
-
-local function scroll_results(direction)
-  return function(prompt_bufnr)
-    local status = require('telescope.state').get_status(prompt_bufnr)
-    local height = vim.api.nvim_win_get_height(status.results_win)
-    action_set.shift_selection(prompt_bufnr, direction * math.floor(height / 2))
-  end
-end
-
--- highlight mobile/desktop
-local function highlight_entry(entry_maker, patterns)
-  return function(entry)
-    local made = entry_maker(entry)
-    if not made then return nil end
-    local original_display = made.display
-    made.display = function(e)
-      local str, highlights = original_display(e)
-      highlights = highlights or {}
-      for _, p in ipairs(patterns) do
-        if e.value and e.value:match(p.pattern) then
-          table.insert(highlights, { { 0, #str }, p.hl_group })
-          break
-        end
-      end
-      return str, highlights
-    end
-    return made
-  end
-end
-local entry_patterns = {
-  { pattern = '/mobile/',  hl_group = 'BufferLineType1' },
-  { pattern = '/desktop/', hl_group = 'BufferLineType2' },
-}
-
-local lga_actions = require("telescope-live-grep-args.actions")
-telescope.setup({
-  defaults = {
-    layout_strategy = 'vertical', layout_config = { vertical = { width = 0.99, height = 0.99, prompt_position = 'top', preview_height = 0.15, }},
-    scroll_strategy = 'limit', sorting_strategy = 'ascending',
-    mappings = {
-        i = {
-          ['<Esc>'] = actions.close, ['<C-j>'] = actions.move_selection_next, ['<C-k>'] = actions.move_selection_previous,
-          ['<C-a>'] = actions.select_all, ['<C-o>'] = actions.send_selected_to_qflist + actions.open_qflist, ['<C-b>'] = actions.toggle_selection,
-          ['<C-d>'] = scroll_results(1), ['<C-u>'] = scroll_results(-1),
-          ['<C-e>'] = actions.preview_scrolling_down, ['<C-y>'] = actions.preview_scrolling_up,
-          ['<C-]>'] = actions.cycle_history_next, ['<C-p>'] = actions.cycle_history_prev,
-          ['<C-h>'] = actions.results_scrolling_left, ['<C-l>'] = actions.results_scrolling_right,
-        },
+do -- status line plugin
+  require('lualine').setup {
+    options = {
+      theme = 'auto',
+      disabled_filetypes = { statusline = { 'TelescopePrompt' }}, icons_enabled = false,
+      section_separators = { left = '', right = '' }, component_separators = { left = '', right = '' },
     },
-    preview = { hide_on_startup = false },
-    vimgrep_arguments = { 'rg', '--color=never', '--no-heading', '--with-filename', '--line-number', '--column', '--smart-case' },
-    history = { path = vim.fn.stdpath('data') .. '/telescope_history', limit = 100, },
-    generic_sorter = require('telescope').extensions.fzf.native_fzf_sorter,
-    file_sorter    = require('telescope').extensions.fzf.native_fzf_sorter,
-  },
-  pickers = {
-    find_files = {
-      find_command = { 'rg', '--files', '--smart-case' },
-      entry_maker = highlight_entry(require('telescope.make_entry').gen_from_file(), entry_patterns),
-    },
-  },
-  extensions = {
-    live_grep_args = {
-      auto_quoting = true,
-      mappings = {
-        i = {
-          ["<C-q>"] = lga_actions.quote_prompt(),
-          ["<C-f>"] = actions.to_fuzzy_refine,
-        },
-      },
+    sections = {
+      lualine_a = { 'mode' },
+      lualine_b = { 'FugitiveHead', 'readonly', 'modified' },
+      lualine_c = {},
+      lualine_x = { 'fileencoding', 'filetype', '%B' },
+      lualine_y = { 'location' },
+      lualine_z = {},
     },
   }
-})
+end
 
-telescope.load_extension('fzf')
-telescope.load_extension('live_grep_args')
+do -- basic settings ------------------------------------------------
 
--- vim.opt.laststatus = 3 TODO: this needs to be enabled only for some windows (telescope search)
+  -- show invisible characters
+  vim.opt.listchars = { tab = '»-', trail = '·', nbsp = '␣', extends = '>', precedes = '<' }
+  vim.opt.list = true
 
-local builtin = require('telescope.builtin')
+end -- basic settings -----------------------------------------------
 
-vim.keymap.set('n', '<C-]>', function() builtin.find_files({ cwd = get_search_directory() }) end, { noremap = true, silent = true })
-vim.keymap.set('n', '<leader><C-]>', function() builtin.find_files({ cwd = '~/Documents' }) end, { noremap = true, silent = true })
+do -- basic mapping
 
-local lga = require('telescope').extensions.live_grep_args
-vim.keymap.set('n', '<C-p>', function()
-  lga.live_grep_args({
-    cwd = get_search_directory(),
-    entry_maker = highlight_entry(
-      require('telescope.make_entry').gen_from_vimgrep(),
-      entry_patterns
-    ),
+  -- Search&Replace in the file
+  vim.keymap.set('v', 'ts', '"hy:%s/\\V<C-R>=escape(@h, \'\\/\')<CR>//cI<Left><Left><Left><Left>')
+
+end -- basic mapping
+
+do -- search for files / in files -----------------------------------
+  local telescope = require('telescope')
+  local telescope_config = require('telescope.config')
+  local actions = require('telescope.actions')
+  local action_set = require('telescope.actions.set')
+  local action_state = require('telescope.actions.state')
+
+  local function scroll_results(direction)
+    return function(prompt_bufnr)
+      local status = require('telescope.state').get_status(prompt_bufnr)
+      local height = vim.api.nvim_win_get_height(status.results_win)
+      action_set.shift_selection(prompt_bufnr, direction * math.floor(height / 2))
+    end
+  end
+
+  -- Smart directory search: git root -> current dir -> ~/Documents fallback with special buffer handling
+  local function get_search_directory()
+    local current_file = vim.fn.expand('%:p:h')
+    local buftype = vim.bo.buftype
+    local filetype = vim.bo.filetype
+  
+    if buftype ~= '' or filetype == 'fugitive' or filetype == 'git' or current_file:match('^fugitive://') then
+      current_file = vim.fn.getcwd()
+    elseif current_file == '' or not vim.fn.isdirectory(current_file) then
+      current_file = vim.fn.getcwd()
+    end
+
+    local git_root = vim.fn.system('git -C ' .. vim.fn.shellescape(current_file) .. ' rev-parse --show-toplevel 2>/dev/null')
+
+    if vim.v.shell_error == 0 and git_root ~= '' then
+      local clean_root = vim.fn.substitute(git_root, '\n', '', '')
+      if vim.fn.isdirectory(clean_root) == 1 then
+        return clean_root
+      end
+    end
+  
+    if vim.fn.isdirectory(current_file) == 1 then
+      return current_file
+    else
+      return vim.fn.expand('~/Documents')
+    end
+  end
+
+  -- highlight mobile/desktop
+  local function highlight_entry(entry_maker, patterns)
+    return function(entry)
+      local made = entry_maker(entry)
+      if not made then return nil end
+      local original_display = made.display
+      made.display = function(e)
+        local str, highlights = original_display(e)
+        highlights = highlights or {}
+        for _, p in ipairs(patterns) do
+          if e.value and e.value:match(p.pattern) then
+            table.insert(highlights, { { 0, #str }, p.hl_group })
+            break
+          end
+        end
+        return str, highlights
+      end
+      return made
+    end
+  end
+  local entry_patterns = {
+    { pattern = '/mobile/',  hl_group = 'BufferLineType1' },
+    { pattern = '/desktop/', hl_group = 'BufferLineType2' },
+  }
+
+  local lga_actions = require("telescope-live-grep-args.actions")
+  telescope.setup({
+    defaults = {
+      layout_strategy = 'vertical', layout_config = { vertical = { width = 0.99, height = 0.99, prompt_position = 'top', preview_height = 0.15, }},
+      scroll_strategy = 'limit', sorting_strategy = 'ascending',
+      mappings = {
+          i = {
+            ['<Esc>'] = actions.close, ['<C-j>'] = actions.move_selection_next, ['<C-k>'] = actions.move_selection_previous,
+            ['<C-a>'] = actions.select_all, ['<C-o>'] = actions.send_selected_to_qflist + actions.open_qflist, ['<C-b>'] = actions.toggle_selection,
+            ['<C-d>'] = scroll_results(1), ['<C-u>'] = scroll_results(-1),
+            ['<C-e>'] = actions.preview_scrolling_down, ['<C-y>'] = actions.preview_scrolling_up,
+            ['<C-]>'] = actions.cycle_history_next, ['<C-p>'] = actions.cycle_history_prev,
+            ['<C-h>'] = actions.results_scrolling_left, ['<C-l>'] = actions.results_scrolling_right,
+          },
+      },
+      preview = { hide_on_startup = false },
+      vimgrep_arguments = { 'rg', '--color=never', '--no-heading', '--with-filename', '--line-number', '--column', '--smart-case' },
+      history = { path = vim.fn.stdpath('data') .. '/telescope_history', limit = 100, },
+      generic_sorter = require('telescope').extensions.fzf.native_fzf_sorter, file_sorter = require('telescope').extensions.fzf.native_fzf_sorter,
+    },
+    pickers = {
+      find_files = {
+        find_command = { 'rg', '--files', '--smart-case' },
+        entry_maker = highlight_entry(require('telescope.make_entry').gen_from_file(), entry_patterns),
+      },
+    },
+    extensions = {
+      live_grep_args = {
+        auto_quoting = true,
+        mappings = {
+          i = {
+            ["<C-q>"] = lga_actions.quote_prompt(),
+            ["<C-f>"] = actions.to_fuzzy_refine,
+          },
+        },
+      },
+    }
   })
-end, { noremap = true, silent = true })
 
-vim.keymap.set('n', '<leader><C-p>', function()
-  lga.live_grep_args({
-    cwd = '~/Documents',
-    entry_maker = highlight_entry(
-      require('telescope.make_entry').gen_from_vimgrep(),
-      entry_patterns
-    ),
-  })
-end, { noremap = true, silent = true })
+  telescope.load_extension('fzf')
+  telescope.load_extension('live_grep_args')
+
+  -- vim.opt.laststatus = 3 TODO: this needs to be enabled only for some windows (telescope search)
+
+  local builtin = require('telescope.builtin')
+
+  vim.keymap.set('n', '<C-]>', function() builtin.find_files({ cwd = get_search_directory() }) end, { noremap = true, silent = true })
+  vim.keymap.set('n', '<leader><C-]>', function() builtin.find_files({ cwd = '~/Documents' }) end, { noremap = true, silent = true })
+
+  local lga = require('telescope').extensions.live_grep_args
+  vim.keymap.set('n', '<C-p>', function()
+    lga.live_grep_args({
+      cwd = get_search_directory(),
+      entry_maker = highlight_entry(
+        require('telescope.make_entry').gen_from_vimgrep(),
+        entry_patterns
+      ),
+    })
+  end, { noremap = true, silent = true })
+
+  vim.keymap.set('n', '<leader><C-p>', function()
+    lga.live_grep_args({
+      cwd = '~/Documents',
+      entry_maker = highlight_entry(
+        require('telescope.make_entry').gen_from_vimgrep(),
+        entry_patterns
+      ),
+    })
+  end, { noremap = true, silent = true })
+end -- telescope file search
 
 -- Navigation
 vim.keymap.set('n', 'n', 'nzz')

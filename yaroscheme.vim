@@ -151,6 +151,10 @@ call s:setbgfg("ColorColumn", s:bg_almost_invisible, s:text_normal)
 call s:setfg("NonText", s:text_invisible_chars)
 call s:setbgfg("CursorLine", s:bg_select, s:text_normal) 
 
+" Lualine colors
+call s:setbgfg("StatusLine", s:bg_default, s:text_normal) 
+call s:setbgfg("StatusLineNC", s:bg_default, s:text_normal) 
+
 " Bufferline colors
 execute 'highlight BufferLineActive                    guibg='   . s:bg_select . ' guifg=' . s:text_normal
 execute 'highlight BufferLineActiveModified   gui=bold guibg='   . s:bg_select . ' guifg=' . s:text_normal
