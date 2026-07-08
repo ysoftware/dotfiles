@@ -102,9 +102,9 @@ call s:setbgfg("EndOfBuffer", s:bg_default, s:text_normal)
 
 call s:setfg("ErrorMsg", s:text_red)
 
-call s:setbgfg("MsgArea", s:bg_almost_invisible, s:text_normal)
-call s:setbgfg("MoreMsg", s:bg_almost_invisible, s:text_normal)
-call s:setbgfg("Question", s:bg_almost_invisible, s:text_blue)
+call s:setbgfg("MsgArea", s:bg_default, s:text_normal)
+call s:setbgfg("MoreMsg", s:bg_default, s:text_normal)
+call s:setbgfg("Question", s:bg_default, s:text_blue)
 
 call s:setbgfg("QuickFixLine", s:bg_highlight, s:text_normal)
 
