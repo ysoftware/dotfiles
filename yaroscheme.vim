@@ -21,6 +21,7 @@ if &background == "dark"
     let s:bg_select = "#424f59"
     let s:bg_green = "#263f23"
     let s:bg_red = "#3f0909"
+    let s:bg_slight = "#272727"
 
     let s:bg_almost_invisible = "#202020"
     let s:text_invisible_chars = "#303030"
@@ -41,6 +42,7 @@ else
     let s:bg_select = "#cee2f2"
     let s:bg_green = "#46a53a"
     let s:bg_red = "#a53a3a"
+    let s:bg_slight = "#f5f5f5"
 
     let s:bg_almost_invisible = "#fcfcfc"
     let s:text_invisible_chars = "#eaeaea"
@@ -132,6 +134,8 @@ call s:setbgfg("DiffSubname", s:bg_secondary, s:text_normal)
 " Git fugitive colors
 call s:setbgfg("diffAdded", s:bg_green, s:text_on_bg)
 call s:setbgfg("diffRemoved", s:bg_red, s:text_on_bg)
+
+call s:setbgfg("WarningBuffer", s:bg_slight, s:text_normal)
 
 " Merge conflict highlighting
 call s:setbgfg("ConflictMarkerOurs", s:bg_green, s:text_on_bg)

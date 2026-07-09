@@ -597,7 +597,13 @@ do -- Git commands / mapping ----------------------------------------
   vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitiveblame', callback = function(a) vim.keymap.set('n', 'q', '<C-w>c', { buffer = a.buf }) end })
   vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'q', '<C-w>c', { buffer = a.buf }) end })
   vim.api.nvim_create_autocmd('FileType', { pattern = 'qf', callback = function(a) vim.keymap.set('n', 'q', '<C-w>c', { buffer = a.buf }) end })
+
+  -- highlight fugitive buffers (/.git//0)
+  local function is_fugitive_object() local name = vim.api.nvim_buf_get_name(0) return name:match("^fugitive://") and not name:match("%.git//$") end
+  vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, { callback = function() if is_fugitive_object() then vim.wo.winhighlight = "Normal:WarningBuffer" else vim.wo.winhighlight = "" end end, })
+
 end -- Git commands / mapping
+
 
 -- this might not be needed in nvim, but I added it for some reason
 vim.cmd('set nocompatible')
