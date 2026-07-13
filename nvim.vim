@@ -459,13 +459,13 @@ do -- search for files / in files -----------------------------------
           },
       },
       preview = { hide_on_startup = false },
-      vimgrep_arguments = { 'rg', '--color=never', '--no-heading', '--with-filename', '--line-number', '--column', '--smart-case' },
+      vimgrep_arguments = { "rg", "--color=never", "--no-heading", "--with-filename", "--line-number", "--column", "--smart-case", "--sort", "path", },
       history = { path = vim.fn.stdpath('data') .. '/telescope_history', limit = 100, },
       generic_sorter = require('telescope').extensions.fzf.native_fzf_sorter, file_sorter = require('telescope').extensions.fzf.native_fzf_sorter,
     },
     pickers = {
       find_files = {
-        find_command = { 'rg', '--files', '--smart-case' },
+        find_command = { "rg", "--files", "--smart-case", "--sort", "path", },
         entry_maker = highlight_entry(require('telescope.make_entry').gen_from_file(), entry_patterns),
       },
     },
