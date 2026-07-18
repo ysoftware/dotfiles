@@ -1,4 +1,5 @@
 #!/bin/bash
+set +xe
 
 # call xrandr to see these variables or just guess them
 PRIMARY="DP-5"

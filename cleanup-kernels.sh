@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#!/bin/bash
+set +xe
 
 old_kernels=($(dnf repoquery --installonly --latest-limit=-1 -q))
 if [ "${#old_kernels[@]}" -eq 0 ]; then
