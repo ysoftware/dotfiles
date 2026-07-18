@@ -90,38 +90,6 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
-" Nerd tree
-let NERDTreeShowHidden=1
-let NERDTreeCustomOpenArgs={'file':{'keepopen': '0'}}
-let g:NERDTreeWinSize=60
-
-set wildignore+=*.pyc,*.svn,*.swp,*.hg,*.DS_Store
-let NERDTreeRespectWildIgnore=1
-
-let g:NERDTreeGitStatusIndicatorMapCustom = {
-    \ 'Modified'  :'m',
-    \ 'Staged'    :'s',
-    \ 'Untracked' :'t',
-    \ 'Renamed'   :'r',
-    \ 'Unmerged'  :'n',
-    \ 'Deleted'   :'d',
-    \ 'Dirty'     :'x',
-    \ 'Ignored'   :'i',
-    \ 'Clean'     :'c',
-    \ 'Unknown'   :'u',
-    \ }
-
-augroup NerdTreeTabWidth
-  autocmd!
-  autocmd FileType nerdtree setlocal tabstop=1 shiftwidth=1 softtabstop=1 noexpandtab
-  autocmd VimEnter * if &filetype ==# 'nerdtree' | setlocal tabstop=1 shiftwidth=1 softtabstop=1 noexpandtab | endif
-augroup END
-
-nnoremap <C-t> :NERDTreeFind<CR>
-nnoremap <leader><C-f> :NERDTreeVCS<CR>
-nnoremap <C-f> :NERDTreeToggle<CR>
-autocmd FileType nerdtree nnoremap <buffer> <leader>q <C-w>c
-
 " Prettify json (depends on installed jq)
 augroup PrettifyJson
   autocmd!
@@ -625,9 +593,43 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
--- fix nerdtree copy path
-vim.api.nvim_create_autocmd("FileType", {
-    pattern = "nerdtree",
+-- nerd tree
+
+vim.g.NERDTreeShowHidden = 1
+vim.g.NERDTreeCustomOpenArgs = { file = { keepopen = '0' } }
+vim.g.NERDTreeWinSize = 60
+vim.g.NERDTreeRespectWildIgnore = 1
+vim.g.NERDTreeNodeDelimiter = vim.fn.nr2char(0xa0) -- https://github.com/preservim/nerdtree/issues/928
+vim.g.NERDTreeGitStatusIndicatorMapCustom = { Modified = 'm', Staged = 's', Untracked = 't', Renamed = 'r',
+    Unmerged = 'n', Deleted = 'd', Dirty = 'x', Ignored = 'i', Clean = 'c', Unknown = 'u', }
+
+vim.opt.wildignore:append({ '*.pyc', '*.svn', '*.swp', '*.hg', '*.DS_Store' })
+
+vim.api.nvim_create_augroup('NerdTreeTabWidth', { clear = true })
+vim.api.nvim_create_autocmd('FileType', {
+    group = 'NerdTreeTabWidth',
+    pattern = 'nerdtree',
+    callback = function()
+        vim.opt_local.tabstop = 1
+        vim.opt_local.shiftwidth = 1
+        vim.opt_local.softtabstop = 1
+        vim.opt_local.expandtab = false
+    end,
+})
+
+vim.keymap.set('n', '<C-t>', ':NERDTreeFind<CR>')
+vim.keymap.set('n', '<leader><C-f>', ':NERDTreeVCS<CR>')
+vim.keymap.set('n', '<C-f>', ':NERDTreeToggle<CR>')
+
+vim.api.nvim_create_autocmd('FileType', {
+    pattern = 'nerdtree',
+    callback = function(args)
+        vim.keymap.set('n', '<leader>q', '<C-w>c', { buffer = args.buf })
+    end,
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+    pattern = 'nerdtree',
     once = true,
     callback = function()
         vim.cmd([[
