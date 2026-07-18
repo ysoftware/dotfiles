@@ -44,7 +44,8 @@ alias mona="~/Documents/GitHub/dotfiles/set-output.sh set_workspace_all"
 export JQ_COLORS="0;31:0;39:0;39:0;34:0;32:0;90:0;90:0;39"
 
 # folder sizes
-alias size="du -h --max-depth=1 | sort -h"
+alias size="du -h -d 1 | sort -h"
+alias disks="df -h"
 
 # shut up clangd
 export CLANGD_FLAGS="--clang-tidy=false"
