@@ -3,159 +3,14 @@
 
 " TODO: add .gitconfig to dotfiles
 
-let mapleader = " "
-:set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
-
-" Multiline
-let g:VM_mouse_mappings = 1
-
-" Buffers
-command! Bufo silent! execute "%bd|e#|bd#"
-nnoremap <C-W>. :vertical res +10<CR>
-nnoremap <C-W>, :vertical res -10<CR>
-nnoremap <C-W>> :res +20<CR>
-nnoremap <C-W>< :res -20<CR>
-command! CountMatches execute "%s///gn"
-command! W :w
-
-" Auto fold imports
-command! FoldPhpImport silent! normal! zEG$/^use <CR>VGNzf/fake-search-query<CR>gg<C-l>
-command! FoldTsImport silent! normal! zEG$/^import <CR>VGNzf/fake-search-query<CR>gg<C-l>
-
-" Code formatting
-autocmd FileType c,cpp,h setlocal commentstring=//\ %s
-autocmd FileType typescript,html,scss,css,javascript setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab
-
-augroup twig_ft
-  au!
-  autocmd BufNewFile,BufRead *.html.twig   set syntax=html
-augroup END
-
-" Snippets
-augroup SwiftSnippets
-    autocmd!
-    autocmd FileType swift abbrev wink .sink { [weak self] in<CR><CR>}<CR>.store(in: &subscribers)<Up><Up><Up><Left><Left><Left>
-    autocmd FileType swift abbrev ws [weak self] in<Left><Left><Left>
-    autocmd FileType swift abbrev gl guard let self else { return }
-    autocmd FileType swift abbrev si .store(in: &subscribers)
-    autocmd FileType swift abbrev infii .frame(maxWidth: .infinity, alignment: .leading)
-augroup END
-
-augroup PhpSnippets
-    autocmd!
-    autocmd FileType php abbrev fwr fwrite(STDOUT, var_export(, true));<Left><Left><Left><Left><Left><Left><Left><Left><Left>
-    autocmd FileType php abbrev stackTrace catch (Throwable $e) { fwrite(STDOUT, " \n \n".$e->getMessage()."\n \n".$e->getTraceAsString()); }
-augroup END
-
-augroup AllSnippets
-    autocmd!
-    autocmd FileType typescript,javascript abbrev cons console.info(); // nocheckin<Left><Left><Left><Left><Left><Left><Left><Left><Left><Left><Left><Left><Left><Left>
-augroup END
-
-" Status line setup
-let g:bufferline_echo = 1
-let g:bufferline_modified = ''
-let g:bufferline_show_bufnr = 0
-let g:bufferline_show_bufpos = 1
-let g:bufferline_inactive_highlight = 'StatusLineNC'
-let g:bufferline_active_highlight = 'Search'
-let g:bufferline_active_buffer_left = ''
-let g:bufferline_active_buffer_right = ''
-let g:bufferline_solo_highlight = 0
-let g:bufferline_rotate = 2
-let g:bufferline_custom_pattern_indicator = [
-  \ ['*/angular/*/mobile/*',  'BufferLineType1'],
-  \ ['*/angular/*/desktop/*', 'BufferLineType2'],
-  \ ['*/frontend-client/*/mobile/*',  'BufferLineType3'],
-  \ ['*/frontend-client/*/desktop/*', 'BufferLineType4'],
-  \ ]
-
-" Start page
-let g:startify_custom_header = ['   neovim']
-
-if has('mac')
-    au BufWritePost * lua require('lint').try_lint()
-endif
-
-function! s:build_quickfix_list(lines)
-    call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
-    copen
-    cc
-endfunction
-
-" Setup Plugin Manager
-let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
-if empty(glob(data_dir . '/autoload/plug.vim'))
-  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
-endif
-
-" Prettify json (depends on installed jq)
-augroup PrettifyJson
-  autocmd!
-  autocmd FileType json command! -buffer Prettify %!jq --indent 2 -f %
-augroup END
-
-" Prettify html (depends on installed pup)
-augroup PrettifyHtml
-  autocmd!
-  autocmd FileType html,htmljinja,html.twig command! -buffer Prettify %!pup -i 2 -f % html
-augroup END
-
-" - SEARCH
-
-" Don't search in folded code
-set fdo-=search
-set fdo-=jump
-
-" File Search
-nnoremap <C-S-up> :e ~/Documents/GitHub/dotfiles/nvim.vim<CR>
-nnoremap <leader><Down> :e ~/Documents/GitHub/Notes/Notes.txt<CR>
-
-if has('mac')
-    nnoremap <C-S-down> :e ~/Documents/Check24/check24-worklog/worklog.txt<CR>
-elseif has('linux')
-    nnoremap <C-S-down> :e ~/Documents/Text/os-todos.txt<CR>
-endif
-
-noremap <C-S-Right> :set background=light<CR><CR><C-l>
-noremap <C-S-Left> :set background=dark<CR><C-l>
-autocmd OptionSet background call yaroscheme#apply()
-
-set ic " case insensitive search
-set gdefault
-let g:searchindex_line_limit=2000000
-nnoremap <silent> <C-l> :noh<CR><C-l>
-nnoremap <leader>n :cn<CR>
-nnoremap <C-b> :make<CR>
-
-" Reset search
-nnoremap <silent> <leader>/ /fake-search-query<CR><C-l>
-autocmd FileType vim nnoremap <buffer> <silent> <leader>/ :noh<CR><C-l>
-
-if has('mac')
-    nnoremap <leader>l :XcodebuildCloseLogs<CR> :ccl<CR>
-    command! Cancel :XcodebuildCancel
-else
-endif
-
-if has('mac')
-    nnoremap <leader>r :w<CR> :Simo<CR> :XcodebuildBuildRun<CR>
-    nnoremap <leader>Q :XcodebuildCodeActions<CR>
-
-    command! Simo execute 'cd ~/Documents/Check24/ios-pod-mobile-sim/' 
-    command! Set :XcodebuildPicker
-    command! Lg :XcodebuildOpenLog
-else
-endif
-
-set termguicolors
-colorscheme yaroscheme
-call yaroscheme#apply()
-set title
-
 lua << EOF
 vim.deprecate = function() end
+
+-- color scheme
+vim.opt.termguicolors = true
+vim.cmd.colorscheme("yaroscheme")
+vim.fn["yaroscheme#apply"]()
+vim.opt.title = true
 
 -- run scripts after installing packages
 vim.api.nvim_create_autocmd('PackChanged', {
@@ -234,6 +89,7 @@ end
 
 do -- basic settings ------------------------------------------------
   vim.cmd('syntax on')
+  vim.g.mapleader = " "
   vim.opt.path:append('**')
   vim.opt.ruler = true
   vim.opt.relativenumber = true
@@ -242,6 +98,13 @@ do -- basic settings ------------------------------------------------
   vim.opt.wildignorecase = true
   vim.opt.scroll = 15
   vim.opt.scrolloff = 3
+  vim.opt.langmap = "ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz"
+
+  -- Start page
+  vim.g.startify_custom_header = {'   neovim'}
+
+  -- Multiline
+  vim.g.VM_mouse_mappings = 1
 
   -- show invisible characters
   vim.opt.listchars = { tab = '»-', trail = '·', nbsp = '␣', extends = '>', precedes = '<' }
@@ -255,6 +118,13 @@ do -- basic settings ------------------------------------------------
   vim.opt.expandtab = true
   vim.opt.showmode = false
 
+  -- Don't search in folded code
+  vim.opt.fdo:remove("search")
+  vim.opt.fdo:remove("jump")
+  vim.opt.ic = true -- case insensitive search
+  vim.opt.gdefault = true
+  vim.g.searchindex_line_limit = 2000000
+
 end -- basic settings
 
 do -- basic mapping -------------------------------------------------
@@ -266,7 +136,7 @@ do -- basic mapping -------------------------------------------------
   vim.keymap.set('n', 'n', 'nzz')
   vim.keymap.set('n', 'N', 'Nzz')
   vim.opt.switchbuf:append('useopen')
-  
+
   -- camel case navigation
   vim.keymap.set('', ',w', '<Plug>CamelCaseMotion_w', { silent = true, remap = true })
   vim.keymap.set('', ',b', '<Plug>CamelCaseMotion_b', { silent = true, remap = true })
@@ -342,6 +212,106 @@ do -- basic mapping -------------------------------------------------
   vim.keymap.set('t', '<C-q>', [[<C-\><C-n>]])
 
 end -- basic mapping
+
+do -- custom commands -----------------------------------------------
+
+  -- buffers
+  vim.api.nvim_create_user_command('Bufo', function() pcall(vim.cmd, '%bd|e#|bd#') end, {})
+  vim.keymap.set('n', '<C-W>.', ':vertical res +10<CR>')
+  vim.keymap.set('n', '<C-W>,', ':vertical res -10<CR>')
+  vim.keymap.set('n', '<C-W>>', ':res +20<CR>')
+  vim.keymap.set('n', '<C-W><', ':res -20<CR>')
+  vim.api.nvim_create_user_command('CountMatches', function() vim.cmd('%s///gn') end, {})
+  vim.api.nvim_create_user_command('W', function() vim.cmd('w') end, {})
+
+  -- auto fold imports
+  vim.api.nvim_create_user_command('FoldPhpImport', function() vim.cmd([[silent! normal! zEG$/^use <CR>VGNzf/fake-search-query<CR>gg<C-l>]]) end, {})
+  vim.api.nvim_create_user_command('FoldTsImport', function() vim.cmd([[silent! normal! zEG$/^import <CR>VGNzf/fake-search-query<CR>gg<C-l>]]) end, {})
+
+  -- code formatting
+  vim.api.nvim_create_autocmd('FileType', { pattern = {'c','cpp','h'}, command = [[setlocal commentstring=//\ %s]] })
+  vim.api.nvim_create_autocmd('FileType', { pattern = {'typescript','html','scss','css','javascript'}, command = 'setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab' })
+  local twig_ft = vim.api.nvim_create_augroup('twig_ft', { clear = true })
+  vim.api.nvim_create_autocmd({'BufNewFile','BufRead'}, { pattern = '*.html.twig', group = twig_ft, command = 'set syntax=html' })
+
+  -- snippets
+  local SwiftSnippets = vim.api.nvim_create_augroup('SwiftSnippets', { clear = true })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'swift', group = SwiftSnippets, command = [[abbrev wink .sink { [weak self] in<CR><CR>}<CR>.store(in: &subscribers)<Up><Up><Up><Left><Left><Left>]] })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'swift', group = SwiftSnippets, command = [[abbrev ws [weak self] in<Left><Left><Left>]] })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'swift', group = SwiftSnippets, command = [[abbrev gl guard let self else { return }]] })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'swift', group = SwiftSnippets, command = [[abbrev si .store(in: &subscribers)]] })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'swift', group = SwiftSnippets, command = [[abbrev infii .frame(maxWidth: .infinity, alignment: .leading)]] })
+  local PhpSnippets = vim.api.nvim_create_augroup('PhpSnippets', { clear = true })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'php', group = PhpSnippets, command = [[abbrev fwr fwrite(STDOUT, var_export(, true));<Left><Left><Left><Left><Left><Left><Left><Left><Left>]] })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'php', group = PhpSnippets, command = [[abbrev stackTrace catch (Throwable $e) { fwrite(STDOUT, " \n \n".$e->getMessage()."\n \n".$e->getTraceAsString()); }]] })
+  local AllSnippets = vim.api.nvim_create_augroup('AllSnippets', { clear = true })
+  vim.api.nvim_create_autocmd('FileType', { pattern = {'typescript','javascript'}, group = AllSnippets, command = [[abbrev cons console.info(); // nocheckin<Left><Left><Left><Left><Left><Left><Left><Left><Left><Left><Left><Left><Left><Left>]] })
+
+  -- linter
+  if vim.fn.has('mac') == 1 then vim.api.nvim_create_autocmd('BufWritePost', { pattern = '*', callback = function() require('lint').try_lint() end, }) end
+
+  local function build_quickfix_list(lines)
+    local qf_list = {}
+    for _, line in ipairs(lines) do
+      table.insert(qf_list, { filename = line })
+    end
+    vim.fn.setqflist(qf_list)
+    vim.cmd('copen')
+    vim.cmd('cc')
+  end
+
+  -- Prettify json (depends on installed jq)
+  local PrettifyJson = vim.api.nvim_create_augroup('PrettifyJson', { clear = true })
+  vim.api.nvim_create_autocmd('FileType', { pattern = 'json', group = PrettifyJson, command = [[command! -buffer Prettify %!jq --indent 2 -f %]] })
+
+  -- Prettify html (depends on installed pup)
+  local PrettifyHtml = vim.api.nvim_create_augroup('PrettifyHtml', { clear = true })
+  vim.api.nvim_create_autocmd('FileType', { pattern = {'html','htmljinja','html.twig'}, group = PrettifyHtml, command = [[command! -buffer Prettify %!pup -i 2 -f % html]] })
+
+  -- Open nvim config file
+  vim.keymap.set('n', '<C-S-up>', ':e ~/Documents/GitHub/dotfiles/nvim.vim<CR>')
+  vim.keymap.set('n', '<leader><Down>', ':e ~/Documents/GitHub/Notes/Notes.txt<CR>')
+
+  if vim.fn.has('mac') == 1 then
+    vim.keymap.set('n', '<C-S-down>', ':e ~/Documents/Check24/check24-worklog/worklog.txt<CR>')
+  elseif vim.fn.has('linux') == 1 then
+    vim.keymap.set('n', '<C-S-down>', ':e ~/Documents/Text/os-todos.txt<CR>')
+  end
+
+  vim.keymap.set('n', '<C-l>', ':noh<CR><C-l>', { silent = true })
+  vim.keymap.set('n', '<leader>n', ':cn<CR>')
+  vim.keymap.set('n', '<C-b>', ':make<CR>')
+
+  -- Color scheme
+  vim.keymap.set('', '<C-S-Right>', ':set background=light<CR><CR><C-l>')
+  vim.keymap.set('', '<C-S-Left>', ':set background=dark<CR><C-l>')
+  vim.api.nvim_create_autocmd('OptionSet', { pattern = 'background', callback = function() vim.fn['yaroscheme#apply']() end })
+
+  -- Reset search
+  vim.keymap.set('n', '<leader>/', '/fake-search-query<CR><C-l>', { silent = true })
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = 'vim',
+    callback = function()
+      vim.keymap.set('n', '<leader>/', ':noh<CR><C-l>', { buffer = true, silent = true })
+    end,
+  })
+
+  if vim.fn.has('mac') == 1 then
+    vim.keymap.set('n', '<leader>l', ':XcodebuildCloseLogs<CR> :ccl<CR>')
+    vim.api.nvim_create_user_command('Cancel', 'XcodebuildCancel', {})
+  end
+
+  if vim.fn.has('mac') == 1 then
+    vim.keymap.set('n', '<leader>r', ':w<CR> :Simo<CR> :XcodebuildBuildRun<CR>')
+    vim.keymap.set('n', '<leader>Q', ':XcodebuildCodeActions<CR>')
+    vim.api.nvim_create_user_command('Simo', function()
+      vim.cmd("cd ~/Documents/Check24/ios-pod-mobile-sim/")
+    end, {})
+    vim.api.nvim_create_user_command('Set', 'XcodebuildPicker', {})
+    vim.api.nvim_create_user_command('Lg', 'XcodebuildOpenLog', {})
+  end
+
+end -- custom commands
 
 do -- search for files / in files -----------------------------------
   local telescope = require('telescope')
@@ -592,6 +562,25 @@ vim.api.nvim_create_autocmd('FileType', {
     end, { buffer = true, silent = true })
   end,
 })
+
+-- bufferline
+
+vim.g.bufferline_echo = 1
+vim.g.bufferline_modified = ''
+vim.g.bufferline_show_bufnr = 0
+vim.g.bufferline_show_bufpos = 1
+vim.g.bufferline_inactive_highlight = 'StatusLineNC'
+vim.g.bufferline_active_highlight = 'Search'
+vim.g.bufferline_active_buffer_left = ''
+vim.g.bufferline_active_buffer_right = ''
+vim.g.bufferline_solo_highlight = 0
+vim.g.bufferline_rotate = 2
+vim.g.bufferline_custom_pattern_indicator = {
+  {'*/angular/*/mobile/*',  'BufferLineType1'},
+  {'*/angular/*/desktop/*', 'BufferLineType2'},
+  {'*/frontend-client/*/mobile/*',  'BufferLineType3'},
+  {'*/frontend-client/*/desktop/*', 'BufferLineType4'},
+}
 
 -- nerd tree
 
