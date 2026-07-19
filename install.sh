@@ -13,10 +13,10 @@ else
 fi
 
 # load nvim config
-NVIM_IN="$DIR/nvim.vim"
-NVIM_OUT="$HOME/.config/nvim/init.vim"
-if ! grep -Fsq "so $NVIM_IN" "$NVIM_OUT"; then
-    echo "so $NVIM_IN \" from $DIR/install.sh" >> "$NVIM_OUT"
+NVIM_IN="$DIR/nvim.lua"
+NVIM_OUT="$HOME/.config/nvim/init.lua"
+if ! grep -Fsq "$NVIM_IN" "$NVIM_OUT"; then
+    echo "dofile(\"$NVIM_IN\") -- from $DIR/install.sh" >> "$NVIM_OUT"
     echo "'nvim: so $NVIM_IN' -> $NVIM_OUT"
 else
     echo "${UP_TO_DATE_MSG}${NVIM_OUT}"
