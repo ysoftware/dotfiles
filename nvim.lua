@@ -1247,6 +1247,13 @@ vim.keymap.set('n', '<leader>f', function()
     end
 end, { noremap = true, silent = true })
 
+vim.keymap.set('n', '<leader>F', function()
+    local command = vim.fn.input('Lua for quickfix: ')
+    local result = load('return ' .. command)()
+    vim.fn.setqflist({}, 'r', { lines = vim.split(vim.inspect(result), '\n') })
+    vim.cmd.copen()
+end, { noremap = true, silent = true })
+
 -- Jump to task when cursor is over huid
 local function open_task_under_cursor()
     local task_dir, pat = "tasks", "%d%d%d%d%d%d%d%d%-%d%d%d%d%d%d"
