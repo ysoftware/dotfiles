@@ -1,5 +1,8 @@
--- TODO: Disable FUCKING STUPID word wrapping (repro: when typing a long comment, it will auto break at 100th)
 -- TODO: add .gitconfig to dotfiles
+
+---@diagnostic disable: redefined-local
+---@diagnostic disable-next-line: undefined-global
+local vim = vim
 
 vim.deprecate = function() end
 
@@ -54,7 +57,7 @@ end
 do -- colorizer plugin
     require'colorizer'.setup()
     vim.api.nvim_create_autocmd('FileType', { pattern = 'diff', callback = function() require'colorizer'.detach_from_buffer(0) end, })
-end
+end -- colorizer plugin
 
 do -- status line plugin
     require('lualine').setup {
@@ -82,7 +85,7 @@ do -- status line plugin
         },
     },
 }
-end
+end -- status line plugin
 
 do -- basic settings ------------------------------------------------
     vim.cmd('syntax on')
@@ -96,6 +99,12 @@ do -- basic settings ------------------------------------------------
     vim.opt.scroll = 15
     vim.opt.scrolloff = 3
     vim.opt.langmap = "ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz"
+
+    vim.api.nvim_create_autocmd("FileType", {
+        callback = function()
+            vim.opt_local.textwidth = 0
+        end,
+    })
 
     -- Start page
     vim.g.startify_custom_header = {'   neovim'}
@@ -196,12 +205,9 @@ do -- basic mapping -------------------------------------------------
     vim.keymap.set('n', '<leader>e', function() vim.diagnostic.setqflist({ severity = vim.diagnostic.severity.ERROR }) vim.cmd('copen') end, { silent = true })
     vim.keymap.set('n', '<leader>E', function() vim.diagnostic.setqflist() vim.cmd('copen') end, { silent = true })
     vim.keymap.set('n', '<leader>h', vim.lsp.buf.hover, { silent = true })
-    vim.keymap.set('n', '[g', function() goto_error_then_hint(vim.diagnostic.goto_prev) end, { silent = true })
-    vim.keymap.set('n', ']g', function() goto_error_then_hint(vim.diagnostic.goto_next) end, { silent = true })
     vim.keymap.set('n', '<leader>o', vim.diagnostic.open_float, { silent = true })
     vim.keymap.set('n', '<leader>d', vim.lsp.buf.definition, { silent = true })
     vim.keymap.set('n', '<leader>D', vim.lsp.buf.references, { silent = true })
-    vim.keymap.set('n', '<leader>M', function() BreakArguments() end, { silent = true })
     vim.keymap.set('n', '<leader><C-A>', '<cmd>InlayHintsToggle<CR>', { silent = true })
     vim.keymap.set('n', '<leader><C-d>', function() vim.cmd('tab split | lua vim.lsp.buf.definition()') end, { noremap = true, silent = true })
 
@@ -247,16 +253,6 @@ do -- custom commands -----------------------------------------------
     -- linter
     if vim.fn.has('mac') == 1 then vim.api.nvim_create_autocmd('BufWritePost', { pattern = '*', callback = function() require('lint').try_lint() end, }) end
 
-    local function build_quickfix_list(lines)
-        local qf_list = {}
-        for _, line in ipairs(lines) do
-            table.insert(qf_list, { filename = line })
-        end
-        vim.fn.setqflist(qf_list)
-        vim.cmd('copen')
-        vim.cmd('cc')
-    end
-
     -- Prettify json (depends on installed jq)
     local PrettifyJson = vim.api.nvim_create_augroup('PrettifyJson', { clear = true })
     vim.api.nvim_create_autocmd('FileType', { pattern = 'json', group = PrettifyJson, command = [[command! -buffer Prettify %!jq --indent 2 -f %]] })
@@ -266,7 +262,7 @@ do -- custom commands -----------------------------------------------
     vim.api.nvim_create_autocmd('FileType', { pattern = {'html','htmljinja','html.twig'}, group = PrettifyHtml, command = [[command! -buffer Prettify %!pup -i 2 -f % html]] })
 
     -- Open nvim config file
-    vim.keymap.set('n', '<C-S-up>', ':e ~/Documents/GitHub/dotfiles/nvim.vim<CR>')
+    vim.keymap.set('n', '<C-S-up>', ':e ~/Documents/GitHub/dotfiles/nvim.lua<CR>')
     vim.keymap.set('n', '<leader><Down>', ':e ~/Documents/GitHub/Notes/Notes.txt<CR>')
 
     if vim.fn.has('mac') == 1 then
@@ -312,10 +308,8 @@ end -- custom commands
 
 do -- search for files / in files -----------------------------------
     local telescope = require('telescope')
-    local telescope_config = require('telescope.config')
     local actions = require('telescope.actions')
     local action_set = require('telescope.actions.set')
-    local action_state = require('telescope.actions.state')
 
     local function scroll_results(direction)
         return function(prompt_bufnr)
@@ -469,7 +463,7 @@ do -- switch buffer by number ---------------------------------------
     vim.keymap.set('n', '<leader>-', ':lua SwitchToBuffer(11)<CR>', { silent = true })
 end -- switch buffer by number
 
-do -- Highlight merge conflicted blocks -----------------------------
+do -- highlight merge conflicted blocks -----------------------------
     local merge_conflict_group = vim.api.nvim_create_augroup('MergeConflictHighlight', { clear = true })
     local function setup_merge_conflict_highlight()
         vim.cmd([[syn region ConflictMarkerOurs start=/^<<<<<<< .*$/ end=/^\ze\(=======$\||||||||\)/]])
@@ -481,9 +475,9 @@ do -- Highlight merge conflicted blocks -----------------------------
         pattern = '*',
         callback = setup_merge_conflict_highlight,
     })
-end
+end -- highlight merge conflicted blocks
 
-do -- Git commands / mapping ----------------------------------------
+do -- git commands / mapping -----------------------------------------
     vim.api.nvim_create_user_command('Diff', 'GitGutterDiff', {})
 
     function GitCheckoutFromBranchesView()
@@ -537,8 +531,57 @@ do -- Git commands / mapping ----------------------------------------
     local function is_fugitive_object() local name = vim.api.nvim_buf_get_name(0) return name:match("^fugitive://") and not name:match("%.git//$") end
     vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, { callback = function() if is_fugitive_object() then vim.wo.winhighlight = "Normal:WarningBuffer" else vim.wo.winhighlight = "" end end, })
 
-end -- Git commands / mapping
+end -- git commands / mapping
 
+do -- advanced LSP features -----------------------------------------
+    local function goto_error_then_hint(goto_func)
+        local pos = vim.api.nvim_win_get_cursor(0)
+        goto_func( {severity=vim.diagnostic.severity.ERROR, wrap = true} )
+        local pos2 = vim.api.nvim_win_get_cursor(0)
+        local r1, c1 = pos[1], pos[2]
+        local r2, c2 = pos2[1], pos2[2]
+        local condition = r1 == r2 and c1 == c2
+        if (condition) then
+            goto_func( {wrap = true} )
+        end
+    end
+    vim.keymap.set('n', '[g', function() goto_error_then_hint(vim.diagnostic.goto_prev) end, { silent = true })
+    vim.keymap.set('n', ']g', function() goto_error_then_hint(vim.diagnostic.goto_next) end, { silent = true })
+
+    local function break_arguments()
+        local line = vim.api.nvim_get_current_line()
+        local new_lines = {}
+        local current_line = ""
+        local inside_parens = false
+
+        for i = 1, #line do
+            local char = line:sub(i, i)
+
+            if char == "(" and not inside_parens then
+                current_line = current_line .. char
+                table.insert(new_lines, current_line)
+                current_line = ""
+                inside_parens = true
+            elseif char == "," and inside_parens then
+                current_line = current_line .. char
+                table.insert(new_lines, current_line)
+                current_line = ""
+            elseif char == ")" and inside_parens then
+                table.insert(new_lines, current_line)
+                current_line = char
+                inside_parens = false
+            else
+                current_line = current_line .. char
+            end
+        end
+
+        table.insert(new_lines, current_line) -- add the last part
+        local row = vim.api.nvim_win_get_cursor(0)[1]
+        vim.api.nvim_buf_set_lines(0, row - 1, row, false, new_lines) -- replace current line with new lines
+        vim.cmd("normal! V%=") -- auto-format
+    end
+    vim.keymap.set('n', '<leader>M', function() break_arguments() end, { silent = true })
+end -- advanced LSP features
 
 -- this might not be needed in nvim, but I added it for some reason
 vim.cmd('set nocompatible')
@@ -630,9 +673,7 @@ vim.api.nvim_create_autocmd('FileType', {
 vim.api.nvim_create_user_command('Mess', "put =execute('messages')", {})
 vim.keymap.set('n', 'Q', vim.lsp.buf.code_action, { silent = true })
 
--- neovide
-
-if vim.g.neovide then -- ->
+if vim.g.neovide then -- neovide ------------------------------------
     vim.g.neovide_pixel_geometry = "RGBH"
     vim.g.neovide_text_gamma = 0.85
 
@@ -666,118 +707,119 @@ if vim.g.neovide then -- ->
             vim.env.PATH = path
         end
     end
-end
+end -- neovide
 
-local ok, xcodebuild = pcall(require, 'xcodebuild')
-if ok and xcodebuild then
-    xcodebuild.setup({ auto_save = false })
-end
-
--- linter + downgrade errors to warnings
-local ok, lint = pcall(require, 'lint')
-if ok and lint then
-    lint.linters_by_ft = {
-        javascript = { "eslint" },
-        typescript = { "eslint" },
-        -- swift      = { "swiftlint" },
-    }
-    lint.linters.eslint = require("lint.util").wrap(lint.linters.eslint, function(diagnostic)
-        if diagnostic.source and diagnostic.source:lower() == "eslint" then
-            diagnostic.severity = vim.diagnostic.severity.WARN
-        end
-        return diagnostic
-    end)
-    lint.linters.swiftlint = require("lint.util").wrap(lint.linters.swiftlint, function(diagnostic)
-        if diagnostic.source and diagnostic.source:lower() == "swiftlint" then
-            diagnostic.severity = vim.diagnostic.severity.WARN
-        end
-        return diagnostic
-    end)
-end
-
--- php lsp (phpactor - free alternative with code actions)
-local phpactor_lsp = require'lspconfig'.phpactor
-if phpactor_lsp then
-    phpactor_lsp.setup {
-        autostart = true,
-        capabilities = capabilities,
-        cmd = { "phpactor", "language-server" },
-        root_dir = function()
-            return "/Users/iaroslav.erokhin/Documents/Check24/core-api/"
-        end,
-        init_options = {
-            ["language_server_phpstan.enabled"] = false,
-            ["language_server_psalm.enabled"] = false,
-        },
-        handlers = {
-            ["window/showMessage"] = function() end,
-        },
-    }
-end
-
--- angular lsp
-local project_library_path = "~/Documents/Check24/angular/"
-local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
-local tsserver_lsp = require'lspconfig'.tsserver
-if tsserver_lsp and tsserver_lsp.setup then
-    tsserver_lsp.setup {
-        capabilities = capabilities,
-        filetypes = { "typescript", "html", "scss", "css", "javascript", "htmlangular" },
-        init_options = {
-            preferences = {
-                importModuleSpecifier = "non-relative",
-                importModuleSpecifierPreference = "non-relative",
-            },
-        },
-    }
-end
-
-local angularls_lsp = require'lspconfig'.angularls
-if angularls_lsp then
-    angularls_lsp.setup {
-        cmd = cmd,
-        capabilities = capabilities,
-        filetypes = { "typescript", "html", "scss", "css", "javascript", "htmlangular" },
-        on_new_config = function(new_config,new_root_dir)
-            new_config.cmd = cmd
-        end,
-    }
-end
-
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-local lspconfig = require('lspconfig')
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
-
-require'lspconfig'.rust_analyzer.setup {
-    capabilities = capabilities,
-    filetypes = { "rust" }
-}
-
-require'lspconfig'.ols.setup {
-    capabilities = capabilities,
-    filetypes = { "odin" }
-}
-
-require'lspconfig'.clangd.setup {
-    capabilities = capabilities,
-    filetypes = { "c", "h", "cpp", "m" },
-    cmd = { "clangd", "--clang-tidy=false" }
-}
-
-require'lspconfig'.lua_ls.setup {
-    capabilities = capabilities,
-    filetypes = { "lua" }
-}
-
-local util = require'lspconfig.util'
-require'lspconfig'.sourcekit.setup { 
-    capabilities = capabilities,
-    filetypes = { "swift" },
-    root_dir = function(idk)
-        return "/Users/iaroslav.erokhin/Documents/Check24/ios-pod-mobile-sim"
+do -- setup lsp servers ------------------------------------------------
+    local ok, xcodebuild = pcall(require, 'xcodebuild')
+    if ok and xcodebuild then
+        xcodebuild.setup({ auto_save = false })
     end
-}
+
+    -- linter + downgrade errors to warnings
+    local ok, lint = pcall(require, 'lint')
+    if ok and lint then
+        lint.linters_by_ft = {
+            javascript = { "eslint" },
+            typescript = { "eslint" },
+            -- swift      = { "swiftlint" },
+        }
+        lint.linters.eslint = require("lint.util").wrap(lint.linters.eslint, function(diagnostic)
+            if diagnostic.source and diagnostic.source:lower() == "eslint" then
+                diagnostic.severity = vim.diagnostic.severity.WARN
+            end
+            return diagnostic
+        end)
+        lint.linters.swiftlint = require("lint.util").wrap(lint.linters.swiftlint, function(diagnostic)
+            if diagnostic.source and diagnostic.source:lower() == "swiftlint" then
+                diagnostic.severity = vim.diagnostic.severity.WARN
+            end
+            return diagnostic
+        end)
+    end
+
+    local lspconfig = require('lspconfig')
+    local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
+
+    -- php lsp (phpactor - free alternative with code actions)
+    local phpactor_lsp = lspconfig.phpactor
+    if phpactor_lsp then
+        phpactor_lsp.setup {
+            autostart = true,
+            capabilities = capabilities,
+            cmd = { "phpactor", "language-server" },
+            root_dir = function()
+                return "/Users/iaroslav.erokhin/Documents/Check24/core-api/"
+            end,
+            init_options = {
+                ["language_server_configuration.auto_config"] = false,
+                ["language_server_phpstan.enabled"] = false,
+                ["language_server_psalm.enabled"] = false,
+            },
+            handlers = {
+                ["window/showMessage"] = function() end,
+            },
+        }
+    end
+
+    -- angular lsp
+    local project_library_path = "~/Documents/Check24/angular/"
+    local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
+    local tsserver_lsp = lspconfig.tsserver
+    if tsserver_lsp and tsserver_lsp.setup then
+        tsserver_lsp.setup {
+            capabilities = capabilities,
+            filetypes = { "typescript", "html", "scss", "css", "javascript", "htmlangular" },
+            init_options = {
+                preferences = {
+                    importModuleSpecifier = "non-relative",
+                    importModuleSpecifierPreference = "non-relative",
+                },
+            },
+        }
+    end
+
+    local angularls_lsp = lspconfig.angularls
+    if angularls_lsp then
+        angularls_lsp.setup {
+            cmd = cmd,
+            capabilities = capabilities,
+            filetypes = { "typescript", "html", "scss", "css", "javascript", "htmlangular" },
+            on_new_config = function(new_config, _)
+                new_config.cmd = cmd
+            end,
+        }
+    end
+
+    lspconfig.rust_analyzer.setup {
+        capabilities = capabilities,
+        filetypes = { "rust" }
+    }
+
+    lspconfig.ols.setup {
+        capabilities = capabilities,
+        filetypes = { "odin" }
+    }
+
+    lspconfig.clangd.setup {
+        capabilities = capabilities,
+        filetypes = { "c", "h", "cpp", "m" },
+        cmd = { "clangd", "--clang-tidy=false" }
+    }
+
+    lspconfig.lua_ls.setup {
+        capabilities = capabilities,
+        filetypes = { "lua" }
+    }
+
+    lspconfig.sourcekit.setup {
+        capabilities = capabilities,
+        filetypes = { "swift" },
+        root_dir = function(_)
+            return "/Users/iaroslav.erokhin/Documents/Check24/ios-pod-mobile-sim"
+        end
+    }
+
+end -- setup lsp servers
 
 -- Setup float diagnostic windows behaviour
 local function close_lsp_floats_if_not_in_float()
@@ -825,7 +867,7 @@ cmp.setup({
         },
     },
     formatting = {
-        format = function(entry, vim_item)
+        format = function(_, vim_item)
             local label = vim_item.abbr
             local truncated_label = vim.fn.strcharpart(label, 0, MAX_LABEL_WIDTH)
             if truncated_label ~= label then
@@ -853,51 +895,6 @@ cmp.setup({
         { name = 'cmdline' },
     },
 })
-
-function goto_error_then_hint(goto_func)
-    local pos = vim.api.nvim_win_get_cursor(0)
-    goto_func( {severity=vim.diagnostic.severity.ERROR, wrap = true} )
-    local pos2 = vim.api.nvim_win_get_cursor(0)
-    local r1, c1 = unpack(pos)
-    local r2, c2 = unpack(pos2)
-    local condition = r1 == r2 and c1 == c2
-    if (condition) then
-        goto_func( {wrap = true} )
-    end
-end
-
-function BreakArguments()
-    local line = vim.api.nvim_get_current_line()
-    local new_lines = {}
-    local current_line = ""
-    local inside_parens = false
-
-    for i = 1, #line do
-        local char = line:sub(i, i)
-
-        if char == "(" and not inside_parens then
-            current_line = current_line .. char
-            table.insert(new_lines, current_line)
-            current_line = ""
-            inside_parens = true
-        elseif char == "," and inside_parens then
-            current_line = current_line .. char
-            table.insert(new_lines, current_line)
-            current_line = ""
-        elseif char == ")" and inside_parens then
-            table.insert(new_lines, current_line)
-            current_line = char
-            inside_parens = false
-        else
-            current_line = current_line .. char
-        end
-    end
-
-    table.insert(new_lines, current_line) -- add the last part
-    local row = vim.api.nvim_win_get_cursor(0)[1]
-    vim.api.nvim_buf_set_lines(0, row - 1, row, false, new_lines) -- replace current line with new lines
-    vim.cmd("normal! V%=") -- auto-format
-end
 
 -- Function to create and setup a new git branch with different local and remote names
 vim.api.nvim_create_user_command('Branch', function()
@@ -1088,7 +1085,7 @@ end, { nargs = '?', complete = 'file' })
 
 -- Open jira ticket from nvim
 vim.api.nvim_create_user_command('JiraOpen', function()
-    local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+    local col = vim.api.nvim_win_get_cursor(0)[2]
     local line = vim.api.nvim_get_current_line()
     if line == '' then
         return
