@@ -273,7 +273,28 @@ do -- custom commands -----------------------------------------------
 
     vim.keymap.set('n', '<C-l>', ':noh<CR><C-l>', { silent = true })
     vim.keymap.set('n', '<leader>n', ':cn<CR>')
-    vim.keymap.set('n', '<C-b>', ':make<CR>')
+
+    -- Build
+    local function run_build(force)
+        if vim.fn.filereadable('Makefile') == 1 or vim.fn.filereadable('makefile') == 1 then
+            vim.print("Calling makefile");
+            vim.cmd('!make')
+        elseif vim.fn.filereadable('nob') == 1 then
+            vim.print("Calling nob");
+            if force then vim.cmd('!./nob -f') else vim.cmd('!./nob') end
+        elseif vim.fn.filereadable('nob.c') == 1 then
+            vim.print("Compiling and calling nob");
+            if force then vim.cmd('!cc nob.c -o nob && ./nob -f') end if force then vim.cmd('!cc nob.c -o nob && ./nob')
+            end
+        elseif vim.fn.filereadable('first.jai') == 1 then
+            vim.cmd('!jai first.jai')
+        else
+            vim.notify('Nothing to build in this directory', vim.log.levels.ERROR)
+        end
+    end
+
+    vim.keymap.set('n', '<C-b>', function() run_build(false) end)
+    vim.keymap.set('n', '<C-S-b>', function() run_build(true) end)
 
     -- Color scheme
     vim.keymap.set('', '<C-S-Right>', ':set background=light<CR><CR><C-l>')
@@ -519,7 +540,8 @@ do -- git commands / mapping -----------------------------------------
     vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'gFP', ':Git push --force', { buffer = a.buf }) end })
     vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'grp', ':Git fetch<CR>', { buffer = a.buf }) end })
     vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'gl', ':Git log -500 --decorate<CR>', { buffer = a.buf }) end })
-    vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'cn', ':Git commit --no-verify<CR>', { buffer = a.buf }) end })
+    vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'cC', ':Git commit --no-verify<CR>', { buffer = a.buf }) end })
+    vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'cA', ':Git commit --amend --no-verify<CR>', { buffer = a.buf }) end })
 
     -- q to quit some buffers
     vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'q', '<C-w>c', { buffer = a.buf }) end })
