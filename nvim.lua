@@ -228,8 +228,8 @@ do -- custom commands -----------------------------------------------
     vim.api.nvim_create_user_command('W', function() vim.cmd('w') end, {})
 
     -- auto fold imports
-    vim.api.nvim_create_user_command('FoldPhpImport', function() vim.cmd([[silent! normal! zEG$/^use <CR>VGNzf/fake-search-query<CR>gg<C-l>]]) end, {})
-    vim.api.nvim_create_user_command('FoldTsImport', function() vim.cmd([[silent! normal! zEG$/^import <CR>VGNzf/fake-search-query<CR>gg<C-l>]]) end, {})
+    vim.api.nvim_create_user_command('FoldPhpImport', function() vim.cmd([[silent! normal! zEG$/^use <CR>VGNzf]]) vim.fn.setreg('/', ('%x'):format(vim.fn.rand())) vim.cmd('normal! gg<C-l>') end, {})
+    vim.api.nvim_create_user_command('FoldTsImport', function() vim.cmd([[silent! normal! zEG$/^import <CR>VGNzf]]) vim.fn.setreg('/', ('%x'):format(vim.fn.rand())) vim.cmd('normal! gg<C-l>') end, {})
 
     -- code formatting
     vim.api.nvim_create_autocmd('FileType', { pattern = {'c','cpp','h'}, command = [[setlocal commentstring=//\ %s]] })
@@ -278,7 +278,7 @@ do -- custom commands -----------------------------------------------
     local function run_build(force)
         if vim.fn.filereadable('Makefile') == 1 or vim.fn.filereadable('makefile') == 1 then
             vim.print("Calling makefile");
-            vim.cmd('!make')
+            vim.cmd('make')
         elseif vim.fn.filereadable('nob') == 1 then
             vim.print("Calling nob");
             if force then vim.cmd('!./nob -f') else vim.cmd('!./nob') end
@@ -302,7 +302,7 @@ do -- custom commands -----------------------------------------------
     vim.api.nvim_create_autocmd('OptionSet', { pattern = 'background', callback = function() vim.fn['yaroscheme#apply']() end })
 
     -- Reset search
-    vim.keymap.set('n', '<leader>/', '/fake-search-query<CR><C-l>', { silent = true })
+    vim.keymap.set('n', '<leader>/', function() vim.fn.setreg('/', ('%x'):format(vim.fn.rand())) vim.cmd('redraw!') end, { silent = true })
     vim.api.nvim_create_autocmd('FileType', {
         pattern = 'vim',
         callback = function()
