@@ -438,24 +438,27 @@ do -- search for files / in files -----------------------------------
     -- vim.opt.laststatus = 3 TODO: this needs to be enabled only for some windows (telescope search)
 
     local builtin = require('telescope.builtin')
-
-    vim.keymap.set('n', '<C-]>', function() builtin.find_files({ cwd = get_search_directory() }) end, { noremap = true, silent = true })
-    vim.keymap.set('n', '<leader><C-]>', function() builtin.find_files({ cwd = '~/Documents' }) end, { noremap = true, silent = true })
-
     local lga = require('telescope').extensions.live_grep_args
-    vim.keymap.set('n', '<C-p>', function()
-        lga.live_grep_args({
-            cwd = get_search_directory(),
-            entry_maker = highlight_entry(
-                require('telescope.make_entry').gen_from_vimgrep(),
-                entry_patterns
-            ),
+
+    vim.keymap.set('n', '<C-]>', function()
+        local dir = get_search_directory()
+        builtin.find_files({
+            cwd = dir,
+            entry_maker = highlight_entry(require('telescope.make_entry').gen_from_file({ cwd = dir }), entry_patterns),
         })
     end, { noremap = true, silent = true })
 
-    vim.keymap.set('n', '<leader><C-p>', function()
+    vim.keymap.set('n', '<leader><C-]>', function()
+        local dir = vim.fn.expand('~/Documents')
+        builtin.find_files({
+            cwd = dir,
+            entry_maker = highlight_entry(require('telescope.make_entry').gen_from_file({ cwd = dir }), entry_patterns),
+        })
+    end, { noremap = true, silent = true })
+
+    vim.keymap.set('n', '<C-p>', function()
         lga.live_grep_args({
-            cwd = '~/Documents',
+            cwd = get_search_directory(),
             entry_maker = highlight_entry(
                 require('telescope.make_entry').gen_from_vimgrep(),
                 entry_patterns
