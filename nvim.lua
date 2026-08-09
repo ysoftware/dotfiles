@@ -1191,6 +1191,11 @@ vim.api.nvim_create_user_command('GitDelete', function()
     vim.cmd("Git branch -D " .. vim.fn.fnameescape(branch))
 end, {})
 
+-- Trim trailing spaces on selected lines
+vim.api.nvim_create_user_command('Trim', function(opts)
+  vim.cmd(opts.line1 .. ',' .. opts.line2 .. 's/\\s\\+$//e')
+end, { range = true })
+
 -- Align selected lines by inserted query
 vim.api.nvim_create_user_command('AlignByQuery', function(opts)
     local start_line = opts.line1
