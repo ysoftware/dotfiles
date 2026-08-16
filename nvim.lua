@@ -573,6 +573,10 @@ do -- advanced LSP features -----------------------------------------
     vim.keymap.set('n', '[g', function() goto_error_then_hint(vim.diagnostic.goto_prev) end, { silent = true })
     vim.keymap.set('n', ']g', function() goto_error_then_hint(vim.diagnostic.goto_next) end, { silent = true })
 
+    vim.keymap.set('n', 'go', function()
+        vim.diagnostic.enable(not vim.diagnostic.is_enabled())
+    end, {})
+
     local function break_arguments()
         local line = vim.api.nvim_get_current_line()
         local new_lines = {}
