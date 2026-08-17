@@ -787,7 +787,7 @@ do -- setup lsp servers ------------------------------------------------
     end
 
     -- angular lsp
-    local project_library_path = "~/Documents/Check24/angular/"
+    local project_library_path = "/Users/iaroslav.erokhin/Documents/Check24/angular/"
     local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
     local tsserver_lsp = lspconfig.tsserver
     if tsserver_lsp and tsserver_lsp.setup then
