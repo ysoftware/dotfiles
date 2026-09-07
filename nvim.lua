@@ -675,7 +675,7 @@ vim.api.nvim_create_autocmd('FileType', {
     end,
 })
 
-vim.keymap.set('n', '<C-t>', ':NERDTreeFind<CR>')
+vim.keymap.set('n', '<C-t>', ':NERDTreeRefreshRoot<CR>:NERDTreeFind<CR>')
 vim.keymap.set('n', '<leader><C-f>', ':NERDTreeVCS<CR>')
 vim.keymap.set('n', '<C-f>', ':NERDTreeToggle<CR>')
 
