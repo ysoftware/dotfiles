@@ -226,6 +226,8 @@ do -- custom commands -----------------------------------------------
     vim.keymap.set('n', '<C-W><', ':res -20<CR>')
     vim.api.nvim_create_user_command('CountMatches', function() vim.cmd('%s///gn') end, {})
     vim.api.nvim_create_user_command('W', function() vim.cmd('w') end, {})
+    vim.api.nvim_create_user_command('Wq', function() vim.cmd('wq') end, {})
+    vim.api.nvim_create_user_command('WQ', function() vim.cmd('wq') end, {})
 
     -- auto fold imports
     vim.api.nvim_create_user_command('FoldPhpImport', function() vim.cmd([[silent! normal! zEG$/^use <CR>VGNzf]]) vim.fn.setreg('/', ('%x'):format(vim.fn.rand())) vim.cmd('normal! gg<C-l>') end, {})
