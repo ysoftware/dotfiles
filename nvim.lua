@@ -741,84 +741,88 @@ if vim.g.neovide then -- neovide ------------------------------------
 end -- neovide
 
 do -- setup lsp servers ------------------------------------------------
-    local ok, xcodebuild = pcall(require, 'xcodebuild')
-    if ok and xcodebuild then
-        xcodebuild.setup({ auto_save = false })
-    end
-
-    -- linter + downgrade errors to warnings
-    local ok, lint = pcall(require, 'lint')
-    if ok and lint then
-        lint.linters_by_ft = {
-            javascript = { "eslint" },
-            typescript = { "eslint" },
-            -- swift      = { "swiftlint" },
-        }
-        lint.linters.eslint = require("lint.util").wrap(lint.linters.eslint, function(diagnostic)
-            if diagnostic.source and diagnostic.source:lower() == "eslint" then
-                diagnostic.severity = vim.diagnostic.severity.WARN
-            end
-            return diagnostic
-        end)
-        lint.linters.swiftlint = require("lint.util").wrap(lint.linters.swiftlint, function(diagnostic)
-            if diagnostic.source and diagnostic.source:lower() == "swiftlint" then
-                diagnostic.severity = vim.diagnostic.severity.WARN
-            end
-            return diagnostic
-        end)
-    end
-
     local lspconfig = require('lspconfig')
     local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
-    -- php lsp (phpactor - free alternative with code actions)
-    local phpactor_lsp = lspconfig.phpactor
-    if phpactor_lsp then
-        phpactor_lsp.setup {
-            autostart = true,
-            capabilities = capabilities,
-            cmd = { "phpactor", "language-server" },
-            root_dir = function()
-                return "/Users/iaroslav.erokhin/Documents/Check24/core-api/"
-            end,
-            init_options = {
-                ["language_server_configuration.auto_config"] = false,
-                ["language_server_phpstan.enabled"] = false,
-                ["language_server_psalm.enabled"] = false,
-            },
-            handlers = {
-                ["window/showMessage"] = function() end,
-            },
-        }
-    end
+    if vim.fn.has('mac') == 1 then
 
-    -- angular lsp
-    local project_library_path = "/Users/iaroslav.erokhin/Documents/Check24/angular/"
-    local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
-    local tsserver_lsp = lspconfig.tsserver
-    if tsserver_lsp and tsserver_lsp.setup then
-        tsserver_lsp.setup {
-            capabilities = capabilities,
-            filetypes = { "typescript", "html", "scss", "css", "javascript", "htmlangular" },
-            init_options = {
-                preferences = {
-                    importModuleSpecifier = "non-relative",
-                    importModuleSpecifierPreference = "non-relative",
+        -- xcodebuild
+        local ok, xcodebuild = pcall(require, 'xcodebuild')
+        if ok and xcodebuild then
+            xcodebuild.setup({ auto_save = false })
+        end
+
+        -- linter + downgrade errors to warnings
+        local ok, lint = pcall(require, 'lint')
+        if ok and lint then
+            lint.linters_by_ft = {
+                javascript = { "eslint" },
+                typescript = { "eslint" },
+                -- swift      = { "swiftlint" },
+            }
+            lint.linters.eslint = require("lint.util").wrap(lint.linters.eslint, function(diagnostic)
+                if diagnostic.source and diagnostic.source:lower() == "eslint" then
+                    diagnostic.severity = vim.diagnostic.severity.WARN
+                end
+                return diagnostic
+            end)
+            lint.linters.swiftlint = require("lint.util").wrap(lint.linters.swiftlint, function(diagnostic)
+                if diagnostic.source and diagnostic.source:lower() == "swiftlint" then
+                    diagnostic.severity = vim.diagnostic.severity.WARN
+                end
+                return diagnostic
+            end)
+        end
+
+        -- php lsp (phpactor - free alternative with code actions)
+        local phpactor_lsp = lspconfig.phpactor
+        if phpactor_lsp then
+            phpactor_lsp.setup {
+                autostart = true,
+                capabilities = capabilities,
+                cmd = { "phpactor", "language-server" },
+                root_dir = function()
+                    return "/Users/iaroslav.erokhin/Documents/Check24/core-api/"
+                end,
+                init_options = {
+                    ["language_server_configuration.auto_config"] = false,
+                    ["language_server_phpstan.enabled"] = false,
+                    ["language_server_psalm.enabled"] = false,
                 },
-            },
-        }
-    end
+                handlers = {
+                    ["window/showMessage"] = function() end,
+                },
+            }
+        end
 
-    local angularls_lsp = lspconfig.angularls
-    if angularls_lsp then
-        angularls_lsp.setup {
-            cmd = cmd,
-            capabilities = capabilities,
-            filetypes = { "typescript", "html", "scss", "css", "javascript", "htmlangular" },
-            on_new_config = function(new_config, _)
-                new_config.cmd = cmd
-            end,
-        }
+        -- angular lsp
+        local project_library_path = "/Users/iaroslav.erokhin/Documents/Check24/angular/"
+        local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
+        local tsserver_lsp = lspconfig.tsserver
+        if tsserver_lsp and tsserver_lsp.setup then
+            tsserver_lsp.setup {
+                capabilities = capabilities,
+                filetypes = { "typescript", "html", "scss", "css", "javascript", "htmlangular" },
+                init_options = {
+                    preferences = {
+                        importModuleSpecifier = "non-relative",
+                        importModuleSpecifierPreference = "non-relative",
+                    },
+                },
+            }
+        end
+
+        local angularls_lsp = lspconfig.angularls
+        if angularls_lsp then
+            angularls_lsp.setup {
+                cmd = cmd,
+                capabilities = capabilities,
+                filetypes = { "typescript", "html", "scss", "css", "javascript", "htmlangular" },
+                on_new_config = function(new_config, _)
+                    new_config.cmd = cmd
+                end,
+            }
+        end
     end
 
     lspconfig.rust_analyzer.setup {
