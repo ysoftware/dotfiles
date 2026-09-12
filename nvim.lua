@@ -516,9 +516,12 @@ do -- git commands / mapping -----------------------------------------
     end
 
     function GitCheckoutNewRemoteFromBranchesView()
-        vim.cmd('normal! 0www"hy$')
-        local branch = vim.fn.getreg('h')
-        vim.cmd('Git checkout -b ' .. branch .. ' origin/' .. branch)
+        local line = vim.fn.getline('.')
+        local remote, branch = line:match('^%s*([^/%s]+)/(.+)$')
+        if not remote then
+            return
+        end
+        vim.cmd('Git checkout -b ' .. branch .. ' ' .. remote .. '/' .. branch)
         vim.cmd('bd')
         vim.cmd('Git branch')
         vim.cmd('redraw!')
