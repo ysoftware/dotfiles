@@ -214,6 +214,9 @@ do -- basic mapping -------------------------------------------------
     -- stop insert mode of terminal
     vim.keymap.set('t', '<C-q>', [[<C-\><C-n>]])
 
+    -- just open url under the cursor
+    vim.keymap.set('n', 'gu', ':UrlOpen<CR>', {})
+
 end -- basic mapping
 
 do -- custom commands -----------------------------------------------
@@ -934,8 +937,8 @@ cmp.setup({
 -- Function to create and setup a new git branch with different local and remote names
 vim.api.nvim_create_user_command('Branch', function()
     local current_branch = vim.fn.system("git rev-parse --abbrev-ref HEAD"):gsub("%s+", "")
-    if current_branch ~= "master" then
-        local choice = vim.fn.confirm("You are on '" .. current_branch .. "', not master. Continue?", "&Yes\n&No", 2)
+    if current_branch ~= "master" and current_branch ~= "main" then
+        local choice = vim.fn.confirm("You are on '" .. current_branch .. "', not master or main. Continue?", "&Yes\n&No", 2)
         if choice ~= 1 then
             print("Branch creation cancelled")
             return
@@ -1118,6 +1121,35 @@ vim.api.nvim_create_user_command('GitFileHistory', function(command_opts)
     vim.api.nvim_set_current_buf(buf_handle)
 end, { nargs = '?', complete = 'file' })
 
+local function open_url(url)
+    local sysname = vim.loop.os_uname().sysname
+    if sysname == "Darwin" then
+        vim.fn.jobstart({ "open", url }, { detach = true })
+    elseif sysname == "Windows_NT" then
+        vim.fn.jobstart({ "cmd", "/c", "start", "", url }, { detach = true })
+    else
+        vim.fn.jobstart({ "xdg-open", url }, { detach = true })
+    end
+end
+
+-- Open URL under the cursor
+vim.api.nvim_create_user_command('UrlOpen', function()
+    local col = vim.api.nvim_win_get_cursor(0)[2] + 1
+    local line = vim.api.nvim_get_current_line()
+
+    for idx = col, 1, -1 do
+        if line:sub(idx, idx) == 'h' then
+            local url = line:sub(idx):match("^https?://[^%s<>\"'%)%]%}]+")
+            if url and col < idx + #url then
+                open_url(url)
+                return
+            end
+        end
+    end
+
+    print("No URL found under the cursor.")
+end, {})
+
 -- Open jira ticket from nvim
 vim.api.nvim_create_user_command('JiraOpen', function()
     local col = vim.api.nvim_win_get_cursor(0)[2]
@@ -1152,14 +1184,7 @@ vim.api.nvim_create_user_command('JiraOpen', function()
 
     local url = "https://c24-mobilfunk.atlassian.net/browse/" .. ticket
 
-    local sysname = vim.loop.os_uname().sysname
-    if sysname == "Darwin" then
-        vim.fn.jobstart({ "open", url }, { detach = true })
-    elseif sysname == "Windows_NT" then
-        vim.fn.jobstart({ "cmd", "/c", "start", "", url }, { detach = true })
-    else
-        vim.fn.jobstart({ "xdg-open", url }, { detach = true })
-    end
+    open_url(url)
 end, {})
 
 -- Delete local branch
