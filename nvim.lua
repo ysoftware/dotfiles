@@ -260,11 +260,11 @@ do -- custom commands -----------------------------------------------
 
     -- Prettify json (depends on installed jq)
     local PrettifyJson = vim.api.nvim_create_augroup('PrettifyJson', { clear = true })
-    vim.api.nvim_create_autocmd('FileType', { pattern = 'json', group = PrettifyJson, command = [[command! -buffer Prettify %!jq --indent 2 -f %]] })
+    vim.api.nvim_create_autocmd('FileType', { pattern = 'json', group = PrettifyJson, command = [[command! -buffer Prettify %!jq --indent 2]], })
 
     -- Prettify html (depends on installed pup)
     local PrettifyHtml = vim.api.nvim_create_augroup('PrettifyHtml', { clear = true })
-    vim.api.nvim_create_autocmd('FileType', { pattern = {'html','htmljinja','html.twig'}, group = PrettifyHtml, command = [[command! -buffer Prettify %!pup -i 2 -f % html]] })
+    vim.api.nvim_create_autocmd('FileType', { pattern = {'html','htmljinja','html.twig'}, group = PrettifyHtml, command = [[command! -buffer Prettify %!pup -i 2 -f html]], })
 
     -- Open nvim config file
     vim.keymap.set('n', '<C-S-up>', ':e ~/Documents/GitHub/dotfiles/nvim.lua<CR>')
