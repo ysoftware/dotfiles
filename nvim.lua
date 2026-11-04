@@ -840,7 +840,7 @@ do -- setup lsp servers ------------------------------------------------
 
     lspconfig.clangd.setup {
         capabilities = capabilities,
-        filetypes = { "c", "h", "cpp", "m" },
+        filetypes = { "c", "h", "cpp", "m", "objc", "objcpp" },
         cmd = { "clangd", "--clang-tidy=false" }
     }
 
