@@ -214,8 +214,9 @@ do -- basic mapping -------------------------------------------------
     -- stop insert mode of terminal
     vim.keymap.set('t', '<C-q>', [[<C-\><C-n>]])
 
-    -- just open url under the cursor
+    -- open url
     vim.keymap.set('n', 'gu', ':UrlOpen<CR>', {})
+    vim.keymap.set('n', 'gj', ':JiraOpen<CR>')
 
 end -- basic mapping
 
@@ -537,7 +538,6 @@ do -- git commands / mapping -----------------------------------------
     vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'gc', ':lua GitCheckoutFromBranchesView()<CR>', { buffer = a.buf }) end })
     vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'grc', ':lua GitCheckoutNewRemoteFromBranchesView()<CR>', { buffer = a.buf }) end })
     vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'gd', ':GitDelete<CR>', { buffer = a.buf }) end })
-    vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'gj', ':JiraOpen<CR>', { buffer = a.buf }) end })
 
     -- Fetch, Pull, Merge, Log
     vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'gm', '0w"hy$:exe \'Git merge \' . @h<CR>', { buffer = a.buf }) end })
