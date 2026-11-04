@@ -54,6 +54,17 @@ if vim.fn.has('mac') == 1 then
     })
 end
 
+-- utils
+local function check_dependencies(required_executables)
+    for _, executable in ipairs(required_executables) do
+        if vim.fn.executable(executable) == 0 then
+            vim.notify("Telescope requires '" .. executable .. "' but it was not found in PATH", vim.log.levels.ERROR)
+            return false
+        end
+    end
+    return true
+end
+
 do -- colorizer plugin
     require'colorizer'.setup()
     vim.api.nvim_create_autocmd('FileType', { pattern = 'diff', callback = function() require'colorizer'.detach_from_buffer(0) end, })
@@ -441,6 +452,8 @@ do -- search for files / in files -----------------------------------
     local lga = require('telescope').extensions.live_grep_args
 
     vim.keymap.set('n', '<C-]>', function()
+        if not check_dependencies({ 'rg', 'fd' }) then return end
+
         local dir = get_search_directory()
         builtin.find_files({
             cwd = dir,
@@ -450,6 +463,8 @@ do -- search for files / in files -----------------------------------
     end, { noremap = true, silent = true })
 
     vim.keymap.set('n', '<leader><C-]>', function()
+        if not check_dependencies({ 'rg', 'fd' }) then return end
+
         local dir = vim.fn.expand('~/Documents')
         builtin.find_files({
             cwd = dir,
