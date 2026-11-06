@@ -760,8 +760,11 @@ end -- neovide
 
 do -- setup lsp servers ------------------------------------------------
     local lspconfig = require('lspconfig')
+    require('lspconfig.util').default_config.flags = { debounce_text_changes = 1000 }
+
     local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
+    -- work config
     if vim.fn.has('mac') == 1 then
 
         -- xcodebuild
@@ -799,9 +802,7 @@ do -- setup lsp servers ------------------------------------------------
                 autostart = true,
                 capabilities = capabilities,
                 cmd = { "phpactor", "language-server" },
-                root_dir = function()
-                    return "/Users/iaroslav.erokhin/Documents/Check24/core-api/"
-                end,
+                root_dir = require('lspconfig.util').root_pattern('composer.json', '.git'),
                 init_options = {
                     ["language_server_configuration.auto_config"] = false,
                     ["language_server_phpstan.enabled"] = false,
@@ -814,14 +815,15 @@ do -- setup lsp servers ------------------------------------------------
         end
 
         -- angular lsp
-        local project_library_path = "/Users/iaroslav.erokhin/Documents/Check24/angular/"
-        local cmd = {"ngserver", "--stdio", "--tsProbeLocations", project_library_path , "--ngProbeLocations", project_library_path}
         local tsserver_lsp = lspconfig.tsserver
         if tsserver_lsp and tsserver_lsp.setup then
             tsserver_lsp.setup {
+                cmd = { vim.fn.expand("~/.serena/language_servers/static/rewrite-web-lsp/node_modules/.bin/typescript-language-server"), "--stdio" },
                 capabilities = capabilities,
-                filetypes = { "typescript", "html", "scss", "css", "javascript", "htmlangular" },
                 init_options = {
+                    tsserver = {
+                        path = vim.fn.expand("~/.serena/language_servers/static/rewrite-web-lsp/node_modules/typescript/lib/tsserver.js"),
+                    },
                     preferences = {
                         importModuleSpecifier = "non-relative",
                         importModuleSpecifierPreference = "non-relative",
@@ -833,11 +835,14 @@ do -- setup lsp servers ------------------------------------------------
         local angularls_lsp = lspconfig.angularls
         if angularls_lsp then
             angularls_lsp.setup {
-                cmd = cmd,
+                cmd = { "ngserver", "--stdio" },
                 capabilities = capabilities,
-                filetypes = { "typescript", "html", "scss", "css", "javascript", "htmlangular" },
-                on_new_config = function(new_config, _)
-                    new_config.cmd = cmd
+                filetypes = { "typescript", "typescriptreact", "html", "htmlangular" },
+                root_dir = require('lspconfig.util').root_pattern('angular.json'),
+                single_file_support = false,
+                on_new_config = function(new_config, new_root_dir)
+                    local project_library_path = new_root_dir .. "/node_modules"
+                    new_config.cmd = { "ngserver", "--stdio", "--tsProbeLocations", project_library_path, "--ngProbeLocations", project_library_path }
                 end,
             }
         end
