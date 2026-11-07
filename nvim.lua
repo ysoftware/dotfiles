@@ -567,6 +567,7 @@ do -- git commands / mapping -----------------------------------------
 
     -- TODO: q can't close the last window if it's just 1 window, this needs to be remade into something more dynamic, in that case we just want to close the buffer
     -- q to quit some buffers
+    vim.api.nvim_create_autocmd('FileType', { pattern = 'nerdtree', callback = function(a) vim.keymap.set('n', 'q', ':NERDTreeClose<CR>', { buffer = a.buf }) end })
     vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitive', callback = function(a) vim.keymap.set('n', 'q', '<C-w>c', { buffer = a.buf }) end })
     vim.api.nvim_create_autocmd('FileType', { pattern = 'fugitiveblame', callback = function(a) vim.keymap.set('n', 'q', '<C-w>c', { buffer = a.buf }) end })
     vim.api.nvim_create_autocmd('FileType', { pattern = 'git', callback = function(a) vim.keymap.set('n', 'q', '<C-w>c', { buffer = a.buf }) end })
