@@ -577,6 +577,15 @@ do -- git commands / mapping -----------------------------------------
     local function is_fugitive_object() local name = vim.api.nvim_buf_get_name(0) return name:match("^fugitive://") and not name:match("%.git//$") end
     vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, { callback = function() if is_fugitive_object() then vim.wo.winhighlight = "Normal:WarningBuffer" else vim.wo.winhighlight = "" end end, })
 
+    -- switch pwd to git root when file is opened (after 100ms)
+    vim.api.nvim_create_autocmd("BufEnter", {
+        callback = function()
+            vim.defer_fn(function()
+                vim.cmd.Gcd()
+            end, 100)
+        end,
+    })
+
 end -- git commands / mapping
 
 do -- advanced LSP features -----------------------------------------
