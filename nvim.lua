@@ -859,10 +859,24 @@ do -- setup lsp servers ------------------------------------------------
         filetypes = { "odin" }
     }
 
+    local watcher = vim.uv.new_fs_event()
+    local timer = vim.uv.new_timer()
     lspconfig.clangd.setup {
         capabilities = capabilities,
         filetypes = { "c", "h", "cpp", "m", "objc", "objcpp" },
-        cmd = { "clangd", "--clang-tidy=false" }
+        cmd = { "clangd", "--clang-tidy=false" },
+        on_attach = function(client)
+            watcher:start(client.config.root_dir, {}, function(_, filename)
+                if filename ~= "compile_commands.json" then
+                    return
+                end
+
+                timer:stop()
+                timer:start(100, 0, vim.schedule_wrap(function()
+                    vim.cmd("lsp restart clangd")
+                end))
+            end)
+        end,
     }
 
     lspconfig.lua_ls.setup {
