@@ -581,7 +581,9 @@ do -- git commands / mapping -----------------------------------------
     vim.api.nvim_create_autocmd("BufEnter", {
         callback = function()
             vim.defer_fn(function()
-                vim.cmd.Gcd()
+                if vim.fn.FugitiveGitDir() ~= "" then
+                    vim.cmd.Gcd()
+                end
             end, 100)
         end,
     })
@@ -875,6 +877,10 @@ do -- setup lsp servers ------------------------------------------------
         filetypes = { "c", "h", "cpp", "m", "objc", "objcpp" },
         cmd = { "clangd", "--clang-tidy=false" },
         on_attach = function(client)
+            if not client.config.root_dir then
+                return
+            end
+
             watcher:start(client.config.root_dir, {}, function(_, filename)
                 if filename ~= "compile_commands.json" then
                     return
