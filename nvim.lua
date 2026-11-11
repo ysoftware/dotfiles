@@ -187,6 +187,33 @@ do -- basic mapping -------------------------------------------------
     vim.keymap.set('n', '<leader>xw', 'viw"qdxea <Esc>"qpbb')
     vim.keymap.set('n', '<leader>xe', 'viw"qywwPlve"qdbbbviwpb')
 
+    -- Toggle C member access at the cursor or after the current identifier
+    local function toggle_member_access()
+        local cursor = vim.api.nvim_win_get_cursor(0)
+        local row, col = cursor[1], cursor[2]
+        local line = vim.api.nvim_get_current_line()
+        local start = col + 1
+        if line:sub(start, start) == '>' and start > 1 and line:sub(start - 1, start) == '->' then
+            start = start - 1
+        elseif not line:sub(start, start):match('[%a_]') and line:sub(start, start) ~= '.' and line:sub(start, start + 1) ~= '->' then
+            if not line:sub(1, start):match('[%a_][%w_]*$') then return end
+        end
+
+        local last = math.min(start + 49, #line)
+        for i = start, last do
+            local char = line:sub(i, i)
+            local arrow = i < last and line:sub(i, i + 1) == '->'
+            if char == '.' or arrow then
+                vim.api.nvim_buf_set_text(0, row - 1, i - 1, row - 1, i - 1 + (arrow and 2 or 1), { arrow and '.' or '->' })
+                vim.api.nvim_win_set_cursor(0, { row, i - 1 })
+                return
+            end
+            if not char:match('[%w_%s]') then return end
+        end
+    end
+    vim.api.nvim_create_user_command('ToggleMemberAccess', toggle_member_access, {})
+    vim.keymap.set('n', '<leader>xm', toggle_member_access)
+
     -- Tabs
     vim.keymap.set('n', 'tg', 'gT')
     vim.keymap.set('n', "<leader>'", ':tabnew<CR>')
