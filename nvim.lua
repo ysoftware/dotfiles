@@ -187,6 +187,52 @@ do -- basic mapping -------------------------------------------------
     vim.keymap.set('n', '<leader>xw', 'viw"qdxea <Esc>"qpbb')
     vim.keymap.set('n', '<leader>xe', 'viw"qywwPlve"qdbbbviwpb')
 
+    -- Prepend an operator at the start of the current C member expression
+    local function prepend_expression(operator)
+        local cursor = vim.api.nvim_win_get_cursor(0)
+        local row, col = cursor[1], cursor[2]
+        local line = vim.api.nvim_get_current_line()
+        local keywords = { ['return'] = true, ['if'] = true, ['while'] = true, ['for'] = true, ['switch'] = true, ['sizeof'] = true, ['_Alignof'] = true }
+        local i = 1
+        while i <= col + 1 do
+            local start = line:find('[%a_("\']', i)
+            if not start then return end
+            local char = line:sub(start, start)
+            if char == '"' or char == "'" then
+                i = start + 1
+                while i <= #line do
+                    local current = line:sub(i, i)
+                    i = i + (current == '\\' and 2 or 1)
+                    if current == char then break end
+                end
+            else
+                local text = line:match('^[%a_][%w_]*', start) or line:match('^%b()', start)
+                local finish = start + #(text or char) - 1
+                if keywords[text] then text = nil end
+                local function suffix(pattern) return line:match('^%s*' .. pattern, finish + 1) end
+                while text do
+                    local next = suffix('%.%s*[%a_][%w_]*') or suffix('%->%s*[%a_][%w_]*') or suffix('%b()') or suffix('%b[]')
+                    if not next then break end
+                    local opening = next:find('(', 1, true)
+                    if opening and col + 1 > finish + opening and col + 1 < finish + #next then
+                        finish = finish + opening
+                        text = nil
+                        break
+                    end
+                    finish = finish + #next
+                end
+                if text and col + 1 >= start and col + 1 <= finish then
+                    vim.api.nvim_buf_set_text(0, row - 1, start - 1, row - 1, start - 1, { operator })
+                    vim.api.nvim_win_set_cursor(0, { row, start - 1 })
+                    return
+                end
+                i = finish + 1
+            end
+        end
+    end
+    vim.keymap.set('n', '<leader>x&', function() prepend_expression('&') end)
+    vim.keymap.set('n', '<leader>x*', function() prepend_expression('*') end)
+
     -- Toggle C member access at the cursor or after the current identifier
     local function toggle_member_access()
         local cursor = vim.api.nvim_win_get_cursor(0)
@@ -355,7 +401,6 @@ do -- custom commands -----------------------------------------------
     })
 
     if vim.fn.has('mac') == 1 then
-        vim.keymap.set('n', '<leader>l', ':XcodebuildCloseLogs<CR> :ccl<CR>')
         vim.api.nvim_create_user_command('Cancel', 'XcodebuildCancel', {})
     end
 
