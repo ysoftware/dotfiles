@@ -35,7 +35,6 @@ vim.pack.add({
     'https://github.com/mhinz/vim-startify',                           -- Startup screen
     'https://github.com/tpope/vim-commentary',                         -- Comment lines of code
     'https://github.com/rluba/jai.vim',                                -- Jai support
-    'https://github.com/neovim/nvim-lspconfig',                        -- Lsp
     'https://github.com/norcalli/nvim-colorizer.lua',                  -- Hex Colors
     'https://github.com/preservim/nerdtree',                           -- File browser
     'https://github.com/nvim-lua/plenary.nvim',                        -- Needed for telescope
@@ -843,10 +842,16 @@ if vim.g.neovide then -- neovide ------------------------------------
 end -- neovide
 
 do -- setup lsp servers ------------------------------------------------
-    local lspconfig = require('lspconfig')
-    require('lspconfig.util').default_config.flags = { debounce_text_changes = 1000 }
+    vim.lsp.config('*', {
+        flags = { debounce_text_changes = 1000 },
+        capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities()),
+    })
 
-    local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
+    local function enable_lsp(name, executable)
+        if vim.fn.executable(executable or vim.lsp.config[name].cmd[1]) == 1 then
+            vim.lsp.enable(name)
+        end
+    end
 
     -- work config
     if vim.fn.has('mac') == 1 then
@@ -880,74 +885,115 @@ do -- setup lsp servers ------------------------------------------------
         end
 
         -- php lsp (phpactor - free alternative with code actions)
-        local phpactor_lsp = lspconfig.phpactor
-        if phpactor_lsp then
-            phpactor_lsp.setup {
-                autostart = true,
-                capabilities = capabilities,
-                cmd = { "phpactor", "language-server" },
-                root_dir = require('lspconfig.util').root_pattern('composer.json', '.git'),
-                init_options = {
-                    ["language_server_configuration.auto_config"] = false,
-                    ["language_server_phpstan.enabled"] = false,
-                    ["language_server_psalm.enabled"] = false,
-                },
-                handlers = {
-                    ["window/showMessage"] = function() end,
-                },
-            }
-        end
+        vim.lsp.config('phpactor', {
+            cmd = { "phpactor", "language-server" },
+            filetypes = { "php" },
+            root_markers = { "composer.json", ".git" },
+            workspace_required = true,
+            init_options = {
+                ["language_server_configuration.auto_config"] = false,
+                ["language_server_phpstan.enabled"] = false,
+                ["language_server_psalm.enabled"] = false,
+            },
+            handlers = {
+                ["window/showMessage"] = function() end,
+            },
+        })
 
         -- angular lsp
-        local tsserver_lsp = lspconfig.tsserver
-        if tsserver_lsp and tsserver_lsp.setup then
-            tsserver_lsp.setup {
-                cmd = { vim.fn.expand("~/.serena/language_servers/static/rewrite-web-lsp/node_modules/.bin/typescript-language-server"), "--stdio" },
-                capabilities = capabilities,
-                init_options = {
-                    tsserver = {
-                        path = vim.fn.expand("~/.serena/language_servers/static/rewrite-web-lsp/node_modules/typescript/lib/tsserver.js"),
-                    },
-                    preferences = {
-                        importModuleSpecifier = "non-relative",
-                        importModuleSpecifierPreference = "non-relative",
-                    },
+        vim.lsp.config('ts_ls', {
+            cmd = { vim.fn.expand("~/.serena/language_servers/static/rewrite-web-lsp/node_modules/.bin/typescript-language-server"), "--stdio" },
+            filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+            root_markers = { "tsconfig.json", "jsconfig.json", "package.json", ".git" },
+            init_options = {
+                hostInfo = "neovim",
+                tsserver = {
+                    path = vim.fn.expand("~/.serena/language_servers/static/rewrite-web-lsp/node_modules/typescript/lib/tsserver.js"),
                 },
-            }
-        end
+                preferences = {
+                    importModuleSpecifier = "non-relative",
+                    importModuleSpecifierPreference = "non-relative",
+                },
+            },
+        })
 
-        local angularls_lsp = lspconfig.angularls
-        if angularls_lsp then
-            angularls_lsp.setup {
-                cmd = { "ngserver", "--stdio" },
-                capabilities = capabilities,
-                filetypes = { "typescript", "typescriptreact", "html", "htmlangular" },
-                root_dir = require('lspconfig.util').root_pattern('angular.json'),
-                single_file_support = false,
-                on_new_config = function(new_config, new_root_dir)
-                    local project_library_path = new_root_dir .. "/node_modules"
-                    new_config.cmd = { "ngserver", "--stdio", "--tsProbeLocations", project_library_path, "--ngProbeLocations", project_library_path }
-                end,
-            }
-        end
+        vim.lsp.config('angularls', {
+            cmd = function(dispatchers, config)
+                local project_library_path = config.root_dir .. "/node_modules"
+                return vim.lsp.rpc.start({ "ngserver", "--stdio", "--tsProbeLocations", project_library_path, "--ngProbeLocations", project_library_path }, dispatchers)
+            end,
+            filetypes = { "typescript", "typescriptreact", "html", "htmlangular" },
+            root_markers = { "angular.json" },
+            workspace_required = true,
+        })
+
+        enable_lsp('phpactor')
+        enable_lsp('ts_ls')
+        enable_lsp('angularls', 'ngserver')
     end
 
-    lspconfig.rust_analyzer.setup {
-        capabilities = capabilities,
-        filetypes = { "rust" }
-    }
+    vim.lsp.config('rust_analyzer', {
+        cmd = { "rust-analyzer" },
+        filetypes = { "rust" },
+        capabilities = { experimental = { serverStatusNotification = true } },
+        root_dir = function(bufnr, on_dir)
+            local filename = vim.api.nvim_buf_get_name(bufnr)
+            local cargo_home = vim.env.CARGO_HOME or vim.fn.expand("~/.cargo")
+            local rustup_home = vim.env.RUSTUP_HOME or vim.fn.expand("~/.rustup")
+            for _, dir in ipairs({ cargo_home .. "/registry/src", cargo_home .. "/git/checkouts", rustup_home .. "/toolchains" }) do
+                if filename ~= "" and vim.fs.relpath(dir, filename) then
+                    local clients = vim.lsp.get_clients({ name = "rust_analyzer" })
+                    local client = clients[#clients]
+                    if client and client.root_dir then
+                        return on_dir(client.root_dir)
+                    end
+                    break
+                end
+            end
 
-    lspconfig.ols.setup {
-        capabilities = capabilities,
-        filetypes = { "odin" }
-    }
+            local cargo_crate_dir = vim.fs.root(bufnr, "Cargo.toml")
+            if not cargo_crate_dir or vim.fn.executable("cargo") == 0 then
+                return on_dir(cargo_crate_dir or vim.fs.root(bufnr, { "rust-project.json", ".git" }))
+            end
+
+            vim.system({ "cargo", "metadata", "--no-deps", "--format-version", "1", "--manifest-path", cargo_crate_dir .. "/Cargo.toml" },
+                { text = true }, vim.schedule_wrap(function(result)
+                    if result.code == 0 then
+                        local ok, metadata = pcall(vim.json.decode, result.stdout)
+                        if ok and type(metadata) == "table" and type(metadata.workspace_root) == "string" then
+                            return on_dir(vim.fs.normalize(metadata.workspace_root))
+                        end
+                    end
+                    on_dir(cargo_crate_dir)
+                end))
+        end,
+    })
+
+    vim.lsp.config('ols', {
+        cmd = { "ols" },
+        filetypes = { "odin" },
+        root_dir = function(bufnr, on_dir)
+            local root = vim.fs.root(bufnr, { "ols.json", ".git" })
+                or vim.fs.root(bufnr, function(name) return name:match("%.odin$") ~= nil end)
+            if root then on_dir(root) end
+        end,
+    })
 
     local watcher = vim.uv.new_fs_event()
     local timer = vim.uv.new_timer()
-    lspconfig.clangd.setup {
-        capabilities = capabilities,
+    vim.lsp.config('clangd', {
         filetypes = { "c", "h", "cpp", "m", "objc", "objcpp" },
         cmd = { "clangd", "--clang-tidy=false" },
+        root_markers = { ".clangd", ".clang-tidy", ".clang-format", "compile_commands.json", "compile_flags.txt", "configure.ac", ".git" },
+        capabilities = {
+            textDocument = { completion = { editsNearCursor = true } },
+            offsetEncoding = { "utf-8", "utf-16" },
+        },
+        on_init = function(client, result)
+            if result.offsetEncoding then
+                client.offset_encoding = result.offsetEncoding
+            end
+        end,
         on_attach = function(client)
             if not client.config.root_dir then
                 return
@@ -964,21 +1010,29 @@ do -- setup lsp servers ------------------------------------------------
                 end))
             end)
         end,
-    }
+    })
 
-    lspconfig.lua_ls.setup {
-        capabilities = capabilities,
-        filetypes = { "lua" }
-    }
+    vim.lsp.config('lua_ls', {
+        cmd = { "lua-language-server" },
+        filetypes = { "lua" },
+        root_markers = { ".luarc.json", ".luarc.jsonc", ".luacheckrc", ".stylua.toml", "stylua.toml", "selene.toml", "selene.yml", ".git" },
+    })
 
-    lspconfig.sourcekit.setup {
-        capabilities = capabilities,
+    vim.lsp.config('sourcekit', {
+        cmd = { "sourcekit-lsp" },
         filetypes = { "swift" },
-        root_dir = function(_)
-            return "/Users/iaroslav.erokhin/Documents/Check24/ios-pod-mobile-sim"
-        end
-    }
+        root_dir = "/Users/iaroslav.erokhin/Documents/Check24/ios-pod-mobile-sim",
+        capabilities = {
+            workspace = { didChangeWatchedFiles = { dynamicRegistration = true } },
+            textDocument = { diagnostic = { dynamicRegistration = true, relatedDocumentSupport = true } },
+        },
+    })
 
+    enable_lsp('rust_analyzer')
+    enable_lsp('ols')
+    enable_lsp('clangd')
+    enable_lsp('lua_ls')
+    enable_lsp('sourcekit')
 end -- setup lsp servers
 
 -- Setup float diagnostic windows behaviour
@@ -1059,8 +1113,8 @@ cmp.setup({
 -- Function to create and setup a new git branch with different local and remote names
 vim.api.nvim_create_user_command('Branch', function()
     local current_branch = vim.fn.system("git rev-parse --abbrev-ref HEAD"):gsub("%s+", "")
-    if current_branch ~= "master" and current_branch ~= "main" then
-        local choice = vim.fn.confirm("You are on '" .. current_branch .. "', not master or main. Continue?", "&Yes\n&No", 2)
+    if current_branch ~= "master" and current_branch ~= "main" and current_branch ~= "development" then
+        local choice = vim.fn.confirm("You are on '" .. current_branch .. "', not master, main or development. Continue?", "&Yes\n&No", 2)
         if choice ~= 1 then
             print("Branch creation cancelled")
             return
