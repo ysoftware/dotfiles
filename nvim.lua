@@ -855,82 +855,97 @@ do -- setup lsp servers ------------------------------------------------
 
     -- work config
     if vim.fn.has('mac') == 1 then
-
         -- xcodebuild
         local ok, xcodebuild = pcall(require, 'xcodebuild')
         if ok and xcodebuild then
             xcodebuild.setup({ auto_save = false })
         end
+    end -- if macos
 
-        -- linter + downgrade errors to warnings
-        local ok, lint = pcall(require, 'lint')
-        if ok and lint then
-            lint.linters_by_ft = {
-                javascript = { "eslint" },
-                typescript = { "eslint" },
-                -- swift      = { "swiftlint" },
-            }
-            lint.linters.eslint = require("lint.util").wrap(lint.linters.eslint, function(diagnostic)
-                if diagnostic.source and diagnostic.source:lower() == "eslint" then
-                    diagnostic.severity = vim.diagnostic.severity.WARN
-                end
-                return diagnostic
-            end)
-            lint.linters.swiftlint = require("lint.util").wrap(lint.linters.swiftlint, function(diagnostic)
-                if diagnostic.source and diagnostic.source:lower() == "swiftlint" then
-                    diagnostic.severity = vim.diagnostic.severity.WARN
-                end
-                return diagnostic
-            end)
-        end
-
-        -- php lsp (phpactor - free alternative with code actions)
-        vim.lsp.config('phpactor', {
-            cmd = { "phpactor", "language-server" },
-            filetypes = { "php" },
-            root_markers = { "composer.json", ".git" },
-            workspace_required = true,
-            init_options = {
-                ["language_server_configuration.auto_config"] = false,
-                ["language_server_phpstan.enabled"] = false,
-                ["language_server_psalm.enabled"] = false,
-            },
-            handlers = {
-                ["window/showMessage"] = function() end,
-            },
-        })
-
-        -- angular lsp
-        vim.lsp.config('ts_ls', {
-            cmd = { vim.fn.expand("~/.serena/language_servers/static/rewrite-web-lsp/node_modules/.bin/typescript-language-server"), "--stdio" },
-            filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
-            root_markers = { "tsconfig.json", "jsconfig.json", "package.json", ".git" },
-            init_options = {
-                hostInfo = "neovim",
-                tsserver = {
-                    path = vim.fn.expand("~/.serena/language_servers/static/rewrite-web-lsp/node_modules/typescript/lib/tsserver.js"),
-                },
-                preferences = {
-                    importModuleSpecifier = "non-relative",
-                    importModuleSpecifierPreference = "non-relative",
-                },
-            },
-        })
-
-        vim.lsp.config('angularls', {
-            cmd = function(dispatchers, config)
-                local project_library_path = config.root_dir .. "/node_modules"
-                return vim.lsp.rpc.start({ "ngserver", "--stdio", "--tsProbeLocations", project_library_path, "--ngProbeLocations", project_library_path }, dispatchers)
-            end,
-            filetypes = { "typescript", "typescriptreact", "html", "htmlangular" },
-            root_markers = { "angular.json" },
-            workspace_required = true,
-        })
-
-        enable_lsp('phpactor')
-        enable_lsp('ts_ls')
-        enable_lsp('angularls', 'ngserver')
+    -- linter + downgrade errors to warnings
+    local ok, lint = pcall(require, 'lint')
+    if ok and lint then
+        lint.linters_by_ft = {
+            javascript = { "eslint" },
+            typescript = { "eslint" },
+            -- swift      = { "swiftlint" },
+        }
+        lint.linters.eslint = require("lint.util").wrap(lint.linters.eslint, function(diagnostic)
+            if diagnostic.source and diagnostic.source:lower() == "eslint" then
+                diagnostic.severity = vim.diagnostic.severity.WARN
+            end
+            return diagnostic
+        end)
+        lint.linters.swiftlint = require("lint.util").wrap(lint.linters.swiftlint, function(diagnostic)
+            if diagnostic.source and diagnostic.source:lower() == "swiftlint" then
+                diagnostic.severity = vim.diagnostic.severity.WARN
+            end
+            return diagnostic
+        end)
     end
+
+    -- php lsp (phpactor - free alternative with code actions)
+    vim.lsp.config('phpactor', {
+        cmd = { "phpactor", "language-server" },
+        filetypes = { "php" },
+        root_markers = { "composer.json", ".git" },
+        workspace_required = true,
+        init_options = {
+            ["language_server_configuration.auto_config"] = false,
+            ["language_server_phpstan.enabled"] = false,
+            ["language_server_psalm.enabled"] = false,
+        },
+        handlers = {
+            ["window/showMessage"] = function() end,
+        },
+    })
+    enable_lsp('phpactor')
+
+    -- angular lsp
+    vim.lsp.config('ts_ls', {
+        cmd = { vim.fn.expand("~/.serena/language_servers/static/rewrite-web-lsp/node_modules/.bin/typescript-language-server"), "--stdio" },
+        filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+        root_markers = { "tsconfig.json", "jsconfig.json", "package.json", ".git" },
+        init_options = {
+            hostInfo = "neovim",
+            tsserver = {
+                path = vim.fn.expand("~/.serena/language_servers/static/rewrite-web-lsp/node_modules/typescript/lib/tsserver.js"),
+            },
+            preferences = {
+                importModuleSpecifier = "non-relative",
+                importModuleSpecifierPreference = "non-relative",
+            },
+        },
+    })
+    enable_lsp('ts_ls')
+
+    vim.lsp.config('angularls', {
+        cmd = function(dispatchers, config)
+            local project_library_path = config.root_dir .. "/node_modules"
+            return vim.lsp.rpc.start({ "ngserver", "--stdio", "--tsProbeLocations", project_library_path, "--ngProbeLocations", project_library_path }, dispatchers)
+        end,
+        filetypes = { "typescript", "typescriptreact", "html", "htmlangular" },
+        root_markers = { "angular.json" },
+        workspace_required = true,
+    })
+    enable_lsp('angularls', 'ngserver')
+
+    -- vanilla html/js
+    vim.lsp.config('html', {
+        cmd = { 'vscode-html-language-server', '--stdio' },
+        filetypes = { 'html' },
+        root_markers = { 'package.json', '.git' },
+        workspace_required = false,
+        init_options = {
+            provideFormatter = true,
+            embeddedLanguages = {
+                css = true,
+                javascript = true,
+            },
+            configurationSection = { 'html', 'css', 'javascript' },
+        },
+    })
+    enable_lsp('html')
 
     vim.lsp.config('rust_analyzer', {
         cmd = { "rust-analyzer" },
@@ -968,6 +983,7 @@ do -- setup lsp servers ------------------------------------------------
                 end))
         end,
     })
+    enable_lsp('rust_analyzer')
 
     vim.lsp.config('ols', {
         cmd = { "ols" },
@@ -978,6 +994,7 @@ do -- setup lsp servers ------------------------------------------------
             if root then on_dir(root) end
         end,
     })
+    enable_lsp('ols')
 
     local watcher = vim.uv.new_fs_event()
     local timer = vim.uv.new_timer()
@@ -1011,12 +1028,14 @@ do -- setup lsp servers ------------------------------------------------
             end)
         end,
     })
+    enable_lsp('clangd')
 
     vim.lsp.config('lua_ls', {
         cmd = { "lua-language-server" },
         filetypes = { "lua" },
         root_markers = { ".luarc.json", ".luarc.jsonc", ".luacheckrc", ".stylua.toml", "stylua.toml", "selene.toml", "selene.yml", ".git" },
     })
+    enable_lsp('lua_ls')
 
     vim.lsp.config('sourcekit', {
         cmd = { "sourcekit-lsp" },
@@ -1027,11 +1046,6 @@ do -- setup lsp servers ------------------------------------------------
             textDocument = { diagnostic = { dynamicRegistration = true, relatedDocumentSupport = true } },
         },
     })
-
-    enable_lsp('rust_analyzer')
-    enable_lsp('ols')
-    enable_lsp('clangd')
-    enable_lsp('lua_ls')
     enable_lsp('sourcekit')
 end -- setup lsp servers
 
