@@ -62,8 +62,9 @@ fi
 
 if [ -L "$GHOSTTY_OUT" ] && [ "$(readlink "$GHOSTTY_OUT")" = "$GHOSTTY_TARGET" ]; then
     echo "${UP_TO_DATE_MSG}${GHOSTTY_OUT}"
-elif [ "$GHOSTTY_TARGET" != "$GHOSTTY_IN" ] && [ -L "$GHOSTTY_OUT" ] &&
-    [ "$(readlink "$GHOSTTY_OUT")" = "$GHOSTTY_IN" ]; then
+elif [ -L "$GHOSTTY_OUT" ] &&
+    { [ "$(readlink "$GHOSTTY_OUT")" = "$GHOSTTY_IN" ] ||
+      [ "$(readlink "$GHOSTTY_OUT")" = "$GHOSTTY_IN/linux" ]; }; then
     ln -sfn "$GHOSTTY_TARGET" "$GHOSTTY_OUT" && echo "$GHOSTTY_TARGET -> $GHOSTTY_OUT"
 elif [ -e "$GHOSTTY_OUT" ] || [ -L "$GHOSTTY_OUT" ]; then
     echo "Up to date: $GHOSTTY_OUT" >&2

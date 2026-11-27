@@ -1,0 +1,31 @@
+theme = light:yaroscheme-light,dark:yaroscheme-dark
+
+font-family = Fira Code
+font-style = Retina
+font-size = 16
+font-feature = +calt, +liga
+
+cursor-style = block
+cursor-style-blink =
+shell-integration-features = no-cursor
+
+window-width = 80
+window-height = 25
+window-padding-x = 0
+window-padding-y = 0
+window-new-tab-position = current
+unfocused-split-opacity = 0.923
+
+working-directory = home
+window-inherit-working-directory = true
+tab-inherit-working-directory = true
+split-inherit-working-directory = true
+term = xterm-256color
+confirm-close-surface = true
+bell-features = no-system,no-audio,border
+clipboard-paste-protection = false
+
+keybind = alt+arrow_left=esc:b
+keybind = alt+arrow_right=esc:f
+keybind = alt+backspace=text:\x1b\x7f
+keybind = alt+delete=esc:d
