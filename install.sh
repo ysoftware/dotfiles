@@ -66,6 +66,18 @@ elif [ -L "$GHOSTTY_OUT" ] &&
     { [ "$(readlink "$GHOSTTY_OUT")" = "$GHOSTTY_IN" ] ||
       [ "$(readlink "$GHOSTTY_OUT")" = "$GHOSTTY_IN/linux" ]; }; then
     ln -sfn "$GHOSTTY_TARGET" "$GHOSTTY_OUT" && echo "$GHOSTTY_TARGET -> $GHOSTTY_OUT"
+elif [ "$GHOSTTY_TARGET" = "$GHOSTTY_IN/linux" ] &&
+    [ -d "$GHOSTTY_OUT" ] && [ ! -L "$GHOSTTY_OUT" ] &&
+    cmp -s "$GHOSTTY_TARGET/config.ghostty" "$GHOSTTY_OUT/config.ghostty"; then
+    # A copied Linux config still needs its shared settings and theme files.
+    if mkdir -p "$GHOSTTY_OUT/themes"; then
+        for GHOSTTY_FILE in shared.ghostty themes/yaroscheme-light themes/yaroscheme-dark; do
+            if [ ! -e "$GHOSTTY_OUT/$GHOSTTY_FILE" ] && [ ! -L "$GHOSTTY_OUT/$GHOSTTY_FILE" ]; then
+                ln -s "$GHOSTTY_IN/$GHOSTTY_FILE" "$GHOSTTY_OUT/$GHOSTTY_FILE" &&
+                    echo "$GHOSTTY_IN/$GHOSTTY_FILE -> $GHOSTTY_OUT/$GHOSTTY_FILE"
+            fi
+        done
+    fi
 elif [ -e "$GHOSTTY_OUT" ] || [ -L "$GHOSTTY_OUT" ]; then
     echo "Up to date: $GHOSTTY_OUT" >&2
 elif mkdir -p "$(dirname "$GHOSTTY_OUT")" && ln -s "$GHOSTTY_TARGET" "$GHOSTTY_OUT"; then
