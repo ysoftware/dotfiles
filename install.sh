@@ -55,13 +55,20 @@ fi
 # symlink Ghostty config directory (includes themes)
 GHOSTTY_IN="$DIR/ghostty"
 GHOSTTY_OUT="${XDG_CONFIG_HOME:-$HOME/.config}/ghostty"
+GHOSTTY_TARGET="$GHOSTTY_IN"
+if [ "$(uname -s)" != Darwin ]; then
+    GHOSTTY_TARGET="$GHOSTTY_IN/linux"
+fi
 
-if [ -L "$GHOSTTY_OUT" ] && [ "$(readlink "$GHOSTTY_OUT")" = "$GHOSTTY_IN" ]; then
+if [ -L "$GHOSTTY_OUT" ] && [ "$(readlink "$GHOSTTY_OUT")" = "$GHOSTTY_TARGET" ]; then
     echo "${UP_TO_DATE_MSG}${GHOSTTY_OUT}"
+elif [ "$GHOSTTY_TARGET" != "$GHOSTTY_IN" ] && [ -L "$GHOSTTY_OUT" ] &&
+    [ "$(readlink "$GHOSTTY_OUT")" = "$GHOSTTY_IN" ]; then
+    ln -sfn "$GHOSTTY_TARGET" "$GHOSTTY_OUT" && echo "$GHOSTTY_TARGET -> $GHOSTTY_OUT"
 elif [ -e "$GHOSTTY_OUT" ] || [ -L "$GHOSTTY_OUT" ]; then
     echo "Skipping Ghostty: $GHOSTTY_OUT already exists" >&2
-elif mkdir -p "$(dirname "$GHOSTTY_OUT")" && ln -s "$GHOSTTY_IN" "$GHOSTTY_OUT"; then
-    echo "$GHOSTTY_IN -> $GHOSTTY_OUT"
+elif mkdir -p "$(dirname "$GHOSTTY_OUT")" && ln -s "$GHOSTTY_TARGET" "$GHOSTTY_OUT"; then
+    echo "$GHOSTTY_TARGET -> $GHOSTTY_OUT"
 fi
 
 # symlink palette (on GNOME)
