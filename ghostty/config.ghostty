@@ -1,0 +1,41 @@
+theme = light:yaroscheme-light,dark:yaroscheme-dark
+
+font-family = Fira Code
+font-style = Retina
+font-size = 16
+font-feature = +calt, +liga
+
+cursor-style = block
+cursor-style-blink =
+shell-integration-features = no-cursor
+
+window-width = 80
+window-height = 25
+window-padding-x = 0
+window-padding-y = 0
+window-new-tab-position = current
+macos-titlebar-style = native
+macos-titlebar-proxy-icon = hidden
+unfocused-split-opacity = 0.923
+vt-window-resize-allowed = false
+
+working-directory = home
+window-inherit-working-directory = true
+tab-inherit-working-directory = true
+split-inherit-working-directory = true
+term = xterm-256color
+scrollback-limit-bytes = unlimited
+scrollback-limit-lines = unlimited
+confirm-close-surface = true
+bell-features = no-system,no-audio,border
+clipboard-paste-protection = false
+
+# Keep Option for macOS character input except for the explicit shortcuts.
+macos-option-as-alt = false
+keybind = super+arrow_left=text:\x01
+keybind = super+arrow_right=text:\x05
+keybind = super+backspace=text:\x15
+keybind = alt+arrow_left=esc:b
+keybind = alt+arrow_right=esc:f
+keybind = alt+backspace=text:\x1b\x7f
+keybind = alt+delete=esc:d

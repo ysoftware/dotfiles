@@ -1,6 +1,13 @@
 # Disable stty for non-interactive sessions; this fixes scp (copy file via ssh)
 [[ $- != *i* ]] && return
 
+# Ghostty does not automatically inject shell integration into macOS's system Bash.
+if [[ $OSTYPE == darwin* && $BASH == /bin/bash && ${TERM_PROGRAM:-} == ghostty &&
+    -n ${GHOSTTY_RESOURCES_DIR:-} && -r "$GHOSTTY_RESOURCES_DIR/shell-integration/bash/ghostty.bash" ]] &&
+    ! declare -F __ghostty_precmd >/dev/null; then
+    source "$GHOSTTY_RESOURCES_DIR/shell-integration/bash/ghostty.bash"
+fi
+
 # General bash settings
 export BASH_SILENCE_DEPRECATION_WARNING=1 # Hide "The default interactive shell is now ..." message
 unset POSIXLY_CORRECT # a setting for grep and other tools

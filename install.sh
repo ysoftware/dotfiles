@@ -52,6 +52,18 @@ else
     echo "${UP_TO_DATE_MSG}${BASHRC_OUT}"
 fi
 
+# symlink Ghostty config directory (includes themes)
+GHOSTTY_IN="$DIR/ghostty"
+GHOSTTY_OUT="${XDG_CONFIG_HOME:-$HOME/.config}/ghostty"
+
+if [ -L "$GHOSTTY_OUT" ] && [ "$(readlink "$GHOSTTY_OUT")" = "$GHOSTTY_IN" ]; then
+    echo "${UP_TO_DATE_MSG}${GHOSTTY_OUT}"
+elif [ -e "$GHOSTTY_OUT" ] || [ -L "$GHOSTTY_OUT" ]; then
+    echo "Skipping Ghostty: $GHOSTTY_OUT already exists" >&2
+elif mkdir -p "$(dirname "$GHOSTTY_OUT")" && ln -s "$GHOSTTY_IN" "$GHOSTTY_OUT"; then
+    echo "$GHOSTTY_IN -> $GHOSTTY_OUT"
+fi
+
 # symlink palette (on GNOME)
 PALETTE_IN="$DIR/ptyxis.palette"
 PALETTE_DIR="$HOME/.local/share/org.gnome.Ptyxis/palettes"

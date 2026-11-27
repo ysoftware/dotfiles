@@ -1,0 +1,26 @@
+# From iterm_yaroscheme.json, with Display P3 colors converted to sRGB.
+background = #ffffff
+foreground = #000000
+cursor-color = #000000
+cursor-text = #ffffff
+selection-background = #3f4f5a
+selection-foreground = #000000
+bold-color = #1a1a1a
+faint-opacity = 0.539
+
+palette = 0=#b2b2b2
+palette = 1=#b43c2a
+palette = 2=#007400
+palette = 3=#c7c400
+palette = 4=#2744c7
+palette = 5=#c040be
+palette = 6=#00c5c7
+palette = 7=#ffffff
+palette = 8=#686868
+palette = 9=#dd7975
+palette = 10=#64c075
+palette = 11=#ece100
+palette = 12=#a7abf2
+palette = 13=#e17ee1
+palette = 14=#60fdff
+palette = 15=#ffffff
