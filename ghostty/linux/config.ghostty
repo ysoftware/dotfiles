@@ -1,5 +1,6 @@
 config-file = shared.ghostty
 
+font-size = 13
 scrollback-limit = 18446744073709551615
 
 # Use Super for Ghostty shortcuts. Leave Ctrl+C and Ctrl+V to the terminal.
