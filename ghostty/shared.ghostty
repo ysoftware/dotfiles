@@ -29,5 +29,5 @@ keybind = alt+arrow_right=esc:f
 keybind = alt+backspace=text:\x1b\x7f
 keybind = alt+delete=esc:d
 
-keybind = super+shift+arrow_left=move_tab:-1
-keybind = super+shift+arrow_right=move_tab:1
+keybind = ctrl+shift+arrow_left=move_tab:-1
+keybind = ctrl+shift+arrow_right=move_tab:1
