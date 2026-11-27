@@ -66,7 +66,7 @@ elif [ "$GHOSTTY_TARGET" != "$GHOSTTY_IN" ] && [ -L "$GHOSTTY_OUT" ] &&
     [ "$(readlink "$GHOSTTY_OUT")" = "$GHOSTTY_IN" ]; then
     ln -sfn "$GHOSTTY_TARGET" "$GHOSTTY_OUT" && echo "$GHOSTTY_TARGET -> $GHOSTTY_OUT"
 elif [ -e "$GHOSTTY_OUT" ] || [ -L "$GHOSTTY_OUT" ]; then
-    echo "Skipping Ghostty: $GHOSTTY_OUT already exists" >&2
+    echo "Up to date: $GHOSTTY_OUT" >&2
 elif mkdir -p "$(dirname "$GHOSTTY_OUT")" && ln -s "$GHOSTTY_TARGET" "$GHOSTTY_OUT"; then
     echo "$GHOSTTY_TARGET -> $GHOSTTY_OUT"
 fi
